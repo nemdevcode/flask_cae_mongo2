@@ -1,0 +1,62 @@
+{% extends "_base.html" %}
+
+{% block main %}
+    <div class="d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card shadow bg-dark text-white" style="min-width: 500px;">
+            <div class="card-body">
+                <h4 class="card-title text-center">Registro de Usuario</h4>
+                <div class="card-body">
+                    <form action="{{ url_for('registrate') }}" method="post">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="nombre_usuario" name="nombre_usuario" required>
+                            <label for="floatingInput">Nombre:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="cif_dni" name="cif_dni" required>
+                            <label for="floatingInput">CIF/DNI:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="domicilio" name="domicilio" required>
+                            <label for="floatingInput">Dirección:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="codigo_postal" name="codigo_postal" required>
+                            <label for="floatingInput">Código Postal:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="poblacion" name="poblacion" required>
+                            <label for="floatingInput">Población:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="provincia" name="provincia" required>
+                            <label for="floatingInput">Provincia:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="telefono" name="telefono" required>
+                            <label for="floatingInput">Teléfono:</label>    
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="email" name="email" required>
+                            <label for="floatingInput">Email:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="password" name="password" required>
+                            <label for="floatingInput">Contraseña:</label>
+                        </div>
+                        {% if mensaje_error %}
+                            <div class="alert alert-danger" role="alert">
+                                {{ mensaje_error }}
+                            </div>
+                        {% endif %}
+                        <div class="d-flex justify-content-end align-items-center gap-2">
+                            <a href="{{ url_for('index') }}" type="button" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Registrarse</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+                            
