@@ -1,9 +1,5 @@
 from flask import Blueprint
-from core.titulares import (
-    usuarios_gestores_titulares_vista,
-    crear_gestores_titulares_vista,
-    actualizar_gestores_titulares_vista,
-    eliminar_gestores_titulares_vista,
+from core.usuarios_titulares import (
     usuarios_titulares_vista,
     usuarios_titulares_gestor_vista
 )

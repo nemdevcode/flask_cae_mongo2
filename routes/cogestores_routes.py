@@ -1,12 +1,10 @@
 from flask import Blueprint
-from core.cogestores import (
-    usuarios_gestores_cogestores_vista,
-    crear_gestores_cogestores_vista,
-    actualizar_gestores_cogestores_vista,
-    eliminar_gestores_cogestores_vista,
+
+from core.usuarios_cogestores import (
     usuarios_cogestores_vista,
     usuarios_cogestores_gestor_vista
 )
+
 from core._decoradores import login_requerido
 
 # Crear el Blueprint para las rutas de cogestores

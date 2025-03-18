@@ -1,5 +1,9 @@
 from flask import Blueprint
-from core.usuarios import usuarios_vista, actualizar_usuario_vista
+from core.usuarios import (
+    usuarios_vista,
+    usuario_actualizar_vista
+)
+
 from core._decoradores import login_requerido
 
 # Crear el Blueprint para las rutas de usuarios
@@ -13,5 +17,5 @@ def usuarios():
 
 @usuarios_bp.route('/usuarios/actualizar', methods=['GET', 'POST'])
 @login_requerido
-def actualizar_usuario():
-    return actualizar_usuario_vista() 
+def usuario_actualizar():
+    return usuario_actualizar_vista() 

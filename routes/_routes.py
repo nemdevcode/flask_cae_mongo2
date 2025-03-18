@@ -1,12 +1,10 @@
 from flask import render_template, session, redirect, url_for, flash, request
 
-from routes.routes_centros import centros_bp
-from routes.routes_cogestores import cogestores_bp
-from routes.routes_usuarios import usuarios_bp
-from routes.routes_titulares import titulares_bp
-from routes.routes_gestores import gestores_bp
-
-from core._decoradores import login_requerido
+from routes.centros_routes import centros_bp
+from routes.cogestores_routes import cogestores_bp
+from routes.gestores_routes import gestores_bp
+from routes.titulares_routes import titulares_bp
+from routes.usuarios_routes import usuarios_bp
 
 from core.login import login_vista
 from core.registrate import registrate_vista
@@ -32,16 +30,6 @@ def rutas(app):
     @app.route('/registrate', methods=['GET', 'POST'])
     def registrate():
         return registrate_vista()
-
-    @app.route('/usuarios/titulares')
-    @login_requerido
-    def titulares():
-        return render_template('titulares.html')
-
-    @app.route('/usuarios/gestores/centros')
-    @login_requerido
-    def gestores_centros():
-        return render_template('centros.html')
 
     @app.route('/logout')
     def logout():

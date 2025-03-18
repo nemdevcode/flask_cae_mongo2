@@ -17,31 +17,12 @@
             <div class="d-grid gap-2 d-md-flex justify-content-md-end align-items-center">
                 <span class="my-auto">Ir a usuario:</span>
                 <div class="btn-group" role="group" aria-label="Navegación entre tipos de usuarios">
-                    <a href="{{ url_for('cogestores.usuarios_gestores_cogestores') }}" class="btn btn-outline-primary">Cogestor</a>
-                    
-                    <button 
-                        type="button" 
-                        class="btn btn-outline-primary" 
-                        onclick="window.location.href='{{ url_for('titulares.usuarios_gestores_titulares') }}'"> 
-                        <!-- Error del linter, es normal en archivos HTML con Jinja2 (linter no entiende la sintaxis de las plantillas Jinja2), el código funcionará correctamente -->
-                        Titular
-                    </button>
-                    <button 
-                        type="button" 
-                        class="btn btn-outline-primary" 
-                        onclick="window.location.href='{{ url_for('centros.usuarios_gestores_centros') }}'"> 
-                        <!-- Error del linter, es normal en archivos HTML con Jinja2 (linter no entiende la sintaxis de las plantillas Jinja2), el código funcionará correctamente -->
-                        Centro
-                    </button>
-                    <button 
-                        type="button" 
-                        class="btn btn-outline-primary" 
-                        onclick=""> 
-                        <!-- Error del linter, es normal en archivos HTML con Jinja2 (linter no entiende la sintaxis de las plantillas Jinja2), el código funcionará correctamente -->
-                        Contrata
-                    </button>
+                    <a href="{{ url_for('gestores.gestores_usuarios_cogestores') }}" class="btn btn-outline-primary">Cogestores</a>
+                    <a href="{{ url_for('gestores.gestores_usuarios_titulares') }}" class="btn btn-outline-primary">Titulares</a>
+                    <a href="{{ url_for('gestores.gestores_usuarios_centros') }}" class="btn btn-outline-primary">Centros</a>
+                    <a href="{{ url_for('gestores.gestores_usuarios_contratas') }}" class="btn btn-outline-primary">Contratas</a>
                 </div>
-                <a href="{{ url_for('gestores_centros') }}" class="btn btn-warning">Centros</a>
+                <a href="{{ url_for('gestores.gestores_centros') }}" class="btn btn-warning">Centros</a>
                 <a href="{{ url_for('logout') }}" class="btn btn-outline-dark">Cerrar sesión</a>
             </div>
         </div>
