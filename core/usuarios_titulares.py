@@ -204,10 +204,143 @@ def gestores_usuarios_titulares_crear_vista():
                                 form_data=request.form)
 
 def gestores_usuarios_titulares_actualizar_vista():
-    return render_template('gestores_usuarios_titulares_actualizar.html')
+    
+    try:
+        # Obtener el ID del gestor actual
+        gestor_id = session.get('usuario_id')
+        if not gestor_id:
+            return redirect(url_for('login', mensaje_error='No hay gestor autenticado'))
+
+        # Obtener el ID del titular a actualizar
+        titular_id = request.args.get('titular_id')
+        if not titular_id:
+            return redirect(url_for('gestores.gestores_usuarios_titulares', 
+                                  mensaje_error='ID de titular no proporcionado'))
+
+        # Verificar que el titular pertenece al gestor actual
+        titular = db.usuarios_titulares.find_one({
+            '_id': ObjectId(titular_id),
+            'gestor_id': ObjectId(gestor_id)
+        })
+
+        if not titular:
+            return redirect(url_for('gestores.gestores_usuarios_titulares', 
+                                  mensaje_error='Titular no encontrado o no pertenece a este gestor'))
+
+        # Obtener la información del usuario
+        usuario = db.usuarios.find_one({'_id': titular['usuario_id']})
+        if not usuario:
+            return redirect(url_for('gestores.gestores_usuarios_titulares', 
+                                  mensaje_error='Usuario no encontrado'))
+
+        # Preparar los datos para el template
+        titular_data = {
+            '_id': titular['_id'],
+            'titular_info': {
+                'alias': titular['alias'],
+                'estado': titular['estado']
+            },
+            'email': usuario['email'],
+            'password': usuario['password']
+        }
+
+        if request.method == 'GET':
+            return render_template('gestores/titulares/actualizar.html', titular=titular_data)
+
+        if request.method == 'POST':
+            # Obtener datos del formulario
+            alias = request.form.get('alias', '').strip()
+            email = request.form.get('email', '').strip().lower()
+            password = request.form.get('password', '').strip()
+            password_confirm = request.form.get('password_confirm', '').strip()
+            estado = request.form.get('estado', 'activo')
+
+            if password != password_confirm:
+                return render_template('gestores/titulares/actualizar.html',
+                                    titular=titular_data,
+                                    mensaje_error='Las contraseñas no coinciden')
+
+            # Verificar si el alias ya existe para este gestor (excluyendo el titular actual)
+            if db.usuarios_titulares.find_one({
+                'alias': alias,
+                'gestor_id': ObjectId(gestor_id),
+                '_id': {'$ne': ObjectId(titular_id)}
+            }):
+                return render_template('gestores/titulares/actualizar.html',
+                                    titular=titular_data,
+                                    mensaje_error='El alias ya está en uso para este gestor')
+
+            # Verificar si el email ya existe en otro usuario
+            if email != usuario['email']:
+                if db.usuarios.find_one({'email': email}):
+                    return render_template('gestores/titulares/actualizar.html',
+                                        titular=titular_data,
+                                        mensaje_error='El email ya está en uso por otro usuario')
+
+            # Actualizar el usuario
+            db.usuarios.update_one(
+                {'_id': usuario['_id']},
+                {
+                    '$set': {
+                        'email': email,
+                        'fecha_modificacion': datetime.now()
+                    }
+                }
+            )
+
+            # Actualizar el titular
+            db.usuarios_titulares.update_one(
+                {'_id': ObjectId(titular_id)},
+                {
+                    '$set': {
+                        'alias': alias,
+                        'estado': estado,
+                        'fecha_modificacion': datetime.now()
+                    }
+                }
+            )
+
+            return redirect(url_for('gestores.gestores_usuarios_titulares', 
+                                  mensaje_ok='Titular actualizado exitosamente'))
+
+    except Exception as e:
+        return render_template('gestores/titulares/actualizar.html',
+                             titular=titular_data if 'titular_data' in locals() else None,
+                             mensaje_error=f'Error al actualizar el titular: {str(e)}')
 
 def gestores_usuarios_titulares_eliminar_vista():
-    return render_template('gestores_usuarios_titulares_eliminar.html')
+    
+    try:
+        # Obtener el ID del gestor actual
+        gestor_id = session.get('usuario_id')
+        if not gestor_id:
+            return redirect(url_for('login', mensaje_error='No hay gestor autenticado'))
+
+        # Obtener el ID del titular a eliminar
+        titular_id = request.args.get('titular_id')
+        if not titular_id:
+            return redirect(url_for('gestores.gestores_usuarios_titulares', 
+                                  mensaje_error='ID de titular no proporcionado'))
+
+        # Verificar que el titular pertenece al gestor actual
+        titular = db.usuarios_titulares.find_one({
+            '_id': ObjectId(titular_id),
+            'gestor_id': ObjectId(gestor_id)
+        })
+
+        if not titular:
+            return redirect(url_for('gestores.gestores_usuarios_titulares', 
+                                  mensaje_error='Titular no encontrado o no pertenece a este gestor'))
+
+        # Eliminar el titular
+        db.usuarios_titulares.delete_one({'_id': ObjectId(titular_id)})
+
+        return redirect(url_for('gestores.gestores_usuarios_titulares', 
+                              mensaje_ok='Titular eliminado exitosamente'))
+
+    except Exception as e:
+        return redirect(url_for('gestores.gestores_usuarios_titulares', 
+                              mensaje_error=f'Error al eliminar el titular: {str(e)}'))
 
 def usuarios_titulares_vista():
     return render_template('usuarios_titulares.html')

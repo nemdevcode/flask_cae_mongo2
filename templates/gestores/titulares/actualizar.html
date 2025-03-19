@@ -1,0 +1,78 @@
+{% extends "_base.html" %}
+
+{% block main %}
+    <div class="d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card shadow bg-dark text-white" style="min-width: 500px;">
+            <div class="card-body">
+                <h4 class="card-title text-center">Actualizar Titular</h4>
+                <div class="card-body">
+                    <form action="{{ url_for('gestores.gestores_usuarios_titulares_actualizar', titular_id=titular._id) }}" method="post">
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="alias" 
+                                   name="alias" 
+                                   value="{{ titular.titular_info.alias }}"
+                                   required>
+                            <label for="alias">Alias:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="email" 
+                                   name="email" 
+                                   value="{{ titular.email }}"
+                                   required>
+                            <label for="email">Email:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="password" 
+                                   name="password" 
+                                   value="{{ titular.password }}"
+                                   required>
+                            <label for="password">Contraseña:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="password_confirm" 
+                                   name="password_confirm" 
+                                   value="{{ titular.password }}"
+                                   required>
+                            <label for="password_confirm">Confirmar contraseña:</label>
+                        </div>
+                        <div class="btn-group text-center w-100 mb-3" role="group" aria-label="Basic radio toggle button group">
+                            <input type="radio" 
+                                   class="btn-check" 
+                                   name="estado" 
+                                   id="estado-activo{{ titular._id }}" 
+                                   value="activo" 
+                                   {% if titular.titular_info.estado == 'activo' %}checked{% endif %}>
+                            <label class="btn btn-outline-success" for="estado-activo{{ titular._id }}">Activo</label> 
+                            
+                            <input type="radio" 
+                                   class="btn-check" 
+                                   name="estado" 
+                                   id="estado-inactivo{{ titular._id }}" 
+                                   value="inactivo"
+                                   {% if titular.titular_info.estado == 'inactivo' %}checked{% endif %}>
+                            <label class="btn btn-outline-secondary" for="estado-inactivo{{ titular._id }}">Inactivo</label>
+                        </div>
+                        {% if mensaje_error %}
+                            <div class="alert alert-danger alert-dismissible fade show mt-3 text-center" role="alert">
+                                {{ mensaje_error }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endif %}
+                        <div class="d-flex justify-content-end align-items-center gap-2">
+                            <a href="{{ url_for('gestores.gestores_usuarios_titulares') }}" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Actualizar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
