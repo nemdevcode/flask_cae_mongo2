@@ -21,6 +21,7 @@ def registrate_vista():
             telefono = request.form['telefono'].strip()
             email = request.form['email'].strip().lower()
             password = request.form['password'].strip()
+            password_confirm = request.form['password_confirm'].strip()
             fecha_alta = datetime.now()
             fecha_modificacion = datetime.now()
             fecha_baja = None
@@ -28,7 +29,13 @@ def registrate_vista():
             nombre_rol = 'gestor'
             descripcion = 'Gestor de coordinación'
 
-             # Listar todos los roles para ver qué hay en la base de datos
+            if password != password_confirm:
+                mensaje_error = "Las contraseñas no coinciden"
+                return render_template('registrate.html', 
+                                    mensaje_error=mensaje_error,
+                                    form_data=request.form)  # Enviamos los datos del formulario
+            
+            # Listar todos los roles para ver qué hay en la base de datos
             todos_roles = list(db.roles.find())
             # Verificar si el rol ya existe
             rol_existente = db.roles.find_one({'nombre_rol': nombre_rol})
@@ -57,15 +64,18 @@ def registrate_vista():
             usuario_rol_existente = db.usuarios_roles.find_one({'usuario_id': usuario_id, 'rol_id': rol_id})
             if usuario_rol_existente:
                 mensaje_error = "El email esta registrado debe utilizar otro email para registrarse"
-                return render_template('registrate.html', mensaje_error=mensaje_error)
+                return render_template('registrate.html', 
+                                    mensaje_error=mensaje_error,
+                                    form_data=request.form)  # Enviamos los datos del formulario
                 
             else:
                 usuario_rol = UsuariosRolesCollection(usuario_id, rol_id, fecha_alta, fecha_modificacion, fecha_baja, estado)
                 db.usuarios_roles.insert_one(usuario_rol.__dict__) # __dict__ -> Convierte todos los atributos de la clase en un diccionario
-                # return redirect(url_for('index'))
                 return redirect(url_for('login'))
         
         except Exception as e:
-            return f"Error al registrar el usuario: {e}"
+            return render_template('registrate.html', 
+                                mensaje_error=f"Error al registrar el usuario: {e}",
+                                form_data=request.form)  # Enviamos los datos del formulario
         
     return render_template('registrate.html')

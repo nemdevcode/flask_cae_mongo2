@@ -44,11 +44,11 @@
                         {%- if rol == 'GESTOR' -%}
                         {{ url_for('gestores.gestores') }}
                         {%- elif rol == 'COGESTOR' -%}
-                        {{ url_for('gestores.gestores_usuarios_cogestores') }}
+                        {{ url_for('cogestores.cogestores') }}
                         {%- elif rol == 'TITULAR' -%}
-                        {{ url_for('gestores.gestores_usuarios_titulares') }}
+                        {{ url_for('titulares.titulares') }}
                         {%- elif rol == 'CENTRO' -%}
-                        {{ url_for('gestores.gestores_centros') }}
+                        {{ url_for('centros.centros') }}
                         {%- endif -%}"
                         class="btn btn-primary">
                       Ir a rol</a>

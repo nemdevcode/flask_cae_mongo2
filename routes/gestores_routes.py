@@ -55,7 +55,7 @@ Rutas para gestión de cogestores, funciones:
     - gestores_usuarios_cogestores_eliminar_vista()
 '''
 
-@gestores_bp.route('/usuarios/gestores/usuarios-cogestores', methods=['GET'])
+@gestores_bp.route('/usuarios/gestores/usuarios-cogestores', methods=['GET', 'POST'])
 @login_requerido
 def gestores_usuarios_cogestores():
     return gestores_usuarios_cogestores_vista()

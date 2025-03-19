@@ -8,44 +8,59 @@
                 <div class="card-body">
                     <form action="{{ url_for('registrate') }}" method="post">
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="nombre_usuario" name="nombre_usuario" required>
+                            <input type="text" class="form-control" id="nombre_usuario" name="nombre_usuario" 
+                                   value="{{ form_data.nombre_usuario if form_data else '' }}" required>
                             <label for="floatingInput">Nombre:</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="cif_dni" name="cif_dni" required>
+                            <input type="text" class="form-control" id="cif_dni" name="cif_dni" 
+                                   value="{{ form_data.cif_dni if form_data else '' }}" required>
                             <label for="floatingInput">CIF/DNI:</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="domicilio" name="domicilio" required>
+                            <input type="text" class="form-control" id="domicilio" name="domicilio" 
+                                   value="{{ form_data.domicilio if form_data else '' }}" required>
                             <label for="floatingInput">Dirección:</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="codigo_postal" name="codigo_postal" required>
+                            <input type="text" class="form-control" id="codigo_postal" name="codigo_postal" 
+                                   value="{{ form_data.codigo_postal if form_data else '' }}" required>
                             <label for="floatingInput">Código Postal:</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="poblacion" name="poblacion" required>
+                            <input type="text" class="form-control" id="poblacion" name="poblacion" 
+                                   value="{{ form_data.poblacion if form_data else '' }}" required>
                             <label for="floatingInput">Población:</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="provincia" name="provincia" required>
+                            <input type="text" class="form-control" id="provincia" name="provincia" 
+                                   value="{{ form_data.provincia if form_data else '' }}" required>
                             <label for="floatingInput">Provincia:</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="telefono" name="telefono" required>
+                            <input type="text" class="form-control" id="telefono" name="telefono" 
+                                   value="{{ form_data.telefono if form_data else '' }}" required>
                             <label for="floatingInput">Teléfono:</label>    
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="email" name="email" required>
+                            <input type="text" class="form-control" id="email" name="email" 
+                                   value="{{ form_data.email if form_data else '' }}" required>
                             <label for="floatingInput">Email:</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="password" name="password" required>
+                            <input type="password" class="form-control" id="password" name="password"
+                            value="{{ form_data.password if form_data else '' }}" required>
                             <label for="floatingInput">Contraseña:</label>
                         </div>
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="password_confirm" name="password_confirm"
+                            value="{{ form_data.password if form_data else '' }}" required>
+                            <label for="floatingInput">Confirmar contraseña:</label>
+                        </div>
                         {% if mensaje_error %}
-                            <div class="alert alert-danger" role="alert">
+                            <div class="alert alert-danger alert-dismissible fade show mt-3 text-center" role="alert">
                                 {{ mensaje_error }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
                         {% endif %}
                         <div class="d-flex justify-content-end align-items-center gap-2">

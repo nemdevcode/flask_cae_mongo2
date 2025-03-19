@@ -25,6 +25,18 @@
 {% endblock %}
 
 {% block main %}
+    {% if mensaje_ok %}
+        <div class="alert alert-success alert-dismissible fade show mt-3 text-center" role="alert">
+            {{ mensaje_ok }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endif %}
+    {% if mensaje_error %}
+        <div class="alert alert-danger alert-dismissible fade show mt-3 text-center" role="alert">
+            {{ mensaje_error }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endif %}
     <div class="container mt-5">
         <h3 class="text-center">Listado de COGESTORES </h3>
         <div class="d-flex justify-content-between">
@@ -44,7 +56,7 @@
                                     autocomplete="off"
                                     autofocus
                                     onfocus="this.setSelectionRange(this.value.length, this.value.length)">
-                                <label for="filtrar_cogestor">Filtrar cogestor</label>
+                                <label for="filtrar_cogestor">Escriba el nombre, alias, teléfono o email para filtrar</label>
                             </div>
                             
                             <!-- Filtro por estado -->
@@ -68,12 +80,12 @@
                                 <label class="btn btn-outline-success" for="activos">Activos</label>
     
                                 <input type="radio" 
-                                class="btn-check" 
-                                name="filtrar_estado" 
-                                id="inactivos" 
-                                value="inactivo"
-                                {% if filtrar_estado == 'inactivo' %}checked{% endif %}
-                                onchange="this.form.submit()">
+                                    class="btn-check" 
+                                    name="filtrar_estado" 
+                                    id="inactivos" 
+                                    value="inactivo"
+                                    {% if filtrar_estado == 'inactivo' %}checked{% endif %}
+                                    onchange="this.form.submit()">
                                 <label class="btn btn-outline-secondary" for="inactivos">Inactivos</label>
                             </div>
                             <!-- Boton para limpiar filtro -->
@@ -95,7 +107,7 @@
                     <th>Alias</th>
                     <th>Nombre</th>
                     <th>Teléfono</th>
-                    <th>Mail</th>
+                    <th>EMail</th>
                     <th>Estado</th>
                     <th>Acciones</th>
                 </tr>
@@ -118,10 +130,35 @@
                             <td class="text-center">
                                 <a href="{{ url_for('gestores.gestores_usuarios_cogestores_actualizar', cogestor_id=cogestor._id) }}" 
                                    class="btn btn-primary btn-sm">Editar</a>
-                                <a href="{{ url_for('gestores.gestores_usuarios_cogestores_eliminar', cogestor_id=cogestor._id) }}" 
-                                   class="btn btn-danger btn-sm">Eliminar</a>
+                                <button type="button" 
+                                        class="btn btn-danger btn-sm" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#confirmarEliminar{{ cogestor._id }}">
+                                    Eliminar
+                                </button>
                             </td>
                         </tr>
+                        <!-- Modal de confirmación para eliminar cogestor-->
+                        <div class="modal fade" id="confirmarEliminar{{ cogestor._id }}" tabindex="-1" aria-labelledby="confirmarEliminarLabel{{ cogestor._id }}" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content bg-dark text-white">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title text-danger text-center w-100" id="confirmarEliminarLabel{{ cogestor._id }}">Confirmar eliminación</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        ¿Está seguro que desea eliminar al cogestor "{{ cogestor.cogestor_info.alias }}"?
+                                        <br>
+                                        <strong>Nombre:</strong> {{ cogestor.nombre_usuario }}
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <a href="{{ url_for('gestores.gestores_usuarios_cogestores_eliminar', cogestor_id=cogestor._id) }}" 
+                                           class="btn btn-danger">Eliminar</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     {% endfor %}
                 {% else %}
                     <tr>

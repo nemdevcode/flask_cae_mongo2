@@ -16,14 +16,14 @@ def gestores_vista():
         
         if gestor:
             nombre_gestor = gestor.get('nombre_usuario')
-            return render_template('gestores/gestores.html', nombre_gestor=nombre_gestor)
+            return render_template('gestores/index.html', nombre_gestor=nombre_gestor)
         else:
             print("No se encontró el gestor")
             
     except Exception as e:
         print(f"Error al buscar gestor: {str(e)}")
     
-    return render_template('gestores/gestores.html')
+    return render_template('gestores/index.html')
 
 
 
