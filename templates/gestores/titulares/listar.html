@@ -8,7 +8,7 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
-            <a class="navbar-brand" href="#">CAE Accesible. Panel de gestión de cogestores de: {{ nombre_gestor }}</a>
+            <a class="navbar-brand" href="#">CAE Accesible. Panel de gestión de titulares de: {{ nombre_gestor }}</a>
             <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="/usuarios">Inicio</a>
@@ -38,23 +38,23 @@
         </div>
     {% endif %}
     <div class="container mt-5">
-        <h3 class="text-center">Listado de COGESTORES </h3>
+        <h3 class="text-center">Listado de TITULARES </h3>
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <!-- Formulario para filtrar cogestores -->
-            <form action="{{ url_for('gestores.gestores_usuarios_cogestores') }}" method="post" id="filtroForm" class="flex-grow-1 me-3">
+            <!-- Formulario para filtrar titulares -->
+            <form action="{{ url_for('gestores.gestores_usuarios_titulares') }}" method="post" id="filtroForm" class="flex-grow-1 me-3">
                 <div class="d-flex gap-3 align-items-center">
-                    <!-- Input para filtrar cogestor por nombre -->
+                    <!-- Input para filtrar titular por nombre -->
                     <div class="form-floating" style="flex: 2;">
                         <input type="text" 
                             class="form-control" 
-                            id="filtrar_cogestor" 
-                            name="filtrar_cogestor"
-                            value="{{ filtrar_cogestor }}"
+                            id="filtrar_titular" 
+                            name="filtrar_titular"
+                            value="{{ filtrar_titular }}"
                             oninput="this.form.submit()"
                             autocomplete="off"
                             autofocus
                             onfocus="this.setSelectionRange(this.value.length, this.value.length)">
-                        <label for="filtrar_cogestor">Escriba el nombre, alias, teléfono o email para filtrar</label>
+                        <label for="filtrar_titular">Escriba el nombre, alias, teléfono o email para filtrar</label>
                     </div>
                     
                     <!-- Filtro por estado -->
@@ -88,15 +88,15 @@
                     </div>
                     <!-- Boton para limpiar filtro -->
                     <div style="flex: 1;">
-                        <a href="{{ url_for('gestores.gestores_usuarios_cogestores', vaciar=1) }}" class="btn btn-secondary">Limpiar filtros</a>
+                        <a href="{{ url_for('gestores.gestores_usuarios_titulares', vaciar=1) }}" class="btn btn-secondary">Limpiar filtros</a>
                     </div>
                 </div>
             </form>
             <!-- Botón crear -->
-            <a href="{{ url_for('gestores.gestores_usuarios_cogestores_crear') }}" class="btn btn-success">Crear</a>
+            <a href="{{ url_for('gestores.gestores_usuarios_titulares_crear') }}" class="btn btn-success">Crear</a>
         </div>
 
-        <!-- Tabla de cogestores -->
+        <!-- Tabla de titulares -->
         <div class="table-responsive">
             <table class="table table-striped">
                 <thead class="text-center">
@@ -110,47 +110,47 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% if cogestores %}
-                        {% for cogestor in cogestores %}
+                    {% if titulares %}
+                        {% for titular in titulares %}
                             <tr>
-                                <td>{{ cogestor.cogestor_info.alias }}</td>
-                                <td>{{ cogestor.nombre_usuario }}</td>
-                                <td>{{ cogestor.telefono }}</td>
-                                <td>{{ cogestor.email }}</td>
+                                <td>{{ titular.titular_info.alias }}</td>
+                                <td>{{ titular.nombre_usuario }}</td>
+                                <td>{{ titular.telefono }}</td>
+                                <td>{{ titular.email }}</td>
                                 <td class="text-center">
-                                    {% if cogestor.cogestor_info.estado == 'activo' %}
+                                    {% if titular.titular_info.estado == 'activo' %}
                                         <span class="badge bg-success">Activo</span>
                                     {% else %}
                                         <span class="badge bg-secondary">Inactivo</span>
                                     {% endif %}
                                 </td>
                                 <td class="text-center">
-                                    <a href="{{ url_for('gestores.gestores_usuarios_cogestores_actualizar', cogestor_id=cogestor._id) }}" 
+                                    <a href="{{ url_for('gestores.gestores_usuarios_titulares_actualizar', titular_id=titular._id) }}" 
                                        class="btn btn-primary btn-sm">Editar</a>
                                     <button type="button" 
                                             class="btn btn-danger btn-sm" 
                                             data-bs-toggle="modal" 
-                                            data-bs-target="#confirmarEliminar{{ cogestor._id }}">
+                                            data-bs-target="#confirmarEliminar{{ titular._id }}">
                                         Eliminar
                                     </button>
                                 </td>
                             </tr>
-                            <!-- Modal de confirmación para eliminar cogestor-->
-                            <div class="modal fade" id="confirmarEliminar{{ cogestor._id }}" tabindex="-1" aria-labelledby="confirmarEliminarLabel{{ cogestor._id }}" aria-hidden="true">
+                            <!-- Modal de confirmación para eliminar titular-->
+                            <div class="modal fade" id="confirmarEliminar{{ titular._id }}" tabindex="-1" aria-labelledby="confirmarEliminarLabel{{ titular._id }}" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content bg-dark text-white">
                                         <div class="modal-header">
-                                            <h5 class="modal-title text-danger text-center w-100" id="confirmarEliminarLabel{{ cogestor._id }}">Confirmar eliminación</h5>
+                                            <h5 class="modal-title text-danger text-center w-100" id="confirmarEliminarLabel{{ titular._id }}">Confirmar eliminación</h5>
                                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
-                                            ¿Está seguro que desea eliminar al cogestor "{{ cogestor.cogestor_info.alias }}"?
+                                            ¿Está seguro que desea eliminar al titular "{{ titular.titular_info.alias }}"?
                                             <br>
-                                            <strong>Nombre:</strong> {{ cogestor.nombre_usuario }}
+                                            <strong>Nombre:</strong> {{ titular.nombre_usuario }}
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                            <a href="{{ url_for('gestores.gestores_usuarios_cogestores_eliminar', cogestor_id=cogestor._id) }}" 
+                                            <a href="{{ url_for('gestores.gestores_usuarios_titulares_eliminar', titular_id=titular._id) }}" 
                                                class="btn btn-danger">Eliminar</a>
                                         </div>
                                     </div>
@@ -159,7 +159,7 @@
                         {% endfor %}
                     {% else %}
                         <tr>
-                            <td colspan="6" class="text-center">No hay cogestores registrados</td>
+                            <td colspan="6" class="text-center">No hay titulares registrados</td>
                         </tr>
                     {% endif %}
                 </tbody>

@@ -1,7 +1,6 @@
-from flask import render_template, request, redirect, url_for, session, flash
+from flask import render_template, request, redirect, url_for, session
 from bson import ObjectId
 from datetime import datetime
-import re
 from config import conexion_mongo
 
 db = conexion_mongo()
@@ -12,8 +11,7 @@ def gestores_usuarios_cogestores_vista():
         # Obtener el ID del gestor actual desde la sesión
         gestor_id = session.get('usuario_id')
         if not gestor_id:
-            flash('No hay gestor autenticado', 'error')
-            return redirect(url_for('login'))
+            return redirect(url_for('login', mensaje_error='No hay gestor autenticado'))
 
         # Obtener el nombre del gestor
         gestor = db.usuarios.find_one({'_id': ObjectId(gestor_id)})
@@ -73,8 +71,7 @@ def gestores_usuarios_cogestores_vista():
                              filtrar_estado=filtrar_estado,
                              mensaje_ok=mensaje_ok)
     except Exception as e:
-        flash(f'Error al cargar la lista de cogestores: {str(e)}', 'error')
-        return redirect(url_for('gestores.gestores_usuarios_cogestores'))
+        return redirect(url_for('gestores.gestores_usuarios_cogestores', mensaje_error=str(e)))
 
 def gestores_usuarios_cogestores_crear_vista():
 
@@ -86,8 +83,7 @@ def gestores_usuarios_cogestores_crear_vista():
             # Obtener el ID del gestor actual
             gestor_id = session.get('usuario_id')
             if not gestor_id:
-                flash('No hay gestor autenticado', 'error')
-                return redirect(url_for('login'))
+                return redirect(url_for('login', mensaje_error='No hay gestor autenticado'))
 
             # Obtener datos del formulario
             alias = request.form.get('alias', '').strip()
