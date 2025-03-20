@@ -137,4 +137,42 @@ def gestores_centros_actualizar_vista():
     return render_template('gestores/centros/actualizar.html')
 
 def gestores_centros_eliminar_vista():
-    return render_template('gestores/centros/eliminar.html')
+    
+    """Elimina un centro de un titular del gestor actual"""
+    try:
+        # Obtener el ID del gestor actual
+        gestor_id = session.get('usuario_id')
+        if not gestor_id:
+            return redirect(url_for('login', mensaje_error='No hay gestor autenticado'))
+
+        # Obtener el ID del centro a eliminar
+        centro_id = request.args.get('centro_id')
+        if not centro_id:
+            return redirect(url_for('gestores.gestores_centros', 
+                                  mensaje_error='ID de centro no proporcionado'))
+
+        # Obtener el centro y verificar que pertenece a un titular del gestor actual
+        centro = db.centros.find_one({'_id': ObjectId(centro_id)})
+        if not centro:
+            return redirect(url_for('gestores.gestores_centros', 
+                                  mensaje_error='Centro no encontrado'))
+
+        # Verificar que el titular del centro pertenece al gestor actual
+        titular = db.usuarios_titulares.find_one({
+            'usuario_id': centro['titular_id'],
+            'gestor_id': ObjectId(gestor_id)
+        })
+
+        if not titular:
+            return redirect(url_for('gestores.gestores_centros', 
+                                  mensaje_error='Centro no pertenece a un titular de este gestor'))
+
+        # Eliminar el centro
+        db.centros.delete_one({'_id': ObjectId(centro_id)})
+        
+        # Redirigir de vuelta a la vista de centros con mensaje de éxito
+        return redirect(url_for('gestores.gestores_centros', mensaje_ok='Centro eliminado correctamente', expandir_titular=request.args.get('expandir_titular')))
+        
+    except Exception as e:
+        # En caso de error, redirigir con mensaje de error
+        return redirect(url_for('gestores.gestores_centros', mensaje_error=str(e), expandir_titular=request.args.get('expandir_titular')))
