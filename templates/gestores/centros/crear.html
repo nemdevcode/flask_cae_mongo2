@@ -1,0 +1,82 @@
+{% extends "_base.html" %}
+
+{% block main %}
+    <div class="d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card shadow bg-dark text-white" style="min-width: 500px;">
+            <div class="card-body">
+                <h4 class="card-title text-center">Crear Nuevo Centro</h4>
+                <div class="card-body">
+                    <form action="{{ url_for('gestores.gestores_centros_crear') }}" method="post">
+                        <input type="hidden" name="titular_id" value="{{ titular_id }}">
+                        
+                        <div class="alert alert-info mb-4">
+                            <strong>Titular:</strong> {{ titular_info.alias }} - {{ titular_info.nombre }}
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="nombre_centro" 
+                                   name="nombre_centro" 
+                                   value="{{ form_data.nombre_centro if form_data else '' }}"
+                                   required>
+                            <label for="nombre_centro">Nombre del Centro:</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="domicilio" 
+                                   name="domicilio" 
+                                   value="{{ form_data.domicilio if form_data else '' }}"
+                                   required>
+                            <label for="domicilio">Domicilio:</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="codigo_postal" 
+                                   name="codigo_postal" 
+                                   value="{{ form_data.codigo_postal if form_data else '' }}"
+                                   required>
+                            <label for="codigo_postal">Código Postal:</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="poblacion" 
+                                   name="poblacion" 
+                                   value="{{ form_data.poblacion if form_data else '' }}"
+                                   required>
+                            <label for="poblacion">Población:</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="provincia" 
+                                   name="provincia" 
+                                   value="{{ form_data.provincia if form_data else '' }}"
+                                   required>
+                            <label for="provincia">Provincia:</label>
+                        </div>
+
+                        {% if mensaje_error %}
+                            <div class="alert alert-danger alert-dismissible fade show mt-3 text-center" role="alert">
+                                {{ mensaje_error }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endif %}
+
+                        <div class="d-flex justify-content-end align-items-center gap-2">
+                            <a href="{{ url_for('gestores.gestores_centros', expandir_titular=titular_id) }}" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Crear</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

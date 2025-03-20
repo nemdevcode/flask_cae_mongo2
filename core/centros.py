@@ -132,7 +132,97 @@ def gestores_centros_vista():
                               mensaje_error=f'Error al cargar los centros: {str(e)}'))
 
 def gestores_centros_crear_vista():
-    return render_template('gestores/centros/crear.html')
+    
+    try:
+        # Obtener el ID del gestor actual
+        gestor_id = session.get('usuario_id')
+        print(f"Gestor ID: {gestor_id}")
+        if not gestor_id:
+            return redirect(url_for('login', mensaje_error='No hay gestor autenticado'))
+
+        # Obtener el ID del titular
+        titular_id = request.args.get('titular_id')
+        print(f"Titular ID recibido: {titular_id}")
+        if not titular_id:
+            return redirect(url_for('gestores.gestores_centros', 
+                                  mensaje_error='ID de titular no proporcionado'))
+
+        # Verificar que el titular pertenece al gestor actual
+        print(f"Buscando titular con ID: {titular_id} y gestor_id: {gestor_id}")
+        # Primero buscamos el titular en la colección usuarios_titulares
+        titular = db.usuarios_titulares.find_one({
+            'usuario_id': ObjectId(titular_id),
+            'gestor_id': ObjectId(gestor_id)
+        })
+        print(f"Titular encontrado: {titular}")
+        if not titular:
+            return redirect(url_for('gestores.gestores_centros', 
+                                  mensaje_error='Titular no encontrado o no pertenece a este gestor'))
+
+        # Obtener la información del titular
+        titular_info = db.usuarios.find_one({'_id': titular['usuario_id']})
+        print(f"Titular info encontrada: {titular_info}")
+        if not titular_info:
+            return redirect(url_for('gestores.gestores_centros', 
+                                  mensaje_error='Titular no encontrado'))
+
+        if request.method == 'GET':
+            return render_template('gestores/centros/crear.html',
+                                 titular_id=titular_id,
+                                 titular_info={
+                                     'alias': titular['alias'],
+                                     'nombre': titular_info['nombre_usuario']
+                                 })
+
+        if request.method == 'POST':
+            # Obtener datos del formulario
+            nombre_centro = request.form.get('nombre_centro', '').strip().upper()
+            domicilio = request.form.get('domicilio', '').strip().upper()
+            codigo_postal = request.form.get('codigo_postal', '').strip().upper()
+            poblacion = request.form.get('poblacion', '').strip().upper()
+            provincia = request.form.get('provincia', '').strip().upper()
+
+            # Verificar si ya existe un centro con el mismo nombre para este titular
+            if db.centros.find_one({
+                'nombre_centro': nombre_centro,
+                'titular_id': ObjectId(titular_id)
+            }):
+                return render_template('gestores/centros/crear.html',
+                                    titular_id=titular_id,
+                                    titular_info={
+                                        'alias': titular['alias'],
+                                        'nombre': titular_info['nombre_usuario']
+                                    },
+                                    mensaje_error='Ya existe un centro con este nombre para este titular',
+                                    form_data=request.form)
+
+            # Crear el centro
+            centro_data = {
+                'titular_id': ObjectId(titular_id),
+                'nombre_centro': nombre_centro,
+                'domicilio': domicilio,
+                'codigo_postal': codigo_postal,
+                'poblacion': poblacion,
+                'provincia': provincia,
+                'estado': 'activo',  # Siempre se crea como activo
+                'fecha_alta': datetime.now(),
+                'fecha_modificacion': datetime.now(),
+                'fecha_baja': None
+            }
+            
+            db.centros.insert_one(centro_data)
+            
+            return redirect(url_for('gestores.gestores_centros', 
+                                  mensaje_ok='Centro creado exitosamente',
+                                  expandir_titular=titular_id))
+
+    except Exception as e:
+        print(f"Error en gestores_centros_crear_vista: {str(e)}")
+        return render_template('gestores/centros/crear.html',
+                             titular_id=titular_id if 'titular_id' in locals() else None,
+                             titular_info=titular_info if 'titular_info' in locals() else None,
+                             mensaje_error=f'Error al crear el centro: {str(e)}',
+                             form_data=request.form if request.method == 'POST' else None)
 
 def gestores_centros_actualizar_vista():
     
