@@ -140,8 +140,12 @@ def gestores_centros_crear_vista():
         if not gestor_id:
             return redirect(url_for('login', mensaje_error='No hay gestor autenticado'))
 
-        # Obtener el ID del titular
-        titular_id = request.args.get('titular_id')
+        # Obtener el ID del titular (de GET o POST según el método)
+        if request.method == 'GET':
+            titular_id = request.args.get('titular_id')
+        else:
+            titular_id = request.form.get('titular_id')
+            
         print(f"Titular ID recibido: {titular_id}")
         if not titular_id:
             return redirect(url_for('gestores.gestores_centros', 
