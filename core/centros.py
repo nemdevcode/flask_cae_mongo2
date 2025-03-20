@@ -67,6 +67,7 @@ def obtener_centros(titular_id):
     return centros
 
 def gestores_centros_vista():
+    
     try:
         # Obtener el ID del gestor actual
         gestor_id = session.get('usuario_id')
