@@ -76,52 +76,59 @@ def gestores_centros_vista():
 
         # Obtener el nombre del gestor
         gestor = db.usuarios.find_one({'_id': ObjectId(gestor_id)})
-        nombre_gestor = gestor.get('nombre_usuario', 'Gestor')
+        nombre_gestor = gestor.get('nombre_usuario', '') if gestor else ''
+
+        # Obtener el ID del titular a expandir
+        expandir_titular = request.form.get('expandir_titular') or request.args.get('expandir_titular')
+
+        # Obtener el filtro de titular
+        filtro_titular = request.form.get('filtrar_titular', '').strip().upper()
 
         # Obtener titulares activos
         titulares = obtener_titulares_activos(gestor_id)
-        
-        # Crear un diccionario de centros por titular
+
+        # Filtrar titulares si hay un filtro
+        if filtro_titular:
+            titulares = [
+                titular for titular in titulares
+                if filtro_titular in titular['alias'].upper() or 
+                   filtro_titular in titular['nombre'].upper()
+            ]
+
+        # Obtener centros para cada titular
         centros_por_titular = {}
         for titular in titulares:
-            centros = obtener_centros(titular['_id'])
-            # Filtrar centros si hay un término de búsqueda
-            filtro_centro = request.form.get(f'filtrar_centro_{titular["_id"]}', '').strip().lower()
+            # Obtener filtros específicos para este titular
+            filtro_centro = request.form.get(f'filtrar_centro_{titular["_id"]}', '').strip().upper()
             filtro_estado = request.form.get(f'filtrar_estado_{titular["_id"]}', 'todos')
-            
-            if filtro_centro or filtro_estado != 'todos':
-                centros_filtrados = []
-                for centro in centros:
-                    # Aplicar filtro de búsqueda
-                    if filtro_centro and not any(filtro_centro in str(valor).lower() for valor in [
-                        centro['nombre_centro'],
-                        centro['domicilio'],
-                        centro['codigo_postal'],
-                        centro['poblacion'],
-                        centro['provincia']
-                    ]):
-                        continue
-                    
-                    # Aplicar filtro de estado
-                    if filtro_estado != 'todos' and centro['estado'] != filtro_estado:
-                        continue
-                        
-                    centros_filtrados.append(centro)
-                centros_por_titular[str(titular['_id'])] = centros_filtrados
-            else:
-                centros_por_titular[str(titular['_id'])] = centros
 
-        # Obtener el ID del titular a expandir (tanto de GET como de POST)
-        expandir_titular = request.args.get('expandir_titular') or request.form.get('expandir_titular', '')
-       
-        
-        # Obtener mensajes de la URL si existen
-        mensaje_ok = request.args.get('mensaje_ok')
-        mensaje_error = request.args.get('mensaje_error')
-        
-        return render_template('gestores/centros/listar.html', 
-                             nombre_gestor=nombre_gestor, 
-                             titulares=titulares, 
+            # Obtener y filtrar centros
+            centros = obtener_centros(titular['_id'])
+            
+            # Aplicar filtro de texto si existe
+            if filtro_centro:
+                centros = [
+                    centro for centro in centros
+                    if (filtro_centro in centro['nombre_centro'].upper() or
+                        filtro_centro in centro['domicilio'].upper() or
+                        filtro_centro in centro['codigo_postal'].upper() or
+                        filtro_centro in centro['poblacion'].upper() or
+                        filtro_centro in centro['provincia'].upper())
+                ]
+
+            # Aplicar filtro de estado si no es 'todos'
+            if filtro_estado != 'todos':
+                centros = [centro for centro in centros if centro['estado'] == filtro_estado]
+
+            centros_por_titular[titular['_id']] = centros
+
+        # Obtener mensajes de la URL
+        mensaje_ok = request.args.get('mensaje_ok', '')
+        mensaje_error = request.args.get('mensaje_error', '')
+
+        return render_template('gestores/centros/listar.html',
+                             nombre_gestor=nombre_gestor,
+                             titulares=titulares,
                              centros_por_titular=centros_por_titular,
                              expandir_titular=expandir_titular,
                              mensaje_ok=mensaje_ok,

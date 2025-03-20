@@ -40,8 +40,37 @@
     <div class="container mt-5">
         <h3 class="text-center mb-4">Listado de Centros por Titular</h3>
         
+        <!-- Formulario de búsqueda de titulares -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form action="{{ url_for('gestores.gestores_centros') }}" method="post">
+                    <input type="hidden" name="expandir_titular" value="{{ expandir_titular }}">
+                    <div class="d-flex gap-3 align-items-center">
+                        <div class="form-floating" style="flex: 1">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="filtrar_titular"
+                                   name="filtrar_titular"
+                                   value="{{ request.form.get('filtrar_titular', '') }}"
+                                   oninput="this.form.submit()"
+                                   autocomplete="off"
+                                   autofocus
+                                   onfocus="this.setSelectionRange(this.value.length, this.value.length)"
+                                   >
+                            <label for="filtrar_titular" class="form-label">Escriba el alias o nombre del titular para filtrar...</label>
+                        </div>
+                        <!-- Botón para limpiar filtro de titulares -->
+                        <div>
+                            <a href="{{ url_for('gestores.gestores_centros', expandir_titular=expandir_titular) }}" class="btn btn-secondary">Limpiar filtro</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
         {% if titulares %}
             {% for titular in titulares %}
+            <!-- Formulario de búsqueda de titulares -->
                 <div class="card mb-4">
                     <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">{{ titular.alias }} - {{ titular.nombre }}</h5>
