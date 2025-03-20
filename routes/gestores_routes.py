@@ -111,12 +111,12 @@ Rutas para gestión de centros, funciones:
     - gestores_centros_eliminar_vista()
 '''
 
-@gestores_bp.route('/usuarios/gestores/centros', methods=['GET'])
+@gestores_bp.route('/usuarios/gestores/centros', methods=['GET', 'POST'])
 @login_requerido
 def gestores_centros():
     return gestores_centros_vista()
 
-@gestores_bp.route('/usuarios/gestores/centros/crear', methods=['POST'])
+@gestores_bp.route('/usuarios/gestores/centros/crear', methods=['GET', 'POST'])
 @login_requerido
 def gestores_centros_crear():
     return gestores_centros_crear_vista()

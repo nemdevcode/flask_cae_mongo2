@@ -1,0 +1,191 @@
+{% extends "_base.html" %}
+
+{% block header %}
+    <nav class="navbar navbar-expand-lg" style="background-color: #e3f2fd;">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+                <a class="navbar-brand" href="#">CAE Accesible. Panel de gestión de centros de: {{ nombre_gestor }}</a>
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/usuarios">Inicio</a>
+                    </li>
+                </ul>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end align-items-center">
+                    <span class="my-auto">Ir a usuario:</span>
+                    <a href="{{ url_for('gestores.gestores') }}" class="btn btn-outline-primary">Gestor</a>
+                    <a href="{{ url_for('logout') }}" class="btn btn-outline-dark">Cerrar sesión</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+{% endblock %}
+
+{% block main %}
+    {% if mensaje_ok %}
+        <div class="alert alert-success alert-dismissible fade show mt-3 text-center" role="alert">
+            {{ mensaje_ok }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endif %}
+    {% if mensaje_error %}
+        <div class="alert alert-danger alert-dismissible fade show mt-3 text-center" role="alert">
+            {{ mensaje_error }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endif %}
+
+    <div class="container mt-5">
+        <h3 class="text-center mb-4">Listado de Centros por Titular</h3>
+        
+        {% if titulares %}
+            {% for titular in titulares %}
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">{{ titular.alias }} - {{ titular.nombre }}</h5>
+                        <button class="btn btn-light btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#centros{{ titular._id }}" aria-expanded="{% if expandir_titular == titular._id %}true{% else %}false{% endif %}" aria-controls="centros{{ titular._id }}">
+                            {% if expandir_titular == titular._id %}Ocultar centros{% else %}Mostrar centros{% endif %}
+                        </button>
+                    </div>
+                    <div class="collapse {% if expandir_titular == titular._id %}show{% endif %}" id="centros{{ titular._id }}">
+                        <div class="card-body">
+                            <!-- Formulario de búsqueda para este titular -->
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <form action="{{ url_for('gestores.gestores_centros') }}" method="post" class="flex-grow-1 me-3">
+                                    <input type="hidden" name="expandir_titular" value="{{ titular._id }}">
+                                    <div class="d-flex gap-3 align-items-center">
+                                        <!-- Input para filtrar centro -->
+                                        <div class="form-floating" style="flex: 2; min-height: 80px;">
+                                            <input type="text" 
+                                                   class="form-control" 
+                                                   id="filtrar_centro_{{ titular._id }}"
+                                                   name="filtrar_centro_{{ titular._id }}"
+                                                   value="{{ request.form.get('filtrar_centro_' + titular._id|string, '') }}"
+                                                   oninput="this.form.submit()"
+                                                   autocomplete="off"
+                                                   autofocus
+                                                   onfocus="this.setSelectionRange(this.value.length, this.value.length)"
+                                                   style="height: 80px;">
+                                            <label for="filtrar_centro_{{ titular._id }}" style="white-space: normal; line-height: 1.2; height: auto; padding-top: 0.5rem; transform-origin: 0 0;">Escriba el nombre, domicilio, código postal, población o provincia para filtrar...</label>
+                                        </div>
+                                        
+                                        <!-- Filtro por estado -->
+                                        <div class="btn-group" role="group" aria-label="Filtrar por estado" style="flex: 2;">
+                                            <input type="radio" 
+                                                   class="btn-check" 
+                                                   name="filtrar_estado_{{ titular._id }}" 
+                                                   id="todos_{{ titular._id }}" 
+                                                   value="todos" 
+                                                   {% if not request.form.get('filtrar_estado_' + titular._id|string) or request.form.get('filtrar_estado_' + titular._id|string) == 'todos' %}checked{% endif %}
+                                                   onchange="this.form.submit()">
+                                            <label class="btn btn-outline-primary" for="todos_{{ titular._id }}">Todos</label>
+                                            
+                                            <input type="radio" 
+                                                   class="btn-check" 
+                                                   name="filtrar_estado_{{ titular._id }}" 
+                                                   id="activos_{{ titular._id }}" 
+                                                   value="activo"
+                                                   {% if request.form.get('filtrar_estado_' + titular._id|string) == 'activo' %}checked{% endif %}
+                                                   onchange="this.form.submit()">
+                                            <label class="btn btn-outline-success" for="activos_{{ titular._id }}">Activos</label>
+                                            
+                                            <input type="radio" 
+                                                   class="btn-check" 
+                                                   name="filtrar_estado_{{ titular._id }}" 
+                                                   id="inactivos_{{ titular._id }}" 
+                                                   value="inactivo"
+                                                   {% if request.form.get('filtrar_estado_' + titular._id|string) == 'inactivo' %}checked{% endif %}
+                                                   onchange="this.form.submit()">
+                                            <label class="btn btn-outline-secondary" for="inactivos_{{ titular._id }}">Inactivos</label>
+                                        </div>
+                                        
+                                        <!-- Botón para limpiar filtro -->
+                                        <div style="flex: 1;">
+                                            <a href="{{ url_for('gestores.gestores_centros', expandir_titular=titular._id) }}" class="btn btn-secondary">Limpiar filtros</a>
+                                        </div>
+                                    </div>
+                                </form>
+                                <!-- Botón crear -->
+                                <a href="{{ url_for('gestores.gestores_centros_crear', titular_id=titular._id) }}" class="btn btn-success">Crear</a>
+                            </div>
+
+                            <!-- Tabla de centros -->
+                            {% if centros_por_titular[titular._id] %}
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead class="text-center">
+                                            <tr>
+                                                <th>Nombre</th>
+                                                <th>Domicilio</th>
+                                                <th>Código Postal</th>
+                                                <th>Población</th>
+                                                <th>Provincia</th>
+                                                <th>Estado</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for centro in centros_por_titular[titular._id] %}
+                                                <tr>
+                                                    <td>{{ centro.nombre_centro }}</td>
+                                                    <td>{{ centro.domicilio }}</td>
+                                                    <td>{{ centro.codigo_postal }}</td>
+                                                    <td>{{ centro.poblacion }}</td>
+                                                    <td>{{ centro.provincia }}</td>
+                                                    <td class="text-center">
+                                                        {% if centro.estado == 'activo' %}
+                                                            <span class="badge bg-success">Activo</span>
+                                                        {% else %}
+                                                            <span class="badge bg-secondary">Inactivo</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        <a href="{{ url_for('gestores.gestores_centros_actualizar', centro_id=centro._id) }}" 
+                                                           class="btn btn-primary btn-sm">Editar</a>
+                                                        <button type="button" 
+                                                                class="btn btn-danger btn-sm" 
+                                                                data-bs-toggle="modal" 
+                                                                data-bs-target="#confirmarEliminar{{ centro._id }}">
+                                                            Eliminar
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <!-- Modal de confirmación de eliminación -->
+                                                <div class="modal fade" id="confirmarEliminar{{ centro._id }}" tabindex="-1" aria-labelledby="confirmarEliminarLabel{{ centro._id }}" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title text-danger text-center w-100" id="confirmarEliminarLabel{{ centro._id }}">Confirmar eliminación</h5>
+                                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                ¿Está seguro que desea eliminar el centro "{{ centro.nombre_centro }}"?
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                                <a href="{{ url_for('gestores.gestores_centros_eliminar', centro_id=centro._id) }}" 
+                                                                   class="btn btn-danger">Eliminar</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <p class="text-center">No hay centros registrados para este titular</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info text-center">
+                No hay titulares registrados
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
