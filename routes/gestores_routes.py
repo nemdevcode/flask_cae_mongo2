@@ -131,7 +131,6 @@ def gestores_centros_actualizar():
 def gestores_centros_eliminar():
     return gestores_centros_eliminar_vista()
 
-
 '''
 Rutas para gestión de usuarios en centros, funciones:
     - gestores_usuarios_centros_vista()
@@ -140,7 +139,7 @@ Rutas para gestión de usuarios en centros, funciones:
     - gestores_usuarios_centros_eliminar_vista()
 '''
 
-@gestores_bp.route('/usuarios/gestores/usuarios-centros', methods=['GET'])
+@gestores_bp.route('/usuarios/gestores/usuarios-centros', methods=['GET', 'POST'])
 @login_requerido
 def gestores_usuarios_centros():
     return gestores_usuarios_centros_vista()

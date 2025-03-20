@@ -64,7 +64,7 @@ def gestores_usuarios_titulares_vista():
                 # Obtener mensaje_ok de los argumentos de la URL si existe
                 mensaje_ok = request.args.get('mensaje_ok')
 
-        return render_template('gestores/titulares/listar.html', 
+        return render_template('gestores/usuarios_titulares/listar.html', 
                              titulares=titulares,
                              nombre_gestor=nombre_gestor,
                              filtrar_titular=filtrar_titular,
@@ -76,7 +76,7 @@ def gestores_usuarios_titulares_vista():
 def gestores_usuarios_titulares_crear_vista():
 
     if request.method == 'GET':
-        return render_template('gestores/titulares/crear.html')
+        return render_template('gestores/usuarios_titulares/crear.html')
     
     if request.method == 'POST':
         try:
@@ -91,7 +91,7 @@ def gestores_usuarios_titulares_crear_vista():
             password = request.form.get('password', '').strip()
             password_confirm = request.form.get('password_confirm', '').strip()
             if password != password_confirm:
-                return render_template('gestores/titulares/crear.html',
+                return render_template('gestores/usuarios_titulares/crear.html',
                                     mensaje_error='Las contraseñas no coinciden',
                                     form_data=request.form)
 
@@ -100,7 +100,7 @@ def gestores_usuarios_titulares_crear_vista():
                 'alias': alias,
                 'gestor_id': ObjectId(gestor_id)
             }):
-                return render_template('gestores/titulares/crear.html',
+                return render_template('gestores/usuarios_titulares/crear.html',
                                     mensaje_error='El alias ya está en uso para este gestor',
                                     form_data=request.form)
 
@@ -113,7 +113,7 @@ def gestores_usuarios_titulares_crear_vista():
                     'gestor_id': ObjectId(gestor_id)
                 })
                 if titular_existente:
-                    return render_template('gestores/titulares/crear.html',
+                    return render_template('gestores/usuarios_titulares/crear.html',
                                         mensaje_error='Este usuario ya es titular para este gestor',
                                         form_data=request.form)
                 
@@ -199,7 +199,7 @@ def gestores_usuarios_titulares_crear_vista():
                                   mensaje_ok='Titular creado exitosamente'))
             
         except Exception as e:
-            return render_template('gestores/titulares/crear.html',
+            return render_template('gestores/usuarios_titulares/crear.html',
                                 mensaje_error=str(e),
                                 form_data=request.form)
 
@@ -245,7 +245,7 @@ def gestores_usuarios_titulares_actualizar_vista():
         }
 
         if request.method == 'GET':
-            return render_template('gestores/titulares/actualizar.html', titular=titular_data)
+            return render_template('gestores/usuarios_titulares/actualizar.html', titular=titular_data)
 
         if request.method == 'POST':
             # Obtener datos del formulario
@@ -256,7 +256,7 @@ def gestores_usuarios_titulares_actualizar_vista():
             estado = request.form.get('estado', 'activo')
 
             if password != password_confirm:
-                return render_template('gestores/titulares/actualizar.html',
+                return render_template('gestores/usuarios_titulares/actualizar.html',
                                     titular=titular_data,
                                     mensaje_error='Las contraseñas no coinciden')
 
@@ -266,14 +266,14 @@ def gestores_usuarios_titulares_actualizar_vista():
                 'gestor_id': ObjectId(gestor_id),
                 '_id': {'$ne': ObjectId(titular_id)}
             }):
-                return render_template('gestores/titulares/actualizar.html',
+                return render_template('gestores/usuarios_titulares/actualizar.html',
                                     titular=titular_data,
                                     mensaje_error='El alias ya está en uso para este gestor')
 
             # Verificar si el email ya existe en otro usuario
             if email != usuario['email']:
                 if db.usuarios.find_one({'email': email}):
-                    return render_template('gestores/titulares/actualizar.html',
+                    return render_template('gestores/usuarios_titulares/actualizar.html',
                                         titular=titular_data,
                                         mensaje_error='El email ya está en uso por otro usuario')
 
@@ -304,7 +304,7 @@ def gestores_usuarios_titulares_actualizar_vista():
                                   mensaje_ok='Titular actualizado exitosamente'))
 
     except Exception as e:
-        return render_template('gestores/titulares/actualizar.html',
+        return render_template('gestores/usuarios_titulares/actualizar.html',
                              titular=titular_data if 'titular_data' in locals() else None,
                              mensaje_error=f'Error al actualizar el titular: {str(e)}')
 
