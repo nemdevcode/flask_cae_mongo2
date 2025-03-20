@@ -1,0 +1,92 @@
+{% extends "_base.html" %}
+
+{% block main %}
+    <div class="d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card shadow bg-dark text-white" style="min-width: 500px;">
+            <div class="card-body">
+                <h4 class="card-title text-center">Actualizar Centro</h4>
+                <div class="card-body">
+                    <form action="{{ url_for('gestores.gestores_centros_actualizar', centro_id=centro._id) }}" method="post">
+                        <input type="hidden" name="expandir_titular" value="{{ expandir_titular }}">
+                        <div class="alert alert-info mb-3">
+                            <strong>Titular:</strong> {{ centro.titular_info.alias }} - {{ centro.titular_info.nombre }}
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="nombre_centro" 
+                                   name="nombre_centro" 
+                                   value="{{ centro.nombre_centro }}"
+                                   required>
+                            <label for="nombre_centro">Nombre del Centro:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="domicilio" 
+                                   name="domicilio" 
+                                   value="{{ centro.domicilio }}"
+                                   required>
+                            <label for="domicilio">Domicilio:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="codigo_postal" 
+                                   name="codigo_postal" 
+                                   value="{{ centro.codigo_postal }}"
+                                   required>
+                            <label for="codigo_postal">Código Postal:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="poblacion" 
+                                   name="poblacion" 
+                                   value="{{ centro.poblacion }}"
+                                   required>
+                            <label for="poblacion">Población:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="provincia" 
+                                   name="provincia" 
+                                   value="{{ centro.provincia }}"
+                                   required>
+                            <label for="provincia">Provincia:</label>
+                        </div>
+                        
+                        <div class="btn-group text-center w-100 mb-3" role="group" aria-label="Basic radio toggle button group">
+                            <input type="radio" 
+                                   class="btn-check" 
+                                   name="estado" 
+                                   id="estado-activo{{ centro._id }}" 
+                                   value="activo" 
+                                   {% if centro.estado == 'activo' %}checked{% endif %}>
+                            <label class="btn btn-outline-success" for="estado-activo{{ centro._id }}">Activo</label> 
+                            
+                            <input type="radio" 
+                                   class="btn-check" 
+                                   name="estado" 
+                                   id="estado-inactivo{{ centro._id }}" 
+                                   value="inactivo"
+                                   {% if centro.estado == 'inactivo' %}checked{% endif %}>
+                            <label class="btn btn-outline-secondary" for="estado-inactivo{{ centro._id }}">Inactivo</label>
+                        </div>
+                        {% if mensaje_error %}
+                            <div class="alert alert-danger alert-dismissible fade show mt-3 text-center" role="alert">
+                                {{ mensaje_error }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endif %}
+                        <div class="d-flex justify-content-end align-items-center gap-2">
+                            <a href="{{ url_for('gestores.gestores_centros', expandir_titular=expandir_titular) }}" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Actualizar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

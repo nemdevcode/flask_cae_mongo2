@@ -143,7 +143,7 @@
                                                         {% endif %}
                                                     </td>
                                                     <td>
-                                                        <a href="{{ url_for('gestores.gestores_centros_actualizar', centro_id=centro._id) }}" 
+                                                        <a href="{{ url_for('gestores.gestores_centros_actualizar', centro_id=centro._id, expandir_titular=titular._id) }}" 
                                                            class="btn btn-primary btn-sm">Editar</a>
                                                         <button type="button" 
                                                                 class="btn btn-danger btn-sm" 
@@ -191,27 +191,4 @@
             </div>
         {% endif %}
     </div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Seleccionar todos los botones de colapso
-    const collapseButtons = document.querySelectorAll('[data-bs-toggle="collapse"]');
-    
-    collapseButtons.forEach(button => {
-        const targetId = button.getAttribute('data-bs-target');
-        const collapseElement = document.querySelector(targetId);
-        
-        // Escuchar el evento de colapso
-        collapseElement.addEventListener('show.bs.collapse', function () {
-            button.textContent = 'Ocultar centros';
-        });
-        
-        collapseElement.addEventListener('hide.bs.collapse', function () {
-            button.textContent = 'Mostrar centros';
-        });
-    });
-});
-</script>
 {% endblock %}
