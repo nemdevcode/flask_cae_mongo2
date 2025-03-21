@@ -76,7 +76,7 @@ def gestores_usuarios_cogestores_eliminar():
     return gestores_usuarios_cogestores_eliminar_vista()
 
 '''
-Rutas para gestión de titulares, funciones:
+Rutas para gestión de usuarios titulares, funciones:
     - gestores_usuarios_titulares_vista()
     - gestores_usuarios_titulares_crear_vista()
     - gestores_usuarios_titulares_actualizar_vista()
