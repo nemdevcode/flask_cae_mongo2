@@ -180,104 +180,172 @@ def gestores_usuarios_centros_vista():
 def gestores_usuarios_centros_crear_vista():
     
     try:
-        ic("\n=== Iniciando gestores_usuarios_centros_crear_vista ===")
-        
         # Obtener el ID del gestor actual
         gestor_id = session.get('usuario_id')
-        ic("Gestor ID:", gestor_id)
         if not gestor_id:
             return redirect(url_for('login', mensaje_error='No hay gestor autenticado'))
 
-        # Obtener los IDs del formulario (tanto de GET como de POST)
-        titular_id = request.args.get('titular_id') or request.form.get('titular_id')
-        centro_id = request.args.get('centro_id') or request.form.get('centro_id')
-        ic("Titular ID recibido:", titular_id)
-        ic("Centro ID recibido:", centro_id)
+        # Obtener el nombre del gestor
+        gestor = db.usuarios.find_one({'_id': ObjectId(gestor_id)})
+        nombre_gestor = gestor.get('nombre_usuario', '') if gestor else ''
 
+        # Obtener el ID del titular y centro
+        titular_id = request.args.get('titular_id')
+        centro_id = request.args.get('centro_id')
         if not titular_id or not centro_id:
-            ic("Error: Faltan datos necesarios")
             return redirect(url_for('gestores.gestores_usuarios_centros', 
-                                  mensaje_error='Faltan datos necesarios'))
+                                  mensaje_error='ID de titular o centro no proporcionado'))
 
-        # Verificar que el centro existe
-        centro = db.centros.find_one({'_id': ObjectId(centro_id)})
-        ic("Centro encontrado:", centro)
-        if not centro:
-            ic("Error: El centro no existe")
-            return redirect(url_for('gestores.gestores_usuarios_centros', 
-                                  mensaje_error='El centro no existe'))
+        # Verificar que el titular pertenece al gestor actual
+        titular = db.usuarios_titulares.find_one({
+            '_id': ObjectId(titular_id),
+            'gestor_id': ObjectId(gestor_id)
+        })
 
-        # Obtener la información del titular
-        titular = db.usuarios_titulares.find_one({'_id': ObjectId(titular_id)})
-        ic("Titular encontrado:", titular)
         if not titular:
-            ic("Error: El titular no existe")
             return redirect(url_for('gestores.gestores_usuarios_centros', 
-                                  mensaje_error='El titular no existe'))
+                                  mensaje_error='Titular no encontrado o no pertenece a este gestor'))
 
+        # Obtener la información del usuario titular
         titular_info = db.usuarios.find_one({'_id': titular['usuario_id']})
-        ic("Información del titular:", titular_info)
         if not titular_info:
-            ic("Error: No se encontró la información del titular")
             return redirect(url_for('gestores.gestores_usuarios_centros', 
                                   mensaje_error='No se encontró la información del titular'))
 
+        # Formatear los datos del titular para el template
+        titular_formateado = {
+            '_id': titular['_id'],
+            'titular_info': {
+                'alias': titular['alias'],
+                'estado': titular['estado']
+            },
+            'nombre_usuario': titular_info['nombre_usuario']
+        }
+
+        # Verificar que el centro existe
+        centro = db.centros.find_one({'_id': ObjectId(centro_id)})
+        if not centro:
+            return redirect(url_for('gestores.gestores_usuarios_centros', 
+                                  mensaje_error='Centro no encontrado'))
+
+        if request.method == 'GET':
+            return render_template('gestores/usuarios_centros/crear.html', 
+                                 titular=titular_formateado,
+                                 centro=centro,
+                                 nombre_gestor=nombre_gestor)
+
         if request.method == 'POST':
-            ic("Método POST detectado")
             # Obtener datos del formulario
-            alias = request.form.get('alias')
-            nombre_usuario = request.form.get('nombre_usuario')
-            telefono = request.form.get('telefono')
-            email = request.form.get('email')
-            password = request.form.get('password')
-            estado = request.form.get('estado', 'activo')
-            ic("Datos del formulario recibidos:", {
+            alias = request.form.get('alias', '').strip()
+            email = request.form.get('email', '').strip().lower()
+            password = request.form.get('password', '').strip()
+            password_confirmacion = request.form.get('password_confirmacion', '').strip()
+
+            if password != password_confirmacion:
+                return render_template('gestores/usuarios_centros/crear.html',
+                                    titular=titular_formateado,
+                                    centro=centro,
+                                    nombre_gestor=nombre_gestor,
+                                    mensaje_error='Las contraseñas no coinciden',
+                                    form_data=request.form)
+
+            # Verificar si el alias ya existe para este centro
+            if db.usuarios_centros.find_one({
                 'alias': alias,
-                'nombre_usuario': nombre_usuario,
-                'telefono': telefono,
-                'email': email,
-                'estado': estado
-            })
+                'centro_id': ObjectId(centro_id)
+            }):
+                return render_template('gestores/usuarios_centros/crear.html',
+                                    titular=titular_formateado,
+                                    centro=centro,
+                                    nombre_gestor=nombre_gestor,
+                                    mensaje_error='El alias ya está en uso para este centro',
+                                    form_data=request.form)
 
-            # Crear el usuario
-            usuario_id = UsuariosCentrosCollection.crear_usuario(
-                alias=alias,
-                nombre_usuario=nombre_usuario,
-                telefono=telefono,
-                email=email,
-                password=password,
-                estado=estado,
-                centro_id=centro_id
-            )
-            ic("Usuario creado con ID:", usuario_id)
-
-            if usuario_id:
-                ic("Usuario creado exitosamente")
-                return redirect(url_for('gestores.gestores_usuarios_centros', 
-                                     expandir_titular=titular_id,
-                                     mensaje_ok='Usuario creado exitosamente'))
+            # Verificar si ya existe un usuario con ese email
+            usuario_existente = db.usuarios.find_one({'email': email})
+            if usuario_existente:
+                # Verificar si ya es usuario de este centro
+                usuario_centro_existente = db.usuarios_centros.find_one({
+                    'usuario_id': usuario_existente['_id'],
+                    'centro_id': ObjectId(centro_id)
+                })
+                if usuario_centro_existente:
+                    return render_template('gestores/usuarios_centros/crear.html',
+                                        titular=titular_formateado,
+                                        centro=centro,
+                                        nombre_gestor=nombre_gestor,
+                                        mensaje_error='Este usuario ya es usuario de este centro',
+                                        form_data=request.form)
+                
+                # Usar el usuario existente
+                usuario_id = usuario_existente['_id']
             else:
-                ic("Error al crear el usuario")
-                return redirect(url_for('gestores.gestores_usuarios_centros', 
-                                     mensaje_error='Error al crear el usuario'))
+                # Crear nuevo usuario
+                usuario_data = {
+                    'nombre_usuario': '',
+                    'email': email,
+                    'password': password,
+                    'telefono': '',
+                    'fecha_alta': datetime.now(),
+                    'fecha_modificacion': datetime.now(),
+                    'fecha_baja': None,
+                    'estado': 'activo'
+                }
+                resultado_usuario = db.usuarios.insert_one(usuario_data)
+                usuario_id = resultado_usuario.inserted_id
 
-        # Para GET, renderizar el formulario
-        ic("Método GET detectado, renderizando template")
-        return render_template('gestores/usuarios_centros/crear.html',
-                             titular={
-                                 '_id': titular_id,
-                                 'titular_info': {
-                                     'alias': titular['alias'],
-                                     'estado': titular['estado']
-                                 },
-                                 'nombre_usuario': titular_info['nombre_usuario']
-                             },
-                             centro=centro)
+                # Obtener o crear el rol de usuario_centro
+                rol_usuario_centro = db.roles.find_one({'nombre_rol': 'centro'})
+                if not rol_usuario_centro:
+                    rol_data = {
+                        'nombre_rol': 'centro',
+                        'descripcion': 'Rol de usuario de centro',
+                        'fecha_alta': datetime.now(),
+                        'fecha_modificacion': datetime.now(),
+                        'fecha_baja': None,
+                        'estado': 'activo'
+                    }
+                    resultado_rol = db.roles.insert_one(rol_data)
+                    rol_id = resultado_rol.inserted_id
+                else:
+                    rol_id = rol_usuario_centro['_id']
 
+                # Crear la relación usuario-rol
+                usuario_rol_data = {
+                    'usuario_id': usuario_id,
+                    'rol_id': rol_id,
+                    'fecha_alta': datetime.now(),
+                    'fecha_modificacion': datetime.now(),
+                    'fecha_baja': None,
+                    'estado': 'activo'
+                }
+                db.usuarios_roles.insert_one(usuario_rol_data)
+            
+            # Crear el usuario de centro
+            usuario_centro_data = {
+                'usuario_id': usuario_id,
+                'centro_id': ObjectId(centro_id),
+                'alias': alias,
+                'estado': 'activo',
+                'fecha_alta': datetime.now(),
+                'fecha_modificacion': datetime.now(),
+                'fecha_baja': None
+            }
+            
+            # Insertar usuario de centro
+            db.usuarios_centros.insert_one(usuario_centro_data)
+            
+            # Redireccionar con mensaje de éxito
+            return redirect(url_for('gestores.gestores_usuarios_centros', 
+                                  mensaje_ok='Usuario de centro creado exitosamente'))
+            
     except Exception as e:
-        ic("Error en gestores_usuarios_centros_crear_vista:", str(e))
-        return redirect(url_for('gestores.gestores_usuarios_centros', 
-                              mensaje_error=f'Error: {str(e)}'))
+        return render_template('gestores/usuarios_centros/crear.html',
+                             titular=titular_formateado if 'titular_formateado' in locals() else None,
+                             centro=centro if 'centro' in locals() else None,
+                             nombre_gestor=nombre_gestor if 'nombre_gestor' in locals() else None,
+                             mensaje_error=str(e),
+                             form_data=request.form if 'request' in locals() else None)
 
 def gestores_usuarios_centros_actualizar_vista():
     return render_template('gestores/usuarios_centros/actualizar.html')

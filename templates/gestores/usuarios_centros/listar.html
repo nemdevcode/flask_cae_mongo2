@@ -218,7 +218,7 @@
                                     <!-- Tabla de usuarios -->
                                     <div class="table-responsive">
                                         <table class="table table-hover">
-                                            <thead>
+                                            <thead class="text-center">
                                                 <tr>
                                                     <th>Alias</th>
                                                     <th>Nombre</th>
@@ -235,16 +235,19 @@
                                                     <td>{{ usuario.nombre_usuario }}</td>
                                                     <td>{{ usuario.telefono }}</td>
                                                     <td>{{ usuario.email }}</td>
-                                                    <td>
+                                                    <td class="text-center">
                                                         <span class="badge {% if usuario.usuario_info.estado == 'activo' %}bg-success{% else %}bg-danger{% endif %}">
                                                             {{ usuario.usuario_info.estado }}
                                                         </span>
                                                     </td>
-                                                    <td>
-                                                        <button type="button" class="btn btn-sm btn-warning" 
+                                                    <td class="text-center">
+                                                        <a href="{{ url_for('gestores.gestores_usuarios_centros_actualizar', usuario_id=usuario._id, expandir_titular=titular._id) }}" 
+                                                           class="btn btn-primary btn-sm">Editar</a>
+                                                        <button type="button" 
+                                                                class="btn btn-danger btn-sm" 
                                                                 data-bs-toggle="modal" 
                                                                 data-bs-target="#confirmarEliminar{{ usuario._id }}">
-                                                            <i class="bi bi-trash"></i>
+                                                            Eliminar
                                                         </button>
                                                     </td>
                                                 </tr>
