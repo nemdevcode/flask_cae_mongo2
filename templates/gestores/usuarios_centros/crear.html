@@ -1,0 +1,93 @@
+{% extends "_base.html" %}
+
+{% block header %}
+    <nav class="navbar navbar-expand-lg" style="background-color: #e3f2fd;">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+                <a class="navbar-brand" href="#">CAE Accesible. Panel de gestión de centros de: {{ nombre_gestor }}</a>
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/usuarios">Inicio</a>
+                    </li>
+                </ul>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end align-items-center">
+                    <span class="my-auto">Ir a usuario:</span>
+                    <a href="{{ url_for('gestores.gestores') }}" class="btn btn-outline-primary">Gestor</a>
+                    <a href="{{ url_for('logout') }}" class="btn btn-outline-dark">Cerrar sesión</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+{% endblock %}
+
+{% block main %}
+    <div class="d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card shadow bg-dark text-white" style="min-width: 500px;">
+            <div class="card-body">
+                <h4 class="card-title text-center">Crear Nuevo Usuario de Centro</h4>
+                <div class="card-body">
+                    <form action="{{ url_for('gestores.gestores_usuarios_centros_crear', titular_id=titular._id, centro_id=centro._id) }}" method="post">
+                        <div class="alert alert-info mb-4">
+                            <strong>Titular:</strong> {{ titular.titular_info.alias }} - {{ titular.nombre_usuario }}
+                            <br>
+                            <strong>Centro:</strong> {{ centro.nombre_centro }}
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="alias" 
+                                   name="alias" 
+                                   value="{{ form_data.alias if form_data else '' }}"
+                                   required>
+                            <label for="alias">Alias:</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="email" 
+                                   class="form-control" 
+                                   id="email" 
+                                   name="email" 
+                                   value="{{ form_data.email if form_data else '' }}"
+                                   required>
+                            <label for="email">Email:</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="password" 
+                                   name="password" 
+                                   required>
+                            <label for="password">Contraseña:</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="password_confirmacion" 
+                                   name="password_confirmacion" 
+                                   required>
+                            <label for="password_confirmacion">Confirmar contraseña:</label>
+                        </div>
+
+                        {% if mensaje_error %}
+                            <div class="alert alert-danger alert-dismissible fade show mt-3 text-center" role="alert">
+                                {{ mensaje_error }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endif %}
+
+                        <div class="d-flex justify-content-end align-items-center gap-2">
+                            <a href="{{ url_for('gestores.gestores_usuarios_centros', expandir_titular=titular._id) }}" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Crear</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

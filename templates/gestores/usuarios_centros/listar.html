@@ -139,119 +139,148 @@
                                     
                                     <!-- Botón para limpiar filtro -->
                                     <div style="flex: 1;">
-                                        <a href="{{ url_for('gestores.gestores_centros', expandir_titular=titular._id) }}" class="btn btn-secondary">Limpiar filtros</a>
+                                        <a href="{{ url_for('gestores.gestores_usuarios_centros', expandir_titular=titular._id) }}" class="btn btn-secondary">Limpiar filtros</a>
                                     </div>
                                 </div>
                             </form>
-                            <!-- Botón crear -->
-                            <a href="{{ url_for('gestores.gestores_centros_crear', titular_id=titular._id) }}" class="btn btn-success">Crear</a>
                         </div>
                         <!-- Listado de centros -->
                         {% for centro in centros_por_titular[titular._id] %}
                         <div class="card mb-3">
-                            <div class="card-header bg-dark text-white">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h6 class="mb-0">
-                                        {{ centro.nombre_centro }}
-                                    </h6>
-                                    <span class="badge {% if centro.estado == 'activo' %}bg-success{% else %}bg-danger{% endif %}">
-                                        {{ centro.estado }}
-                                    </span>
+                            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">{{ centro.nombre_centro }}</h6>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-light btn-sm" 
+                                        type="button" 
+                                        data-bs-toggle="collapse" 
+                                        data-bs-target="#usuarios{{ centro._id }}" 
+                                        aria-controls="usuarios{{ centro._id }}">
+                                        Mostrar/Ocultar USUARIOS
+                                    </button>
                                 </div>
                             </div>
-                            <div class="card-body">
-                                <!-- Filtro de usuarios para este centro -->
-                                <form method="post" class="mb-3">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-floating mb-2">
+                            <div class="collapse" id="usuarios{{ centro._id }}">
+                                <div class="card-body">
+                                    <!-- Filtro de usuarios para este centro -->
+                                    <form method="post" class="mb-3">
+                                        <div class="d-flex gap-3 align-items-center">
+                                            <!-- Input para filtrar usuario -->
+                                            <div class="form-floating" style="flex: 2; min-height: 80px;">
                                                 <input type="text" class="form-control" 
                                                        id="filtrar_usuario_{{ centro._id }}" 
                                                        name="filtrar_usuario_{{ centro._id }}"
-                                                       placeholder="Filtrar usuarios" 
                                                        value="{{ request.form.get('filtrar_usuario_' + centro._id|string, '') }}"
-                                                       oninput="this.form.submit()" autocomplete="off"
-                                                       onfocus="this.setSelectionRange(this.value.length, this.value.length)">
-                                                <label for="filtrar_usuario_{{ centro._id }}">Filtrar usuarios</label>
+                                                       oninput="this.form.submit()" 
+                                                       autocomplete="off"
+                                                       onfocus="this.setSelectionRange(this.value.length, this.value.length)"
+                                                       style="height: 80px;">
+                                                <label for="filtrar_usuario_{{ centro._id }}" style="white-space: normal; line-height: 1.2; height: auto; padding-top: 0.5rem; transform-origin: 0 0;">Escriba el nombre, alias, teléfono o email para filtrar...</label>
+                                            </div>
+                                            
+                                            <!-- Filtro por estado -->
+                                            <div class="btn-group" role="group" aria-label="Filtrar por estado" style="flex: 2;">
+                                                <input type="radio" 
+                                                       class="btn-check" 
+                                                       name="filtrar_estado_usuario_{{ centro._id }}" 
+                                                       id="todos_usuarios_{{ centro._id }}" 
+                                                       value="todos" 
+                                                       {% if not request.form.get('filtrar_estado_usuario_' + centro._id|string) or request.form.get('filtrar_estado_usuario_' + centro._id|string) == 'todos' %}checked{% endif %}
+                                                       onchange="this.form.submit()">
+                                                <label class="btn btn-outline-primary" for="todos_usuarios_{{ centro._id }}">Todos</label>
+                                                
+                                                <input type="radio" 
+                                                       class="btn-check" 
+                                                       name="filtrar_estado_usuario_{{ centro._id }}" 
+                                                       id="activos_usuarios_{{ centro._id }}" 
+                                                       value="activo"
+                                                       {% if request.form.get('filtrar_estado_usuario_' + centro._id|string) == 'activo' %}checked{% endif %}
+                                                       onchange="this.form.submit()">
+                                                <label class="btn btn-outline-success" for="activos_usuarios_{{ centro._id }}">Activos</label>
+                                                
+                                                <input type="radio" 
+                                                       class="btn-check" 
+                                                       name="filtrar_estado_usuario_{{ centro._id }}" 
+                                                       id="inactivos_usuarios_{{ centro._id }}" 
+                                                       value="inactivo"
+                                                       {% if request.form.get('filtrar_estado_usuario_' + centro._id|string) == 'inactivo' %}checked{% endif %}
+                                                       onchange="this.form.submit()">
+                                                <label class="btn btn-outline-secondary" for="inactivos_usuarios_{{ centro._id }}">Inactivos</label>
+                                            </div>
+                                            
+                                            <!-- Botones de acción -->
+                                            <div style="flex: 1;" class="d-flex gap-2">
+                                                <a href="{{ url_for('gestores.gestores_usuarios_centros', expandir_centro=centro._id) }}" class="btn btn-secondary">Limpiar filtros</a>
+                                                <a href="{{ url_for('gestores.gestores_usuarios_centros_crear', titular_id=titular._id, centro_id=centro._id) }}" class="btn btn-success">Crear USUARIO</a>
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
-                                            <div class="form-floating mb-2">
-                                                <select class="form-select" 
-                                                        id="filtrar_estado_usuario_{{ centro._id }}" 
-                                                        name="filtrar_estado_usuario_{{ centro._id }}"
-                                                        onchange="this.form.submit()">
-                                                    <option value="todos" {% if request.form.get('filtrar_estado_usuario_' + centro._id|string) == 'todos' %}selected{% endif %}>Todos los estados</option>
-                                                    <option value="activo" {% if request.form.get('filtrar_estado_usuario_' + centro._id|string) == 'activo' %}selected{% endif %}>Activo</option>
-                                                    <option value="inactivo" {% if request.form.get('filtrar_estado_usuario_' + centro._id|string) == 'inactivo' %}selected{% endif %}>Inactivo</option>
-                                                </select>
-                                                <label for="filtrar_estado_usuario_{{ centro._id }}">Estado</label>
+                                    </form>
+
+                                    <!-- Tabla de usuarios -->
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Alias</th>
+                                                    <th>Nombre</th>
+                                                    <th>Teléfono</th>
+                                                    <th>Email</th>
+                                                    <th>Estado</th>
+                                                    <th>Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for usuario in usuarios_por_centro[centro._id] %}
+                                                <tr>
+                                                    <td>{{ usuario.usuario_info.alias }}</td>
+                                                    <td>{{ usuario.nombre_usuario }}</td>
+                                                    <td>{{ usuario.telefono }}</td>
+                                                    <td>{{ usuario.email }}</td>
+                                                    <td>
+                                                        <span class="badge {% if usuario.usuario_info.estado == 'activo' %}bg-success{% else %}bg-danger{% endif %}">
+                                                            {{ usuario.usuario_info.estado }}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-sm btn-warning" 
+                                                                data-bs-toggle="modal" 
+                                                                data-bs-target="#confirmarEliminar{{ usuario._id }}">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                {% else %}
+                                                <tr>
+                                                    <td colspan="6" class="text-center">No hay usuarios registrados</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- Modal de confirmación de eliminación -->
+                                    {% for usuario in usuarios_por_centro[centro._id] %}
+                                    <div class="modal fade" id="confirmarEliminar{{ usuario._id }}" tabindex="-1" aria-labelledby="confirmarEliminarLabel{{ usuario._id }}" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content bg-dark text-white">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title text-danger text-center w-100" id="confirmarEliminarLabel{{ usuario._id }}">Confirmar eliminación</h5>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    ¿Está seguro que desea eliminar al usuario "{{ usuario.usuario_info.alias }}"?
+                                                    <br>
+                                                    <strong>Nombre:</strong> {{ usuario.nombre_usuario }}
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                    <a href="{{ url_for('gestores.gestores_usuarios_centros_eliminar', usuario_id=usuario._id, expandir_centro=centro._id) }}" 
+                                                       class="btn btn-danger">Eliminar</a>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </form>
-
-                                <!-- Tabla de usuarios -->
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>Alias</th>
-                                                <th>Nombre</th>
-                                                <th>Teléfono</th>
-                                                <th>Email</th>
-                                                <th>Estado</th>
-                                                <th>Acciones</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for usuario in usuarios_por_centro[centro._id] %}
-                                            <tr>
-                                                <td>{{ usuario.usuario_info.alias }}</td>
-                                                <td>{{ usuario.nombre_usuario }}</td>
-                                                <td>{{ usuario.telefono }}</td>
-                                                <td>{{ usuario.email }}</td>
-                                                <td>
-                                                    <span class="badge {% if usuario.usuario_info.estado == 'activo' %}bg-success{% else %}bg-danger{% endif %}">
-                                                        {{ usuario.usuario_info.estado }}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <button type="button" class="btn btn-sm btn-warning" 
-                                                            data-bs-toggle="modal" 
-                                                            data-bs-target="#confirmarEliminar{{ usuario._id }}">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
+                                    {% endfor %}
                                 </div>
-
-                                <!-- Modal de confirmación de eliminación -->
-                                {% for usuario in usuarios_por_centro[centro._id] %}
-                                <div class="modal fade" id="confirmarEliminar{{ usuario._id }}" tabindex="-1" aria-labelledby="confirmarEliminarLabel{{ usuario._id }}" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content bg-dark text-white">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title text-danger text-center w-100" id="confirmarEliminarLabel{{ usuario._id }}">Confirmar eliminación</h5>
-                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                ¿Está seguro que desea eliminar al usuario "{{ usuario.usuario_info.alias }}"?
-                                                <br>
-                                                <strong>Nombre:</strong> {{ usuario.nombre_usuario }}
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                                <a href="{{ url_for('gestores.gestores_usuarios_centros_eliminar', usuario_id=usuario._id, expandir_centro=centro._id) }}" 
-                                                   class="btn btn-danger">Eliminar</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endfor %}
                             </div>
                         </div>
                         {% endfor %}
