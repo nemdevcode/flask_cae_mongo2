@@ -1,5 +1,7 @@
 from flask import render_template, session, request, redirect, url_for, flash, jsonify
 from bson.objectid import ObjectId
+from icecream import ic
+ic.disable()
 
 from datetime import datetime
 
@@ -145,7 +147,7 @@ def gestores_centros_crear_vista():
     try:
         # Obtener el ID del gestor actual
         gestor_id = session.get('usuario_id')
-        print(f"Gestor ID: {gestor_id}")
+        ic("Gestor ID:", gestor_id)
         if not gestor_id:
             flash('No hay gestor autenticado', 'danger')
             return redirect(url_for('login'))
@@ -156,26 +158,26 @@ def gestores_centros_crear_vista():
         else:
             titular_id = request.form.get('titular_id')
             
-        print(f"Titular ID recibido: {titular_id}")
+        ic("Titular ID recibido:", titular_id)
         if not titular_id:
             flash('ID de titular no proporcionado', 'danger')
             return redirect(url_for('gestores.gestores_centros'))
 
         # Verificar que el titular pertenece al gestor actual
-        print(f"Buscando titular con ID: {titular_id} y gestor_id: {gestor_id}")
+        ic("Buscando titular con ID:", titular_id, "y gestor_id:", gestor_id)
         # Primero buscamos el titular en la colección usuarios_titulares
         titular = db.usuarios_titulares.find_one({
             'usuario_id': ObjectId(titular_id),
             'gestor_id': ObjectId(gestor_id)
         })
-        print(f"Titular encontrado: {titular}")
+        ic("Titular encontrado:", titular)
         if not titular:
             flash('Titular no encontrado o no pertenece a este gestor', 'danger')
             return redirect(url_for('gestores.gestores_centros'))
 
         # Obtener la información del titular
         titular_info = db.usuarios.find_one({'_id': titular['usuario_id']})
-        print(f"Titular info encontrada: {titular_info}")
+        ic("Titular info encontrada:", titular_info)
         if not titular_info:
             flash('Titular no encontrado', 'danger')
             return redirect(url_for('gestores.gestores_centros'))
@@ -231,7 +233,7 @@ def gestores_centros_crear_vista():
 
     except Exception as e:
         flash(f'Error al crear el centro: {str(e)}', 'danger')
-        print(f"Error en gestores_centros_crear_vista: {str(e)}")
+        ic("Error en gestores_centros_crear_vista:", str(e))
         return render_template('gestores/centros/crear.html',
                              titular_id=titular_id if 'titular_id' in locals() else None,
                              titular_info=titular_info if 'titular_info' in locals() else None,

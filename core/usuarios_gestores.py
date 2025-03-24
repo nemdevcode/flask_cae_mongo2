@@ -1,5 +1,7 @@
 from flask import render_template, session
 from bson.objectid import ObjectId
+from icecream import ic
+ic.disable()
 from models.usuarios_model import UsuariosCollection
 from models.roles_model import RolesCollection
 from models.usuarios_roles_model import UsuariosRolesCollection
@@ -18,10 +20,10 @@ def gestores_vista():
             nombre_gestor = gestor.get('nombre_usuario')
             return render_template('gestores/index.html', nombre_gestor=nombre_gestor)
         else:
-            print("No se encontró el gestor")
+            ic("No se encontró el gestor")
             
     except Exception as e:
-        print(f"Error al buscar gestor: {str(e)}")
+        ic("Error al buscar gestor:", str(e))
     
     return render_template('gestores/index.html')
 
