@@ -24,20 +24,6 @@
 {% endblock %}
 
 {% block main %}
-    <!-- Mensajes -->
-    {% if mensaje_ok %}
-        <div class="alert alert-success alert-dismissible fade show mt-3 text-center" role="alert">
-            {{ mensaje_ok }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    {% endif %}
-    {% if mensaje_error %}
-        <div class="alert alert-danger alert-dismissible fade show mt-3 text-center" role="alert">
-            {{ mensaje_error }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    {% endif %}
-
     <!-- Listado de usuarios por titular y centro -->
     <div class="container mt-5">
         <h3 class="text-center mb-4">Listado de Usuarios por Titular y Centro</h3>

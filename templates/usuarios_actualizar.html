@@ -47,11 +47,6 @@
                             <input type="text" class="form-control" id="confirmar_password" name="confirmar_password" value="{{ usuario.password }}" required>
                             <label for="floatingInput">Confirmar contraseña:</label>
                         </div>
-                        {% if mensaje_error %}
-                            <div class="alert alert-danger" role="alert">
-                                {{ mensaje_error }}
-                            </div>
-                        {% endif %}
                         <div class="d-flex justify-content-end align-items-center gap-2">
                             <a href="{{ url_for('usuarios.usuarios') }}" type="button" class="btn btn-secondary">Cancelar</a>
                             <button type="submit" class="btn btn-primary">Actualizar</button>

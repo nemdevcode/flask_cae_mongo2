@@ -25,18 +25,6 @@
 {% endblock %}
 
 {% block main %}
-    {% if mensaje_ok %}
-        <div class="alert alert-success alert-dismissible fade show mt-3 text-center" role="alert">
-            {{ mensaje_ok }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    {% endif %}
-    {% if mensaje_error %}
-        <div class="alert alert-danger alert-dismissible fade show mt-3 text-center" role="alert">
-            {{ mensaje_error }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    {% endif %}
     <div class="container mt-5">
         <h3 class="text-center">Listado de COGESTORES </h3>
         <div class="d-flex justify-content-between align-items-center mb-4">

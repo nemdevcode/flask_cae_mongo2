@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, session
+from flask import render_template, request, redirect, url_for, session, flash
 from bson import ObjectId
 from datetime import datetime
 from config import conexion_mongo
@@ -11,7 +11,8 @@ def gestores_usuarios_cogestores_vista():
         # Obtener el ID del gestor actual desde la sesión
         gestor_id = session.get('usuario_id')
         if not gestor_id:
-            return redirect(url_for('login', mensaje_error='No hay gestor autenticado'))
+            flash('No hay gestor autenticado', 'danger')
+            return redirect(url_for('login'))
 
         # Obtener el nombre del gestor
         gestor = db.usuarios.find_one({'_id': ObjectId(gestor_id)})
@@ -62,16 +63,18 @@ def gestores_usuarios_cogestores_vista():
                 cogestores.append(cogestor)
 
                 # Obtener mensaje_ok de los argumentos de la URL si existe
-                mensaje_ok = request.args.get('mensaje_ok')
+                # mensaje_ok = request.args.get('mensaje_ok')
 
         return render_template('gestores/usuarios_cogestores/listar.html', 
                              cogestores=cogestores,
                              nombre_gestor=nombre_gestor,
                              filtrar_cogestor=filtrar_cogestor,
                              filtrar_estado=filtrar_estado,
-                             mensaje_ok=mensaje_ok)
+                            #  mensaje_ok=mensaje_ok,
+                             )
     except Exception as e:
-        return redirect(url_for('gestores.gestores_usuarios_cogestores', mensaje_error=str(e)))
+        flash(f'Error al listar los cogestores: {str(e)}', 'danger')
+        return redirect(url_for('gestores.gestores_usuarios_cogestores'))
 
 def gestores_usuarios_cogestores_crear_vista():
 
@@ -83,7 +86,8 @@ def gestores_usuarios_cogestores_crear_vista():
             # Obtener el ID del gestor actual
             gestor_id = session.get('usuario_id')
             if not gestor_id:
-                return redirect(url_for('login', mensaje_error='No hay gestor autenticado'))
+                flash('No hay gestor autenticado', 'danger')
+                return redirect(url_for('login'))
 
             # Obtener datos del formulario
             alias = request.form.get('alias', '').strip()
@@ -91,8 +95,8 @@ def gestores_usuarios_cogestores_crear_vista():
             password = request.form.get('password', '').strip()
             password_confirm = request.form.get('password_confirm', '').strip()
             if password != password_confirm:
+                flash('Las contraseñas no coinciden', 'danger')
                 return render_template('gestores/usuarios_cogestores/crear.html',
-                                    mensaje_error='Las contraseñas no coinciden',
                                     form_data=request.form)
 
             # Verificar si el alias ya existe para este gestor
@@ -100,8 +104,8 @@ def gestores_usuarios_cogestores_crear_vista():
                 'alias': alias,
                 'gestor_id': ObjectId(gestor_id)
             }):
+                flash('El alias ya está en uso para este gestor', 'danger')
                 return render_template('gestores/usuarios_cogestores/crear.html',
-                                    mensaje_error='El alias ya está en uso para este gestor',
                                     form_data=request.form)
 
             # Verificar si ya existe un cogestor con ese email para este gestor
@@ -113,8 +117,8 @@ def gestores_usuarios_cogestores_crear_vista():
                     'gestor_id': ObjectId(gestor_id)
                 })
                 if cogestor_existente:
+                    flash('Este usuario ya es cogestor para este gestor', 'danger')
                     return render_template('gestores/usuarios_cogestores/crear.html',
-                                        mensaje_error='Este usuario ya es cogestor para este gestor',
                                         form_data=request.form)
                 
                 # Verificar si el usuario ya tiene el rol de cogestor
@@ -195,12 +199,12 @@ def gestores_usuarios_cogestores_crear_vista():
             db.usuarios_cogestores.insert_one(cogestor_data)
             
             # Redireccionar con mensaje de éxito
-            return redirect(url_for('gestores.gestores_usuarios_cogestores', 
-                                  mensaje_ok='Cogestor creado exitosamente'))
+            flash('Cogestor creado exitosamente', 'success')
+            return redirect(url_for('gestores.gestores_usuarios_cogestores'))
             
         except Exception as e:
+            flash(f'Error al crear el cogestor: {str(e)}', 'danger')
             return render_template('gestores/usuarios_cogestores/crear.html',
-                                mensaje_error=str(e),
                                 form_data=request.form)
 
 def gestores_usuarios_cogestores_actualizar_vista():
@@ -209,13 +213,14 @@ def gestores_usuarios_cogestores_actualizar_vista():
         # Obtener el ID del gestor actual
         gestor_id = session.get('usuario_id')
         if not gestor_id:
-            return redirect(url_for('login', mensaje_error='No hay gestor autenticado'))
+            flash('No hay gestor autenticado', 'danger')
+            return redirect(url_for('login'))
 
         # Obtener el ID del cogestor a actualizar
         cogestor_id = request.args.get('cogestor_id')
         if not cogestor_id:
-            return redirect(url_for('gestores.gestores_usuarios_cogestores', 
-                                  mensaje_error='ID de cogestor no proporcionado'))
+            flash('ID de cogestor no proporcionado', 'danger')
+            return redirect(url_for('gestores.gestores_usuarios_cogestores'))
 
         # Verificar que el cogestor pertenece al gestor actual
         cogestor = db.usuarios_cogestores.find_one({
@@ -224,14 +229,14 @@ def gestores_usuarios_cogestores_actualizar_vista():
         })
 
         if not cogestor:
-            return redirect(url_for('gestores.gestores_usuarios_cogestores', 
-                                  mensaje_error='Cogestor no encontrado o no pertenece a este gestor'))
+            flash('Cogestor no encontrado o no pertenece a este gestor', 'danger')
+            return redirect(url_for('gestores.gestores_usuarios_cogestores'))
 
         # Obtener la información del usuario
         usuario = db.usuarios.find_one({'_id': cogestor['usuario_id']})
         if not usuario:
-            return redirect(url_for('gestores.gestores_usuarios_cogestores', 
-                                  mensaje_error='Usuario no encontrado'))
+            flash('Usuario no encontrado', 'danger')
+            return redirect(url_for('gestores.gestores_usuarios_cogestores'))
 
         # Preparar los datos para el template
         cogestor_data = {
@@ -256,9 +261,9 @@ def gestores_usuarios_cogestores_actualizar_vista():
             estado = request.form.get('estado', 'activo')
 
             if password != password_confirm:
+                flash('Las contraseñas no coinciden', 'danger')
                 return render_template('gestores/usuarios_cogestores/actualizar.html',
-                                    cogestor=cogestor_data,
-                                    mensaje_error='Las contraseñas no coinciden')
+                                        cogestor=cogestor_data)
 
             # Verificar si el alias ya existe para este gestor (excluyendo el cogestor actual)
             if db.usuarios_cogestores.find_one({
@@ -266,16 +271,16 @@ def gestores_usuarios_cogestores_actualizar_vista():
                 'gestor_id': ObjectId(gestor_id),
                 '_id': {'$ne': ObjectId(cogestor_id)}
             }):
+                flash('El alias ya está en uso para este gestor', 'danger')
                 return render_template('gestores/usuarios_cogestores/actualizar.html',
-                                    cogestor=cogestor_data,
-                                    mensaje_error='El alias ya está en uso para este gestor')
+                                        cogestor=cogestor_data)
 
             # Verificar si el email ya existe en otro usuario
             if email != usuario['email']:
                 if db.usuarios.find_one({'email': email}):
+                    flash('El email ya está en uso por otro usuario', 'danger')
                     return render_template('gestores/usuarios_cogestores/actualizar.html',
-                                        cogestor=cogestor_data,
-                                        mensaje_error='El email ya está en uso por otro usuario')
+                                        cogestor=cogestor_data)
 
             # Actualizar el usuario
             db.usuarios.update_one(
@@ -300,26 +305,27 @@ def gestores_usuarios_cogestores_actualizar_vista():
                 }
             )
 
-            return redirect(url_for('gestores.gestores_usuarios_cogestores', 
-                                  mensaje_ok='Cogestor actualizado exitosamente'))
+            flash('Cogestor actualizado exitosamente', 'success')
+            return redirect(url_for('gestores.gestores_usuarios_cogestores'))
 
     except Exception as e:
+        flash(f'Error al actualizar el cogestor: {str(e)}', 'danger')
         return render_template('gestores/usuarios_cogestores/actualizar.html',
-                             cogestor=cogestor_data if 'cogestor_data' in locals() else None,
-                             mensaje_error=f'Error al actualizar el cogestor: {str(e)}')
+                             cogestor=cogestor_data if 'cogestor_data' in locals() else None)
 
 def gestores_usuarios_cogestores_eliminar_vista():
     try:
         # Obtener el ID del gestor actual
         gestor_id = session.get('usuario_id')
         if not gestor_id:
-            return redirect(url_for('login', mensaje_error='No hay gestor autenticado'))
+            flash('No hay gestor autenticado', 'danger')
+            return redirect(url_for('login'))
 
         # Obtener el ID del cogestor a eliminar
         cogestor_id = request.args.get('cogestor_id')
         if not cogestor_id:
-            return redirect(url_for('gestores.gestores_usuarios_cogestores', 
-                                  mensaje_error='ID de cogestor no proporcionado'))
+            flash('ID de cogestor no proporcionado', 'danger')
+            return redirect(url_for('gestores.gestores_usuarios_cogestores'))
 
         # Verificar que el cogestor pertenece al gestor actual
         cogestor = db.usuarios_cogestores.find_one({
@@ -328,18 +334,17 @@ def gestores_usuarios_cogestores_eliminar_vista():
         })
 
         if not cogestor:
-            return redirect(url_for('gestores.gestores_usuarios_cogestores', 
-                                  mensaje_error='Cogestor no encontrado o no pertenece a este gestor'))
+            flash('Cogestor no encontrado o no pertenece a este gestor', 'danger')
+            return redirect(url_for('gestores.gestores_usuarios_cogestores'))
 
         # Eliminar el cogestor
         db.usuarios_cogestores.delete_one({'_id': ObjectId(cogestor_id)})
-
-        return redirect(url_for('gestores.gestores_usuarios_cogestores', 
-                              mensaje_ok='Cogestor eliminado exitosamente'))
+        flash('Cogestor eliminado exitosamente', 'success')
+        return redirect(url_for('gestores.gestores_usuarios_cogestores'))
 
     except Exception as e:
-        return redirect(url_for('gestores.gestores_usuarios_cogestores', 
-                              mensaje_error=f'Error al eliminar el cogestor: {str(e)}'))
+        flash(f'Error al eliminar el cogestor: {str(e)}', 'danger')
+        return redirect(url_for('gestores.gestores_usuarios_cogestores'))
 
 def usuarios_cogestores_vista():
     return render_template('cogestores/cogestores.html')

@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, session
+from flask import render_template, request, redirect, url_for, session, flash
 from bson import ObjectId
 from datetime import datetime
 from config import conexion_mongo
@@ -11,7 +11,8 @@ def gestores_usuarios_titulares_vista():
         # Obtener el ID del gestor actual desde la sesión
         gestor_id = session.get('usuario_id')
         if not gestor_id:
-            return redirect(url_for('login', mensaje_error='No hay gestor autenticado'))
+            flash('No hay gestor autenticado', 'danger')
+            return redirect(url_for('login'))
 
         # Obtener el nombre del gestor
         gestor = db.usuarios.find_one({'_id': ObjectId(gestor_id)})
@@ -62,16 +63,18 @@ def gestores_usuarios_titulares_vista():
                 titulares.append(titular)
 
                 # Obtener mensaje_ok de los argumentos de la URL si existe
-                mensaje_ok = request.args.get('mensaje_ok')
+                # mensaje_ok = request.args.get('mensaje_ok')
 
         return render_template('gestores/usuarios_titulares/listar.html', 
                              titulares=titulares,
                              nombre_gestor=nombre_gestor,
                              filtrar_titular=filtrar_titular,
                              filtrar_estado=filtrar_estado,
-                             mensaje_ok=mensaje_ok)
+                            #  mensaje_ok=mensaje_ok,
+                             )
     except Exception as e:
-        return redirect(url_for('gestores.gestores_usuarios_titulares', mensaje_error=str(e)))
+        flash(f'Error al listar los titulares: {str(e)}', 'danger')
+        return redirect(url_for('gestores.gestores_usuarios_titulares'))
 
 def gestores_usuarios_titulares_crear_vista():
 
@@ -83,7 +86,8 @@ def gestores_usuarios_titulares_crear_vista():
             # Obtener el ID del gestor actual
             gestor_id = session.get('usuario_id')
             if not gestor_id:
-                return redirect(url_for('login', mensaje_error='No hay gestor autenticado'))
+                flash('No hay gestor autenticado', 'danger')
+                return redirect(url_for('login'))
 
             # Obtener datos del formulario
             alias = request.form.get('alias', '').strip()
@@ -91,8 +95,8 @@ def gestores_usuarios_titulares_crear_vista():
             password = request.form.get('password', '').strip()
             password_confirm = request.form.get('password_confirm', '').strip()
             if password != password_confirm:
+                flash('Las contraseñas no coinciden', 'danger')
                 return render_template('gestores/usuarios_titulares/crear.html',
-                                    mensaje_error='Las contraseñas no coinciden',
                                     form_data=request.form)
 
             # Verificar si el alias ya existe para este gestor
@@ -100,8 +104,8 @@ def gestores_usuarios_titulares_crear_vista():
                 'alias': alias,
                 'gestor_id': ObjectId(gestor_id)
             }):
+                flash('El alias ya está en uso para este gestor', 'danger')
                 return render_template('gestores/usuarios_titulares/crear.html',
-                                    mensaje_error='El alias ya está en uso para este gestor',
                                     form_data=request.form)
 
             # Verificar si ya existe un titular con ese email para este gestor
@@ -113,8 +117,8 @@ def gestores_usuarios_titulares_crear_vista():
                     'gestor_id': ObjectId(gestor_id)
                 })
                 if titular_existente:
+                    flash('Este usuario ya es titular para este gestor', 'danger')
                     return render_template('gestores/usuarios_titulares/crear.html',
-                                        mensaje_error='Este usuario ya es titular para este gestor',
                                         form_data=request.form)
                 
                 # Verificar si el usuario ya tiene el rol de titular
@@ -193,14 +197,14 @@ def gestores_usuarios_titulares_crear_vista():
             
             # Insertar titular
             db.usuarios_titulares.insert_one(titular_data)
+            flash('Titular creado exitosamente', 'success')
             
             # Redireccionar con mensaje de éxito
-            return redirect(url_for('gestores.gestores_usuarios_titulares', 
-                                  mensaje_ok='Titular creado exitosamente'))
+            return redirect(url_for('gestores.gestores_usuarios_titulares'))
             
         except Exception as e:
+            flash(f'Error al crear el titular: {str(e)}', 'danger')
             return render_template('gestores/usuarios_titulares/crear.html',
-                                mensaje_error=str(e),
                                 form_data=request.form)
 
 def gestores_usuarios_titulares_actualizar_vista():
@@ -209,13 +213,14 @@ def gestores_usuarios_titulares_actualizar_vista():
         # Obtener el ID del gestor actual
         gestor_id = session.get('usuario_id')
         if not gestor_id:
-            return redirect(url_for('login', mensaje_error='No hay gestor autenticado'))
+            flash('No hay gestor autenticado', 'danger')
+            return redirect(url_for('login'))
 
         # Obtener el ID del titular a actualizar
         titular_id = request.args.get('titular_id')
         if not titular_id:
-            return redirect(url_for('gestores.gestores_usuarios_titulares', 
-                                  mensaje_error='ID de titular no proporcionado'))
+            flash('ID de titular no proporcionado', 'danger')
+            return redirect(url_for('gestores.gestores_usuarios_titulares'))
 
         # Verificar que el titular pertenece al gestor actual
         titular = db.usuarios_titulares.find_one({
@@ -224,14 +229,14 @@ def gestores_usuarios_titulares_actualizar_vista():
         })
 
         if not titular:
-            return redirect(url_for('gestores.gestores_usuarios_titulares', 
-                                  mensaje_error='Titular no encontrado o no pertenece a este gestor'))
+            flash('Titular no encontrado o no pertenece a este gestor', 'danger')
+            return redirect(url_for('gestores.gestores_usuarios_titulares'))
 
         # Obtener la información del usuario
         usuario = db.usuarios.find_one({'_id': titular['usuario_id']})
         if not usuario:
-            return redirect(url_for('gestores.gestores_usuarios_titulares', 
-                                  mensaje_error='Usuario no encontrado'))
+            flash('Usuario no encontrado', 'danger')
+            return redirect(url_for('gestores.gestores_usuarios_titulares'))
 
         # Preparar los datos para el template
         titular_data = {
@@ -256,9 +261,9 @@ def gestores_usuarios_titulares_actualizar_vista():
             estado = request.form.get('estado', 'activo')
 
             if password != password_confirm:
+                flash('Las contraseñas no coinciden', 'danger')
                 return render_template('gestores/usuarios_titulares/actualizar.html',
-                                    titular=titular_data,
-                                    mensaje_error='Las contraseñas no coinciden')
+                                    titular=titular_data)
 
             # Verificar si el alias ya existe para este gestor (excluyendo el titular actual)
             if db.usuarios_titulares.find_one({
@@ -266,16 +271,16 @@ def gestores_usuarios_titulares_actualizar_vista():
                 'gestor_id': ObjectId(gestor_id),
                 '_id': {'$ne': ObjectId(titular_id)}
             }):
+                flash('El alias ya está en uso para este gestor', 'danger')
                 return render_template('gestores/usuarios_titulares/actualizar.html',
-                                    titular=titular_data,
-                                    mensaje_error='El alias ya está en uso para este gestor')
+                                    titular=titular_data)
 
             # Verificar si el email ya existe en otro usuario
             if email != usuario['email']:
                 if db.usuarios.find_one({'email': email}):
+                    flash('El email ya está en uso por otro usuario', 'danger')
                     return render_template('gestores/usuarios_titulares/actualizar.html',
-                                        titular=titular_data,
-                                        mensaje_error='El email ya está en uso por otro usuario')
+                                        titular=titular_data)
 
             # Actualizar el usuario
             db.usuarios.update_one(
@@ -300,13 +305,13 @@ def gestores_usuarios_titulares_actualizar_vista():
                 }
             )
 
-            return redirect(url_for('gestores.gestores_usuarios_titulares', 
-                                  mensaje_ok='Titular actualizado exitosamente'))
+            flash('Titular actualizado exitosamente', 'success')
+            return redirect(url_for('gestores.gestores_usuarios_titulares'))
 
     except Exception as e:
+        flash(f'Error al actualizar el titular: {str(e)}', 'danger')
         return render_template('gestores/usuarios_titulares/actualizar.html',
-                             titular=titular_data if 'titular_data' in locals() else None,
-                             mensaje_error=f'Error al actualizar el titular: {str(e)}')
+                             titular=titular_data if 'titular_data' in locals() else None)
 
 def gestores_usuarios_titulares_eliminar_vista():
     
@@ -314,13 +319,14 @@ def gestores_usuarios_titulares_eliminar_vista():
         # Obtener el ID del gestor actual
         gestor_id = session.get('usuario_id')
         if not gestor_id:
-            return redirect(url_for('login', mensaje_error='No hay gestor autenticado'))
+            flash('No hay gestor autenticado', 'danger')
+            return redirect(url_for('login'))
 
         # Obtener el ID del titular a eliminar
         titular_id = request.args.get('titular_id')
         if not titular_id:
-            return redirect(url_for('gestores.gestores_usuarios_titulares', 
-                                  mensaje_error='ID de titular no proporcionado'))
+            flash('ID de titular no proporcionado', 'danger')
+            return redirect(url_for('gestores.gestores_usuarios_titulares'))
 
         # Verificar que el titular pertenece al gestor actual
         titular = db.usuarios_titulares.find_one({
@@ -329,18 +335,17 @@ def gestores_usuarios_titulares_eliminar_vista():
         })
 
         if not titular:
-            return redirect(url_for('gestores.gestores_usuarios_titulares', 
-                                  mensaje_error='Titular no encontrado o no pertenece a este gestor'))
+            flash('Titular no encontrado o no pertenece a este gestor', 'danger')
+            return redirect(url_for('gestores.gestores_usuarios_titulares'))
 
         # Eliminar el titular
         db.usuarios_titulares.delete_one({'_id': ObjectId(titular_id)})
-
-        return redirect(url_for('gestores.gestores_usuarios_titulares', 
-                              mensaje_ok='Titular eliminado exitosamente'))
+        flash('Titular eliminado exitosamente', 'success')
+        return redirect(url_for('gestores.gestores_usuarios_titulares'))
 
     except Exception as e:
-        return redirect(url_for('gestores.gestores_usuarios_titulares', 
-                              mensaje_error=f'Error al eliminar el titular: {str(e)}'))
+        flash(f'Error al eliminar el titular: {str(e)}', 'danger')
+        return redirect(url_for('gestores.gestores_usuarios_titulares'))
 
 def usuarios_titulares_vista():
     return render_template('usuarios_titulares.html')

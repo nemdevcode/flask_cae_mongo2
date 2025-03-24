@@ -1,8 +1,10 @@
 from datetime import datetime # Para registrar los datos de acceso en la base de datos
-from flask import request, redirect, url_for, render_template, session
+from flask import request, redirect, url_for, render_template, session, flash
+from icecream import ic
 from models.usuarios_model import UsuariosCollection
 from config import conexion_mongo
-from bson.objectid import ObjectId
+
+ic.enable()
 
 db = conexion_mongo()
 
@@ -16,12 +18,14 @@ def login_vista():
             if usuario:
                 # Guardamos el ID como string
                 session['usuario_id'] = str(usuario['_id'])
-                print(f"Usuario encontrado: {usuario}")  # Para debug
-                print(f"ID guardado en sesión: {session['usuario_id']}")  # Para debug
+                ic("Usuario encontrado:", usuario)
+                ic("ID guardado en sesión:", session['usuario_id'])
                 return redirect(url_for('usuarios.usuarios'))
             else:
-                return render_template('login.html', mensaje_error="Usuario o contraseña incorrectos")
+                flash("Usuario o contraseña incorrectos", "danger")
+                return render_template('login.html')
         except Exception as e:
-            print(f"Error en login: {str(e)}")  # Para ver el error en la consola
-            return render_template('login.html', mensaje_error=f"Error al procesar el login: {str(e)}")
+            ic("Error en login:", str(e))
+            flash(f"Error al procesar el login: {str(e)}", "danger")
+            return render_template('login.html')
     return render_template('login.html')

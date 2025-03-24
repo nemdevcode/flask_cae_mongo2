@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, request, session
+from flask import render_template, redirect, url_for, request, session, flash
 from bson import ObjectId
 from datetime import datetime
 from icecream import ic
@@ -70,7 +70,8 @@ def gestores_usuarios_centros_vista():
         # Obtener el ID del gestor actual
         gestor_id = session.get('usuario_id')
         if not gestor_id:
-            return redirect(url_for('login', mensaje_error='No hay gestor autenticado'))
+            flash('No hay gestor autenticado', 'danger')
+            return redirect(url_for('login'))
 
         # Obtener el nombre del gestor
         gestor = db.usuarios.find_one({'_id': ObjectId(gestor_id)})
@@ -161,8 +162,8 @@ def gestores_usuarios_centros_vista():
                 usuarios_por_centro[centro['_id']] = usuarios
 
         # Obtener mensajes de la URL
-        mensaje_ok = request.args.get('mensaje_ok', '')
-        mensaje_error = request.args.get('mensaje_error', '')
+        # mensaje_ok = request.args.get('mensaje_ok', '')
+        # mensaje_error = request.args.get('mensaje_error', '')
 
         return render_template('gestores/usuarios_centros/listar.html',
                              nombre_gestor=nombre_gestor,
@@ -170,12 +171,13 @@ def gestores_usuarios_centros_vista():
                              centros_por_titular=centros_por_titular,
                              usuarios_por_centro=usuarios_por_centro,
                              expandir_titular=expandir_titular,
-                             mensaje_ok=mensaje_ok,
-                             mensaje_error=mensaje_error)
+                            #  mensaje_ok=mensaje_ok,
+                            #  mensaje_error=mensaje_error,
+                             )
                              
     except Exception as e:
-        return redirect(url_for('gestores.gestores_usuarios_centros', 
-                              mensaje_error=f'Error al cargar los usuarios de centros: {str(e)}'))
+        flash(f'Error al cargar los usuarios de centros: {str(e)}', 'danger')
+        return redirect(url_for('gestores.gestores_usuarios_centros'))
 
 def gestores_usuarios_centros_crear_vista():
     
@@ -183,7 +185,8 @@ def gestores_usuarios_centros_crear_vista():
         # Obtener el ID del gestor actual
         gestor_id = session.get('usuario_id')
         if not gestor_id:
-            return redirect(url_for('login', mensaje_error='No hay gestor autenticado'))
+            flash('No hay gestor autenticado', 'danger')
+            return redirect(url_for('login'))
 
         # Obtener el nombre del gestor
         gestor = db.usuarios.find_one({'_id': ObjectId(gestor_id)})
@@ -193,8 +196,8 @@ def gestores_usuarios_centros_crear_vista():
         titular_id = request.args.get('titular_id')
         centro_id = request.args.get('centro_id')
         if not titular_id or not centro_id:
-            return redirect(url_for('gestores.gestores_usuarios_centros', 
-                                  mensaje_error='ID de titular o centro no proporcionado'))
+            flash('ID de titular o centro no proporcionado', 'danger')
+            return redirect(url_for('gestores.gestores_usuarios_centros'))
 
         # Verificar que el titular pertenece al gestor actual
         titular = db.usuarios_titulares.find_one({
@@ -203,14 +206,14 @@ def gestores_usuarios_centros_crear_vista():
         })
 
         if not titular:
-            return redirect(url_for('gestores.gestores_usuarios_centros', 
-                                  mensaje_error='Titular no encontrado o no pertenece a este gestor'))
+            flash('Titular no encontrado o no pertenece a este gestor', 'danger')
+            return redirect(url_for('gestores.gestores_usuarios_centros'))
 
         # Obtener la información del usuario titular
         titular_info = db.usuarios.find_one({'_id': titular['usuario_id']})
         if not titular_info:
-            return redirect(url_for('gestores.gestores_usuarios_centros', 
-                                  mensaje_error='No se encontró la información del titular'))
+            flash('No se encontró la información del titular', 'danger')
+            return redirect(url_for('gestores.gestores_usuarios_centros'))
 
         # Formatear los datos del titular para el template
         titular_formateado = {
@@ -225,8 +228,8 @@ def gestores_usuarios_centros_crear_vista():
         # Verificar que el centro existe
         centro = db.centros.find_one({'_id': ObjectId(centro_id)})
         if not centro:
-            return redirect(url_for('gestores.gestores_usuarios_centros', 
-                                  mensaje_error='Centro no encontrado'))
+            flash('Centro no encontrado', 'danger')
+            return redirect(url_for('gestores.gestores_usuarios_centros'))
 
         if request.method == 'GET':
             return render_template('gestores/usuarios_centros/crear.html', 
@@ -242,24 +245,24 @@ def gestores_usuarios_centros_crear_vista():
             password_confirmacion = request.form.get('password_confirmacion', '').strip()
 
             if password != password_confirmacion:
+                flash('Las contraseñas no coinciden', 'danger')
                 return render_template('gestores/usuarios_centros/crear.html',
-                                    titular=titular_formateado,
-                                    centro=centro,
-                                    nombre_gestor=nombre_gestor,
-                                    mensaje_error='Las contraseñas no coinciden',
-                                    form_data=request.form)
+                                        titular=titular_formateado,
+                                        centro=centro,
+                                        nombre_gestor=nombre_gestor,
+                                        form_data=request.form)
 
             # Verificar si el alias ya existe para este centro
             if db.usuarios_centros.find_one({
                 'alias': alias,
                 'centro_id': ObjectId(centro_id)
             }):
+                flash('El alias ya está en uso para este centro', 'danger')
                 return render_template('gestores/usuarios_centros/crear.html',
-                                    titular=titular_formateado,
-                                    centro=centro,
-                                    nombre_gestor=nombre_gestor,
-                                    mensaje_error='El alias ya está en uso para este centro',
-                                    form_data=request.form)
+                                        titular=titular_formateado,
+                                        centro=centro,
+                                        nombre_gestor=nombre_gestor,
+                                        form_data=request.form)
 
             # Verificar si ya existe un usuario con ese email
             usuario_existente = db.usuarios.find_one({'email': email})
@@ -270,12 +273,12 @@ def gestores_usuarios_centros_crear_vista():
                     'centro_id': ObjectId(centro_id)
                 })
                 if usuario_centro_existente:
+                    flash('Este usuario ya es usuario de este centro', 'danger')
                     return render_template('gestores/usuarios_centros/crear.html',
-                                        titular=titular_formateado,
-                                        centro=centro,
-                                        nombre_gestor=nombre_gestor,
-                                        mensaje_error='Este usuario ya es usuario de este centro',
-                                        form_data=request.form)
+                                            titular=titular_formateado,
+                                            centro=centro,
+                                            nombre_gestor=nombre_gestor,
+                                            form_data=request.form)
                 
                 # Usar el usuario existente
                 usuario_id = usuario_existente['_id']
@@ -336,16 +339,16 @@ def gestores_usuarios_centros_crear_vista():
             db.usuarios_centros.insert_one(usuario_centro_data)
             
             # Redireccionar con mensaje de éxito
-            return redirect(url_for('gestores.gestores_usuarios_centros', 
-                                  mensaje_ok='Usuario de centro creado exitosamente'))
+            flash('Usuario de centro creado exitosamente', 'success')
+            return redirect(url_for('gestores.gestores_usuarios_centros'))
             
     except Exception as e:
+        flash(f'Error al crear el usuario de centro: {str(e)}', 'danger')
         return render_template('gestores/usuarios_centros/crear.html',
-                             titular=titular_formateado if 'titular_formateado' in locals() else None,
-                             centro=centro if 'centro' in locals() else None,
-                             nombre_gestor=nombre_gestor if 'nombre_gestor' in locals() else None,
-                             mensaje_error=str(e),
-                             form_data=request.form if 'request' in locals() else None)
+                                titular=titular_formateado if 'titular_formateado' in locals() else None,
+                                centro=centro if 'centro' in locals() else None,
+                                nombre_gestor=nombre_gestor if 'nombre_gestor' in locals() else None,
+                                form_data=request.form if 'request' in locals() else None)
 
 def gestores_usuarios_centros_actualizar_vista():
     return render_template('gestores/usuarios_centros/actualizar.html')

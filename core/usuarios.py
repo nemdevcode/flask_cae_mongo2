@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, session
+from flask import render_template, request, redirect, url_for, session, flash
 from bson.objectid import ObjectId
 from datetime import datetime
 import re
@@ -32,12 +32,13 @@ def usuarios_vista():
     nombres_roles = [rol['nombre_rol'].upper() for rol in roles]
     
     # Obtener mensaje_ok de los argumentos de la URL si existe
-    mensaje_ok = request.args.get('mensaje_ok')
+    # mensaje_ok = request.args.get('mensaje_ok')
     
     return render_template('usuarios.html', 
                          usuario=usuario, 
                          nombres_roles=nombres_roles,
-                         mensaje_ok=mensaje_ok)
+                        #  mensaje_ok=mensaje_ok,
+                         )
     
 def usuario_actualizar_vista():
 
@@ -66,9 +67,8 @@ def usuario_actualizar_vista():
             if datos_actualizados['password'] != datos_actualizados['confirmar_password']:
                 usuario_id = session.get('usuario_id')
                 usuario = db.usuarios.find_one({'_id': ObjectId(usuario_id)})
-                return render_template('usuarios_actualizar.html', 
-                                    usuario=usuario, 
-                                    mensaje_error='Las contraseñas no coinciden')
+                flash('Las contraseñas no coinciden', 'danger')
+                return render_template('usuarios_actualizar.html', usuario=usuario)
             
             # Verificar si el email ya existe en otro usuario
             email_existente = db.usuarios.find_one({
@@ -78,20 +78,19 @@ def usuario_actualizar_vista():
             
             if email_existente:
                 usuario = db.usuarios.find_one({'_id': ObjectId(usuario_id)})
-                return render_template('usuarios_actualizar.html', 
-                                    usuario=usuario, 
-                                    mensaje_error='El email ya está registrado por otro usuario')
+                flash('El email ya está registrado por otro usuario', 'danger')
+                return render_template('usuarios_actualizar.html', usuario=usuario)
             
             db.usuarios.update_one(
                 {'_id': ObjectId(usuario_id)},
                 {'$set': datos_actualizados}
             )
             
-            return redirect(url_for('usuarios.usuarios', mensaje_ok='Usuario actualizado correctamente'))
+            flash('Usuario actualizado correctamente', 'success')
+            return redirect(url_for('usuarios.usuarios'))
             
         except Exception as e:
             usuario_id = session.get('usuario_id')
             usuario = db.usuarios.find_one({'_id': ObjectId(usuario_id)})
-            return render_template('usuarios_actualizar.html', 
-                                usuario=usuario, 
-                                mensaje_error=str(e))
+            flash(f'Error al actualizar el usuario: {str(e)}', 'danger')
+            return render_template('usuarios_actualizar.html', usuario=usuario)

@@ -72,7 +72,8 @@ def gestores_centros_vista():
         # Obtener el ID del gestor actual
         gestor_id = session.get('usuario_id')
         if not gestor_id:
-            return redirect(url_for('login', mensaje_error='No hay gestor autenticado'))
+            flash('No hay gestor autenticado', 'danger')
+            return redirect(url_for('login'))
 
         # Obtener el nombre del gestor
         gestor = db.usuarios.find_one({'_id': ObjectId(gestor_id)})
@@ -123,20 +124,21 @@ def gestores_centros_vista():
             centros_por_titular[titular['_id']] = centros
 
         # Obtener mensajes de la URL
-        mensaje_ok = request.args.get('mensaje_ok', '')
-        mensaje_error = request.args.get('mensaje_error', '')
+        # mensaje_ok = request.args.get('mensaje_ok', '')
+        # mensaje_error = request.args.get('mensaje_error', '')
 
         return render_template('gestores/centros/listar.html',
                              nombre_gestor=nombre_gestor,
                              titulares=titulares,
                              centros_por_titular=centros_por_titular,
                              expandir_titular=expandir_titular,
-                             mensaje_ok=mensaje_ok,
-                             mensaje_error=mensaje_error)
+                            #  mensaje_ok=mensaje_ok,
+                            #  mensaje_error=mensaje_error,
+                             )
                              
     except Exception as e:
-        return redirect(url_for('gestores.gestores_centros', 
-                              mensaje_error=f'Error al cargar los centros: {str(e)}'))
+        flash(f'Error al cargar los centros: {str(e)}', 'danger')
+        return redirect(url_for('gestores.gestores_centros'))
 
 def gestores_centros_crear_vista():
     
@@ -145,7 +147,8 @@ def gestores_centros_crear_vista():
         gestor_id = session.get('usuario_id')
         print(f"Gestor ID: {gestor_id}")
         if not gestor_id:
-            return redirect(url_for('login', mensaje_error='No hay gestor autenticado'))
+            flash('No hay gestor autenticado', 'danger')
+            return redirect(url_for('login'))
 
         # Obtener el ID del titular (de GET o POST según el método)
         if request.method == 'GET':
@@ -155,8 +158,8 @@ def gestores_centros_crear_vista():
             
         print(f"Titular ID recibido: {titular_id}")
         if not titular_id:
-            return redirect(url_for('gestores.gestores_centros', 
-                                  mensaje_error='ID de titular no proporcionado'))
+            flash('ID de titular no proporcionado', 'danger')
+            return redirect(url_for('gestores.gestores_centros'))
 
         # Verificar que el titular pertenece al gestor actual
         print(f"Buscando titular con ID: {titular_id} y gestor_id: {gestor_id}")
@@ -167,15 +170,15 @@ def gestores_centros_crear_vista():
         })
         print(f"Titular encontrado: {titular}")
         if not titular:
-            return redirect(url_for('gestores.gestores_centros', 
-                                  mensaje_error='Titular no encontrado o no pertenece a este gestor'))
+            flash('Titular no encontrado o no pertenece a este gestor', 'danger')
+            return redirect(url_for('gestores.gestores_centros'))
 
         # Obtener la información del titular
         titular_info = db.usuarios.find_one({'_id': titular['usuario_id']})
         print(f"Titular info encontrada: {titular_info}")
         if not titular_info:
-            return redirect(url_for('gestores.gestores_centros', 
-                                  mensaje_error='Titular no encontrado'))
+            flash('Titular no encontrado', 'danger')
+            return redirect(url_for('gestores.gestores_centros'))
 
         if request.method == 'GET':
             return render_template('gestores/centros/crear.html',
@@ -198,13 +201,13 @@ def gestores_centros_crear_vista():
                 'nombre_centro': nombre_centro,
                 'titular_id': ObjectId(titular_id)
             }):
+                flash('Ya existe un centro con este nombre para este titular', 'danger')
                 return render_template('gestores/centros/crear.html',
                                     titular_id=titular_id,
                                     titular_info={
                                         'alias': titular['alias'],
                                         'nombre': titular_info['nombre_usuario']
                                     },
-                                    mensaje_error='Ya existe un centro con este nombre para este titular',
                                     form_data=request.form)
 
             # Crear el centro
@@ -222,17 +225,16 @@ def gestores_centros_crear_vista():
             }
             
             db.centros.insert_one(centro_data)
-            
+            flash('Centro creado exitosamente', 'success')
             return redirect(url_for('gestores.gestores_centros', 
-                                  mensaje_ok='Centro creado exitosamente',
-                                  expandir_titular=titular_id))
+                                    expandir_titular=titular_id))
 
     except Exception as e:
+        flash(f'Error al crear el centro: {str(e)}', 'danger')
         print(f"Error en gestores_centros_crear_vista: {str(e)}")
         return render_template('gestores/centros/crear.html',
                              titular_id=titular_id if 'titular_id' in locals() else None,
                              titular_info=titular_info if 'titular_info' in locals() else None,
-                             mensaje_error=f'Error al crear el centro: {str(e)}',
                              form_data=request.form if request.method == 'POST' else None)
 
 def gestores_centros_actualizar_vista():
@@ -241,13 +243,14 @@ def gestores_centros_actualizar_vista():
         # Obtener el ID del gestor actual
         gestor_id = session.get('usuario_id')
         if not gestor_id:
-            return redirect(url_for('login', mensaje_error='No hay gestor autenticado'))
+            flash('No hay gestor autenticado', 'danger')
+            return redirect(url_for('login'))
 
         # Obtener el ID del centro a actualizar
         centro_id = request.args.get('centro_id')
         if not centro_id:
-            return redirect(url_for('gestores.gestores_centros', 
-                                  mensaje_error='ID de centro no proporcionado'))
+            flash('ID de centro no proporcionado', 'danger')
+            return redirect(url_for('gestores.gestores_centros'))
 
         # Obtener el ID del titular a expandir (tanto de GET como de POST)
         expandir_titular = request.args.get('expandir_titular') or request.form.get('expandir_titular')
@@ -255,8 +258,8 @@ def gestores_centros_actualizar_vista():
         # Obtener el centro y verificar que pertenece a un titular del gestor actual
         centro = db.centros.find_one({'_id': ObjectId(centro_id)})
         if not centro:
-            return redirect(url_for('gestores.gestores_centros', 
-                                  mensaje_error='Centro no encontrado'))
+            flash('Centro no encontrado', 'danger')
+            return redirect(url_for('gestores.gestores_centros'))
 
         # Verificar que el titular del centro pertenece al gestor actual
         titular = db.usuarios_titulares.find_one({
@@ -265,14 +268,14 @@ def gestores_centros_actualizar_vista():
         })
 
         if not titular:
-            return redirect(url_for('gestores.gestores_centros', 
-                                  mensaje_error='Centro no pertenece a un titular de este gestor'))
+            flash('Centro no pertenece a un titular de este gestor', 'danger')
+            return redirect(url_for('gestores.gestores_centros'))
 
         # Obtener la información del titular
         titular_info = db.usuarios.find_one({'_id': titular['usuario_id']})
         if not titular_info:
-            return redirect(url_for('gestores.gestores_centros', 
-                                  mensaje_error='Titular no encontrado'))
+            flash('Titular no encontrado', 'danger')
+            return redirect(url_for('gestores.gestores_centros'))
 
         # Preparar los datos para el template
         centro_data = {
@@ -310,10 +313,11 @@ def gestores_centros_actualizar_vista():
                 'titular_id': centro['titular_id'],
                 '_id': {'$ne': ObjectId(centro_id)}
             }):
+                flash('Ya existe un centro con este nombre para este titular', 'danger')
                 return render_template('gestores/centros/actualizar.html',
                                     centro=centro_data,
                                     expandir_titular=expandir_titular,
-                                    mensaje_error='Ya existe un centro con este nombre para este titular')
+                                    form_data=request.form)
 
             # Actualizar el centro
             db.centros.update_one(
@@ -330,16 +334,16 @@ def gestores_centros_actualizar_vista():
                     }
                 }
             )
-
+            flash('Centro actualizado exitosamente', 'success')
             return redirect(url_for('gestores.gestores_centros', 
-                                  mensaje_ok='Centro actualizado exitosamente',
                                   expandir_titular=expandir_titular))
 
     except Exception as e:
+        flash(f'Error al actualizar el centro: {str(e)}', 'danger')
         return render_template('gestores/centros/actualizar.html',
                              centro=centro_data if 'centro_data' in locals() else None,
                              expandir_titular=expandir_titular if 'expandir_titular' in locals() else None,
-                             mensaje_error=f'Error al actualizar el centro: {str(e)}')
+                             form_data=request.form if request.method == 'POST' else None)
 
 def gestores_centros_eliminar_vista():
     
@@ -348,19 +352,20 @@ def gestores_centros_eliminar_vista():
         # Obtener el ID del gestor actual
         gestor_id = session.get('usuario_id')
         if not gestor_id:
-            return redirect(url_for('login', mensaje_error='No hay gestor autenticado'))
+            flash('No hay gestor autenticado', 'danger')
+            return redirect(url_for('login'))
 
         # Obtener el ID del centro a eliminar
         centro_id = request.args.get('centro_id')
         if not centro_id:
-            return redirect(url_for('gestores.gestores_centros', 
-                                  mensaje_error='ID de centro no proporcionado'))
+            flash('ID de centro no proporcionado', 'danger')
+            return redirect(url_for('gestores.gestores_centros'))
 
         # Obtener el centro y verificar que pertenece a un titular del gestor actual
         centro = db.centros.find_one({'_id': ObjectId(centro_id)})
         if not centro:
-            return redirect(url_for('gestores.gestores_centros', 
-                                  mensaje_error='Centro no encontrado'))
+            flash('Centro no encontrado', 'danger')
+            return redirect(url_for('gestores.gestores_centros'))
 
         # Verificar que el titular del centro pertenece al gestor actual
         titular = db.usuarios_titulares.find_one({
@@ -369,15 +374,17 @@ def gestores_centros_eliminar_vista():
         })
 
         if not titular:
-            return redirect(url_for('gestores.gestores_centros', 
-                                  mensaje_error='Centro no pertenece a un titular de este gestor'))
+            flash('Centro no pertenece a un titular de este gestor', 'danger')
+            return redirect(url_for('gestores.gestores_centros'))
 
         # Eliminar el centro
         db.centros.delete_one({'_id': ObjectId(centro_id)})
         
         # Redirigir de vuelta a la vista de centros con mensaje de éxito
-        return redirect(url_for('gestores.gestores_centros', mensaje_ok='Centro eliminado correctamente', expandir_titular=request.args.get('expandir_titular')))
+        flash('Centro eliminado correctamente', 'success')
+        return redirect(url_for('gestores.gestores_centros', expandir_titular=request.args.get('expandir_titular')))
         
     except Exception as e:
         # En caso de error, redirigir con mensaje de error
-        return redirect(url_for('gestores.gestores_centros', mensaje_error=str(e), expandir_titular=request.args.get('expandir_titular')))
+        flash(f'Error al eliminar el centro: {str(e)}', 'danger')
+        return redirect(url_for('gestores.gestores_centros', expandir_titular=request.args.get('expandir_titular')))

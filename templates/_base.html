@@ -13,6 +13,25 @@
 <body>
     <header>{% block header %}{% endblock %}</header>
     
+    <!-- Mensajes Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                {% if category == 'success' %}
+                    <div class="alert alert-success alert-dismissible fade show mt-3 text-center" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% elif category == 'danger' %}
+                    <div class="alert alert-danger alert-dismissible fade show mt-3 text-center" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
     <main>{% block main %}{% endblock %}</main>
     
     <footer>{% block footer %}{% endblock %}</footer>

@@ -1,6 +1,6 @@
 from datetime import datetime
 import re
-from flask import request, redirect, url_for, render_template
+from flask import request, redirect, url_for, render_template, flash
 from models.usuarios_model import UsuariosCollection
 from models.roles_model import RolesCollection
 from models.usuarios_roles_model import UsuariosRolesCollection
@@ -30,9 +30,8 @@ def registrate_vista():
             descripcion = 'Gestor de coordinación'
 
             if password != password_confirm:
-                mensaje_error = "Las contraseñas no coinciden"
+                flash("Las contraseñas no coinciden", "danger")
                 return render_template('registrate.html', 
-                                    mensaje_error=mensaje_error,
                                     form_data=request.form)  # Enviamos los datos del formulario
             
             # Listar todos los roles para ver qué hay en la base de datos
@@ -63,9 +62,8 @@ def registrate_vista():
             # Verifficar si el usuario ya tiene el rol de gestor
             usuario_rol_existente = db.usuarios_roles.find_one({'usuario_id': usuario_id, 'rol_id': rol_id})
             if usuario_rol_existente:
-                mensaje_error = "El email esta registrado debe utilizar otro email para registrarse"
+                flash("El email esta registrado debe utilizar otro email para registrarse", "danger")
                 return render_template('registrate.html', 
-                                    mensaje_error=mensaje_error,
                                     form_data=request.form)  # Enviamos los datos del formulario
                 
             else:
@@ -74,8 +72,8 @@ def registrate_vista():
                 return redirect(url_for('login'))
         
         except Exception as e:
+            flash(f"Error al registrar el usuario: {e}", "danger")
             return render_template('registrate.html', 
-                                mensaje_error=f"Error al registrar el usuario: {e}",
-                                form_data=request.form)  # Enviamos los datos del formulario
+                                    form_data=request.form)  # Enviamos los datos del formulario
         
     return render_template('registrate.html')

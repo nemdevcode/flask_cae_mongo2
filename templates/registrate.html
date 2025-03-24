@@ -57,12 +57,6 @@
                             value="{{ form_data.password if form_data else '' }}" required>
                             <label for="floatingInput">Confirmar contraseña:</label>
                         </div>
-                        {% if mensaje_error %}
-                            <div class="alert alert-danger alert-dismissible fade show mt-3 text-center" role="alert">
-                                {{ mensaje_error }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        {% endif %}
                         <div class="d-flex justify-content-end align-items-center gap-2">
                             <a href="{{ url_for('index') }}" type="button" class="btn btn-secondary">Cancelar</a>
                             <button type="submit" class="btn btn-primary">Registrarse</button>
