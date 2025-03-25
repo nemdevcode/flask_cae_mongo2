@@ -44,7 +44,6 @@ def rutas(app):
     def reset_password():
         return reset_password_vista()
 
-
     @app.route('/logout')
     def logout():
         session.clear()
