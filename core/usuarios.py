@@ -3,6 +3,9 @@ from bson.objectid import ObjectId
 from datetime import datetime
 import re
 
+from utils.token_utils import generar_token_verificacion
+from utils.email_utils import enviar_email
+
 from config import conexion_mongo
 
 db = conexion_mongo()
@@ -41,7 +44,6 @@ def usuarios_vista():
                          )
     
 def usuario_actualizar_vista():
-
     if request.method == 'GET':
         usuario_id = session.get('usuario_id')
         usuario = db.usuarios.find_one({'_id': ObjectId(usuario_id)})
@@ -59,16 +61,8 @@ def usuario_actualizar_vista():
                 'provincia': request.form.get('provincia').strip().upper(),
                 'telefono': request.form.get('telefono').strip(),
                 'email': request.form.get('email').strip().lower(),
-                'password': request.form.get('password').strip(),
-                'confirmar_password': request.form.get('confirmar_password').strip(),
                 'fecha_modificacion': datetime.now()
             }
-
-            if datos_actualizados['password'] != datos_actualizados['confirmar_password']:
-                usuario_id = session.get('usuario_id')
-                usuario = db.usuarios.find_one({'_id': ObjectId(usuario_id)})
-                flash('Las contraseñas no coinciden', 'danger')
-                return render_template('usuarios_actualizar.html', usuario=usuario)
             
             # Verificar si el email ya existe en otro usuario
             email_existente = db.usuarios.find_one({
@@ -94,3 +88,48 @@ def usuario_actualizar_vista():
             usuario = db.usuarios.find_one({'_id': ObjectId(usuario_id)})
             flash(f'Error al actualizar el usuario: {str(e)}', 'danger')
             return render_template('usuarios_actualizar.html', usuario=usuario)
+
+def usuario_solicitar_cambio_password():
+    try:
+        usuario_id = session.get('usuario_id')
+        if not usuario_id:
+            flash('No hay usuario autenticado', 'danger')
+            return redirect(url_for('login'))
+
+        # Obtener el email del usuario
+        usuario = db.usuarios.find_one({'_id': ObjectId(usuario_id)})
+        if not usuario:
+            flash('Usuario no encontrado', 'danger')
+            return redirect(url_for('usuarios.usuarios'))
+
+        email = usuario['email']
+
+        # Generar token de recuperación
+        token = generar_token_verificacion(email)
+
+        # Actualizar usuario con el token
+        db.usuarios.update_one(
+            {'_id': ObjectId(usuario_id)},
+            {'$set': {'token_recuperacion': token}}
+        )
+
+        # Enviar email con el enlace de recuperación
+        link_recuperacion = url_for('reset_password', token=token, email=email, _external=True)
+        cuerpo_email = f"""
+        <h2>Cambio de Contraseña</h2>
+        <p>Has solicitado cambiar tu contraseña. Haz clic en el siguiente enlace para crear una nueva:</p>
+        <p><a href="{link_recuperacion}">Cambiar contraseña</a></p>
+        <p>Este enlace expirará en 1 hora.</p>
+        <p>Si no solicitaste este cambio, puedes ignorar este correo.</p>
+        """
+
+        if enviar_email(email, "Cambio de contraseña - CAE Accesible", cuerpo_email):
+            flash('Te hemos enviado un email con las instrucciones para cambiar tu contraseña', 'success')
+        else:
+            flash('Error al enviar el email. Por favor, intenta nuevamente', 'danger')
+
+        return redirect(url_for('usuarios.usuario_actualizar'))
+
+    except Exception as e:
+        flash(f'Error al procesar la solicitud: {str(e)}', 'danger')
+        return redirect(url_for('usuarios.usuario_actualizar'))

@@ -2,6 +2,8 @@ from flask import render_template, request, redirect, url_for, session, flash
 from bson import ObjectId
 from datetime import datetime
 from config import conexion_mongo
+from utils.token_utils import generar_token_verificacion
+from utils.email_utils import enviar_email
 
 db = conexion_mongo()
 
@@ -77,7 +79,6 @@ def gestores_usuarios_cogestores_vista():
         return redirect(url_for('gestores.gestores_usuarios_cogestores'))
 
 def gestores_usuarios_cogestores_crear_vista():
-
     if request.method == 'GET':
         return render_template('gestores/usuarios_cogestores/crear.html')
     
@@ -92,116 +93,63 @@ def gestores_usuarios_cogestores_crear_vista():
             # Obtener datos del formulario
             alias = request.form.get('alias', '').strip()
             email = request.form.get('email', '').strip().lower()
-            password = request.form.get('password', '').strip()
-            password_confirm = request.form.get('password_confirm', '').strip()
-            if password != password_confirm:
-                flash('Las contraseñas no coinciden', 'danger')
+            nombre_usuario = request.form.get('nombre_usuario', '').strip()
+            telefono = request.form.get('telefono', '').strip()
+
+            # Validaciones básicas
+            if not all([alias, email, nombre_usuario, telefono]):
+                flash('Todos los campos son obligatorios', 'danger')
                 return render_template('gestores/usuarios_cogestores/crear.html',
                                     form_data=request.form)
 
-            # Verificar si el alias ya existe para este gestor
-            if db.usuarios_cogestores.find_one({
-                'alias': alias,
-                'gestor_id': ObjectId(gestor_id)
-            }):
-                flash('El alias ya está en uso para este gestor', 'danger')
+            # Verificar si el email ya existe
+            if db.usuarios.find_one({'email': email}):
+                flash('El email ya está registrado', 'danger')
                 return render_template('gestores/usuarios_cogestores/crear.html',
                                     form_data=request.form)
 
-            # Verificar si ya existe un cogestor con ese email para este gestor
-            usuario_existente = db.usuarios.find_one({'email': email})
-            if usuario_existente:
-                # Verificar si ya es cogestor de este gestor
-                cogestor_existente = db.usuarios_cogestores.find_one({
-                    'usuario_id': usuario_existente['_id'],
-                    'gestor_id': ObjectId(gestor_id)
-                })
-                if cogestor_existente:
-                    flash('Este usuario ya es cogestor para este gestor', 'danger')
-                    return render_template('gestores/usuarios_cogestores/crear.html',
-                                        form_data=request.form)
-                
-                # Verificar si el usuario ya tiene el rol de cogestor
-                rol_cogestor = db.roles.find_one({'nombre_rol': 'cogestor'})
-                if rol_cogestor:
-                    usuario_rol = db.usuarios_roles.find_one({
-                        'usuario_id': usuario_existente['_id'],
-                        'rol_id': rol_cogestor['_id']
-                    })
-                    if not usuario_rol:
-                        # Si no tiene el rol, asignarlo
-                        usuario_rol_data = {
-                            'usuario_id': usuario_existente['_id'],
-                            'rol_id': rol_cogestor['_id'],
-                            'fecha_alta': datetime.now(),
-                            'fecha_modificacion': datetime.now(),
-                            'fecha_baja': None,
-                            'estado': 'activo'
-                        }
-                        db.usuarios_roles.insert_one(usuario_rol_data)
-                
-                # Usar el usuario existente
-                usuario_id = usuario_existente['_id']
-            else:
-                # Crear nuevo usuario
-                usuario_data = {
-                    'nombre_usuario': '',
-                    'email': email,
-                    'password': password,
-                    'telefono': '',
-                    'fecha_alta': datetime.now(),
-                    'fecha_modificacion': datetime.now(),
-                    'fecha_baja': None,
-                    'estado': 'activo'
-                }
-                resultado_usuario = db.usuarios.insert_one(usuario_data)
-                usuario_id = resultado_usuario.inserted_id
+            # Generar token de verificación
+            token = generar_token_verificacion(email)
 
-                # Obtener o crear el rol de cogestor
-                rol_cogestor = db.roles.find_one({'nombre_rol': 'cogestor'})
-                if not rol_cogestor:
-                    rol_data = {
-                        'nombre_rol': 'cogestor',
-                        'descripcion': 'Rol de cogestor',
-                        'fecha_alta': datetime.now(),
-                        'fecha_modificacion': datetime.now(),
-                        'fecha_baja': None,
-                        'estado': 'activo'
-                    }
-                    resultado_rol = db.roles.insert_one(rol_data)
-                    rol_id = resultado_rol.inserted_id
-                else:
-                    rol_id = rol_cogestor['_id']
+            # Crear el usuario
+            usuario_id = db.usuarios.insert_one({
+                'nombre_usuario': nombre_usuario,
+                'email': email,
+                'telefono': telefono,
+                'estado': 'pendiente',
+                'verificado': False,
+                'token_verificacion': token,
+                'fecha_creacion': datetime.now(),
+                'fecha_modificacion': datetime.now()
+            }).inserted_id
 
-                # Crear la relación usuario-rol
-                usuario_rol_data = {
-                    'usuario_id': usuario_id,
-                    'rol_id': rol_id,
-                    'fecha_alta': datetime.now(),
-                    'fecha_modificacion': datetime.now(),
-                    'fecha_baja': None,
-                    'estado': 'activo'
-                }
-                db.usuarios_roles.insert_one(usuario_rol_data)
-            
             # Crear el cogestor
-            cogestor_data = {
+            db.usuarios_cogestores.insert_one({
                 'usuario_id': usuario_id,
                 'gestor_id': ObjectId(gestor_id),
                 'alias': alias,
-                'estado': 'activo',
-                'fecha_alta': datetime.now(),
-                'fecha_modificacion': datetime.now(),
-                'fecha_baja': None
-            }
-            
-            # Insertar cogestor
-            db.usuarios_cogestores.insert_one(cogestor_data)
-            
-            # Redireccionar con mensaje de éxito
-            flash('Cogestor creado exitosamente', 'success')
+                'estado': 'pendiente',
+                'fecha_creacion': datetime.now(),
+                'fecha_modificacion': datetime.now()
+            })
+
+            # Enviar email de verificación
+            link_verificacion = url_for('verificar_email', token=token, email=email, _external=True)
+            cuerpo_email = f"""
+            <h2>Bienvenido a CAE Accesible</h2>
+            <p>Has sido registrado como cogestor en CAE Accesible. Para activar tu cuenta, haz clic en el siguiente enlace:</p>
+            <p><a href="{link_verificacion}">Activar cuenta</a></p>
+            <p>Este enlace expirará en 1 hora.</p>
+            <p>Si no solicitaste este registro, puedes ignorar este correo.</p>
+            """
+
+            if enviar_email(email, "Activación de cuenta - CAE Accesible", cuerpo_email):
+                flash('Cogestor creado correctamente. Se ha enviado un email de activación.', 'success')
+            else:
+                flash('Cogestor creado pero hubo un error al enviar el email de activación.', 'warning')
+
             return redirect(url_for('gestores.gestores_usuarios_cogestores'))
-            
+
         except Exception as e:
             flash(f'Error al crear el cogestor: {str(e)}', 'danger')
             return render_template('gestores/usuarios_cogestores/crear.html',
