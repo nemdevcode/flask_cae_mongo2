@@ -3,10 +3,11 @@ import os
 from routes._routes import rutas
 from extensions import init_extensions
 from icecream import ic
+ic.disable()
 from dotenv import load_dotenv, find_dotenv
 
 def crear_app():
-    # Forzar recarga del archivo .env
+    # Forzar recarga del archivo .env, tomaba contraseñas antiguas
     dotenv_path = find_dotenv()
     ic("Archivo .env encontrado en:", dotenv_path)
     load_dotenv(dotenv_path, override=True)
