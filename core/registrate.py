@@ -1,9 +1,11 @@
 from datetime import datetime
 import re
-from flask import request, redirect, url_for, render_template, flash
+from flask import request, redirect, url_for, render_template, flash, session
 from models.usuarios_model import UsuariosCollection
 from models.roles_model import RolesCollection
 from models.usuarios_roles_model import UsuariosRolesCollection
+from utils.email_utils import enviar_email
+from utils.token_utils import generar_token_verificacion
 from config import conexion_mongo
 
 db = conexion_mongo()
@@ -20,60 +22,77 @@ def registrate_vista():
             provincia = request.form['provincia'].strip().upper()
             telefono = request.form['telefono'].strip()
             email = request.form['email'].strip().lower()
-            password = request.form['password'].strip()
-            password_confirm = request.form['password_confirm'].strip()
             fecha_alta = datetime.now()
             fecha_modificacion = datetime.now()
             fecha_baja = None
-            estado = 'activo'
+            estado = 'pendiente'
             nombre_rol = 'gestor'
             descripcion = 'Gestor de coordinación'
-
-            if password != password_confirm:
-                flash("Las contraseñas no coinciden", "danger")
-                return render_template('registrate.html', 
-                                    form_data=request.form)  # Enviamos los datos del formulario
-            
-            # Listar todos los roles para ver qué hay en la base de datos
-            todos_roles = list(db.roles.find())
-            # Verificar si el rol ya existe
-            rol_existente = db.roles.find_one({'nombre_rol': nombre_rol})
-            if rol_existente:
-                # Si existe, usar el ID del rol existente
-                rol_id = rol_existente['_id']
-            else:
-                # Si no existe, crear nuevo rol
-                rol = RolesCollection(nombre_rol, descripcion, fecha_alta, fecha_modificacion, fecha_baja, estado)
-                resultado_rol = db.roles.insert_one(rol.__dict__)
-                rol_id = resultado_rol.inserted_id
 
             # Verificar si el usuario ya existe
             usuario_existente = db.usuarios.find_one({'email': email})
             if usuario_existente:
-                usuario_id = usuario_existente['_id']
+                flash("El email ya está registrado", "danger")
+                return render_template('registrate.html', form_data=request.form)
 
-            else:
-                usuario = UsuariosCollection(nombre_usuario, cif_dni, domicilio, codigo_postal, poblacion, 
-                                       provincia, telefono, email, password, fecha_alta, 
-                                       fecha_modificacion, fecha_baja, estado)
-                resultado_usuario = db.usuarios.insert_one(usuario.__dict__) # __dict__ -> Convierte todos los atributos de la clase en un diccionario
+            # Generar token de verificación
+            token = generar_token_verificacion(email)
+
+            # Primero intentar enviar el email
+            link_verificacion = url_for('verificar_email', token=token, email=email, _external=True)
+            cuerpo_email = f"""
+            <h2>Bienvenido a CAE Accesible</h2>
+            <p>Gracias por registrarte. Para completar tu registro, por favor, haz clic en el siguiente enlace:</p>
+            <p><a href="{link_verificacion}">Activar mi cuenta</a></p>
+            <p>Este enlace expirará en 1 hora.</p>
+            """
+            
+            # Solo proceder con la creación del usuario si el email se envía correctamente
+            if enviar_email(email, "Activa tu cuenta en CAE Accesible", cuerpo_email):
+                # Crear nuevo usuario sin contraseña
+                usuario = UsuariosCollection(
+                    nombre_usuario=nombre_usuario,
+                    cif_dni=cif_dni,
+                    domicilio=domicilio,
+                    codigo_postal=codigo_postal,
+                    poblacion=poblacion,
+                    provincia=provincia,
+                    telefono=telefono,
+                    email=email,
+                    fecha_alta=fecha_alta,
+                    fecha_modificacion=fecha_modificacion,
+                    fecha_baja=fecha_baja,
+                    estado=estado,
+                    token_verificacion=token
+                )
+                
+                resultado_usuario = db.usuarios.insert_one(usuario.__dict__)
                 usuario_id = resultado_usuario.inserted_id
 
-            # Verifficar si el usuario ya tiene el rol de gestor
-            usuario_rol_existente = db.usuarios_roles.find_one({'usuario_id': usuario_id, 'rol_id': rol_id})
-            if usuario_rol_existente:
-                flash("El email esta registrado debe utilizar otro email para registrarse", "danger")
-                return render_template('registrate.html', 
-                                    form_data=request.form)  # Enviamos los datos del formulario
-                
-            else:
+                # Verificar si el rol ya existe
+                rol_existente = db.roles.find_one({'nombre_rol': nombre_rol})
+                if rol_existente:
+                    rol_id = rol_existente['_id']
+                else:
+                    rol = RolesCollection(nombre_rol, descripcion, fecha_alta, fecha_modificacion, fecha_baja, estado)
+                    resultado_rol = db.roles.insert_one(rol.__dict__)
+                    rol_id = resultado_rol.inserted_id
+
+                # Crear relación usuario-rol
                 usuario_rol = UsuariosRolesCollection(usuario_id, rol_id, fecha_alta, fecha_modificacion, fecha_baja, estado)
-                db.usuarios_roles.insert_one(usuario_rol.__dict__) # __dict__ -> Convierte todos los atributos de la clase en un diccionario
+                db.usuarios_roles.insert_one(usuario_rol.__dict__)
+
+                # Guardar token y email en la sesión
+                session['verification_token'] = token
+                session['verification_email'] = email
+                flash("Te hemos enviado un email para activar tu cuenta. Por favor, revisa tu bandeja de entrada.", "success")
                 return redirect(url_for('login'))
+            else:
+                flash("Hubo un problema al enviar el email de verificación. Por favor, intenta registrarte nuevamente.", "danger")
+                return render_template('registrate.html', form_data=request.form)
         
         except Exception as e:
             flash(f"Error al registrar el usuario: {e}", "danger")
-            return render_template('registrate.html', 
-                                    form_data=request.form)  # Enviamos los datos del formulario
+            return render_template('registrate.html', form_data=request.form)
         
     return render_template('registrate.html')

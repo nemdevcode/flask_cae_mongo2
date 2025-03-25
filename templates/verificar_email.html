@@ -1,0 +1,42 @@
+{% extends "_base.html" %}
+
+{% block main %}
+<div class="d-flex justify-content-center align-items-center min-vh-100">
+    <div class="card shadow bg-dark text-white" style="min-width: 500px;">
+        <div class="card-body">
+            <h4 class="card-title text-center">Activar cuenta</h4>
+            <div class="card-body">
+                <form action="{{ url_for('verificar_email') }}" method="post">
+                    <div class="alert alert-info mb-4">
+                        <p class="mb-0">Por favor, establece una contraseña para tu cuenta:</p>
+                        <strong>{{ email }}</strong>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input type="password" 
+                               class="form-control" 
+                               id="password" 
+                               name="password" 
+                               required>
+                        <label for="password">Contraseña:</label>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input type="password" 
+                               class="form-control" 
+                               id="password_confirm" 
+                               name="password_confirm" 
+                               required>
+                        <label for="password_confirm">Confirmar contraseña:</label>
+                    </div>
+
+                    <div class="d-flex justify-content-end align-items-center gap-2">
+                        <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Activar cuenta</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

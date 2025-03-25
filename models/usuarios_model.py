@@ -8,11 +8,13 @@ class UsuariosCollection:
                  provincia, 
                  telefono, 
                  email, 
-                 password, 
-                 fecha_alta, 
-                 fecha_modificacion, 
-                 fecha_baja, 
-                 estado):
+                 password=None, 
+                 fecha_alta=None, 
+                 fecha_modificacion=None, 
+                 fecha_baja=None, 
+                 estado='pendiente',
+                 token_verificacion=None,
+                 verificado=False):
         self.nombre_usuario = nombre_usuario
         self.cif_dni = cif_dni
         self.domicilio = domicilio
@@ -25,4 +27,6 @@ class UsuariosCollection:
         self.fecha_alta = fecha_alta
         self.fecha_modificacion = fecha_modificacion
         self.fecha_baja = fecha_baja
-        self.estado = estado 
+        self.estado = estado
+        self.token_verificacion = token_verificacion
+        self.verificado = verificado 
