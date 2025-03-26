@@ -17,15 +17,6 @@
                             <label for="alias">Alias:</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" 
-                                   class="form-control" 
-                                   id="nombre_usuario" 
-                                   name="nombre_usuario" 
-                                   value="{{ form_data.nombre_usuario if form_data else '' }}"
-                                   required>
-                            <label for="nombre_usuario">Nombre de Usuario:</label>
-                        </div>
-                        <div class="form-floating mb-3">
                             <input type="email" 
                                    class="form-control" 
                                    id="email" 
@@ -33,15 +24,6 @@
                                    value="{{ form_data.email if form_data else '' }}"
                                    required>
                             <label for="email">Email:</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input type="tel" 
-                                   class="form-control" 
-                                   id="telefono" 
-                                   name="telefono" 
-                                   value="{{ form_data.telefono if form_data else '' }}"
-                                   required>
-                            <label for="telefono">Teléfono:</label>
                         </div>
                         <div class="d-flex justify-content-end align-items-center gap-2">
                             <a href="{{ url_for('gestores.gestores_usuarios_cogestores') }}" class="btn btn-secondary">Cancelar</a>

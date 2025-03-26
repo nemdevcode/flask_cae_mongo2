@@ -102,8 +102,8 @@
                         {% for cogestor in cogestores %}
                             <tr>
                                 <td>{{ cogestor.cogestor_info.alias }}</td>
-                                <td>{{ cogestor.nombre_usuario }}</td>
-                                <td>{{ cogestor.telefono }}</td>
+                                <td>{{ cogestor.cogestor_info.nombre_usuario }}</td>
+                                <td>{{ cogestor.cogestor_info.telefono }}</td>
                                 <td>{{ cogestor.email }}</td>
                                 <td class="text-center">
                                     {% if cogestor.cogestor_info.estado == 'activo' %}

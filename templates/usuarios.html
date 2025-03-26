@@ -8,7 +8,7 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
-            <a class="navbar-brand" href="#">CAE Accesible. Panel de usuarios de: {{ usuario.nombre_usuario }}</a>
+            <a class="navbar-brand" href="#">CAE Accesible. Panel de usuarios de: {{ usuario_actual.nombre_usuario }}</a>
             <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="{{ url_for('usuarios.usuarios') }}">Inicio</a>
@@ -38,20 +38,20 @@
                 <div class="card" style="width: 18rem;">
                     <img src="..." class="card-img-top" alt="...">
                     <div class="card-body text-center">
-                      <h5 class="card-title">{{ rol }}</h5>
-                      <p class="card-text">Descripción del rol</p>
-                      <a href="
-                        {%- if rol == 'GESTOR' -%}
-                        {{ url_for('gestores.gestores') }}
-                        {%- elif rol == 'COGESTOR' -%}
-                        {{ url_for('cogestores.cogestores') }}
-                        {%- elif rol == 'TITULAR' -%}
-                        {{ url_for('titulares.titulares') }}
-                        {%- elif rol == 'CENTRO' -%}
-                        {{ url_for('centros.centros') }}
-                        {%- endif -%}"
-                        class="btn btn-primary">
-                      Ir a rol</a>
+                      <h5 class="card-title">{{ rol.nombre_rol.upper() }}</h5>
+                      <p class="card-text">{{ rol.descripcion }}</p>
+                        <a href="
+                          {%- if rol.nombre_rol == 'gestor' -%}
+                          {{ url_for('gestores.gestores') }}
+                          {%- elif rol.nombre_rol == 'cogestor' -%}
+                          {{ url_for('cogestores.cogestores') }}
+                          {%- elif rol.nombre_rol == 'titular' -%}
+                          {{ url_for('titulares.titulares') }}
+                          {%- elif rol.nombre_rol == 'centro' -%}
+                          {{ url_for('centros.centros') }}
+                          {%- endif -%}"
+                          class="btn btn-primary">
+                        Ir a rol</a>
                     </div>
                 </div>
             </div>

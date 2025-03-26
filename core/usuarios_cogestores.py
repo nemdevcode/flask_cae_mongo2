@@ -46,9 +46,7 @@ def gestores_usuarios_cogestores_vista():
             if usuario:
                 # Si hay filtro por nombre, verificar si coincide
                 if filtrar_cogestor:
-                    if (filtrar_cogestor.lower() not in usuario['nombre_usuario'].lower() and 
-                        filtrar_cogestor.lower() not in uc['alias'].lower() and
-                        filtrar_cogestor.lower() not in usuario['telefono'].lower() and
+                    if (filtrar_cogestor.lower() not in uc['alias'].lower() and
                         filtrar_cogestor.lower() not in usuario['email'].lower()):
                         continue
 
@@ -56,10 +54,10 @@ def gestores_usuarios_cogestores_vista():
                     '_id': uc['_id'],
                     'cogestor_info': {
                         'alias': uc['alias'],
+                        'nombre_usuario': usuario['nombre_usuario'],
+                        'telefono': usuario['telefono'],
                         'estado': uc['estado']
                     },
-                    'nombre_usuario': usuario['nombre_usuario'],
-                    'telefono': usuario['telefono'],
                     'email': usuario['email']
                 }
                 cogestores.append(cogestor)
@@ -78,7 +76,58 @@ def gestores_usuarios_cogestores_vista():
         flash(f'Error al listar los cogestores: {str(e)}', 'danger')
         return redirect(url_for('gestores.gestores_usuarios_cogestores'))
 
+def obtener_rol_cogestor():
+    
+    """Obtiene el rol de cogestor, lo crea si no existe"""
+    rol_cogestor = db.roles.find_one({'nombre_rol': 'cogestor'})
+    if not rol_cogestor:
+        rol_data = {
+            'nombre_rol': 'cogestor',
+            'descripcion': 'Rol de cogestor',
+            'fecha_alta': datetime.now(),
+            'fecha_modificacion': datetime.now(),
+            'fecha_baja': None,
+            'estado': 'activo'
+        }
+        resultado_rol = db.roles.insert_one(rol_data)
+        return resultado_rol.inserted_id
+    return rol_cogestor['_id']
+
+def obtener_usuario_rol(usuario_id, rol_id):
+
+    """Obtiene el usuario_rol, lo crea si no existe"""
+    usuario_rol_existente = db.usuarios_roles.find_one({
+        'usuario_id': usuario_id,
+        'rol_id': rol_id
+    })
+    
+    if not usuario_rol_existente:
+        usuario_rol_data = {
+            'usuario_id': usuario_id,
+            'rol_id': rol_id,
+            'fecha_alta': datetime.now(),
+            'fecha_modificacion': datetime.now(),
+            'fecha_baja': None,
+            'estado': 'activo'
+        }
+        resultado_usuario_rol = db.usuarios_roles.insert_one(usuario_rol_data)
+        return resultado_usuario_rol.inserted_id
+    return usuario_rol_existente['_id']
+
+def crear_usuario_cogestor(usuario_rol_id, gestor_id, alias):
+
+    """Crea un nuevo usuario_cogestor"""
+    return db.usuarios_cogestores.insert_one({
+        'usuario_rol_id': usuario_rol_id,
+        'gestor_id': ObjectId(gestor_id),
+        'alias': alias,
+        'estado': 'activo',
+        'fecha_creacion': datetime.now(),
+        'fecha_modificacion': datetime.now()
+    })
+
 def gestores_usuarios_cogestores_crear_vista():
+    
     if request.method == 'GET':
         return render_template('gestores/usuarios_cogestores/crear.html')
     
@@ -91,31 +140,41 @@ def gestores_usuarios_cogestores_crear_vista():
                 return redirect(url_for('login'))
 
             # Obtener datos del formulario
-            alias = request.form.get('alias', '').strip()
+            alias = request.form.get('alias', '').strip().upper()
             email = request.form.get('email', '').strip().lower()
-            nombre_usuario = request.form.get('nombre_usuario', '').strip()
-            telefono = request.form.get('telefono', '').strip()
 
-            # Validaciones básicas
-            if not all([alias, email, nombre_usuario, telefono]):
-                flash('Todos los campos son obligatorios', 'danger')
-                return render_template('gestores/usuarios_cogestores/crear.html',
-                                    form_data=request.form)
+            # Verificar si el email existe en la colección usuarios
+            usuario_existente = db.usuarios.find_one({'email': email})
+            
+            if usuario_existente:
+                # Si existe el usuario, verificar si ya es cogestor para este gestor
+                usuario_id = usuario_existente['_id']
+                cogestor_existente = db.usuarios_cogestores.find_one({
+                    'usuario_id': usuario_id,
+                    'gestor_id': ObjectId(gestor_id)
+                })
+                
+                if cogestor_existente:
+                    flash('Este email ya está registrado como cogestor para este gestor', 'danger')
+                    return render_template('gestores/usuarios_cogestores/crear.html',
+                                        form_data=request.form)
+                
+                # Obtener rol de cogestor y crear usuario_rol
+                rol_id = obtener_rol_cogestor()
+                usuario_rol_id = obtener_usuario_rol(usuario_id, rol_id)
+                
+                # Crear el cogestor
+                crear_usuario_cogestor(usuario_rol_id, gestor_id, alias)
+                flash('Cogestor creado correctamente', 'success')
+                return redirect(url_for('gestores.gestores_usuarios_cogestores'))
 
-            # Verificar si el email ya existe
-            if db.usuarios.find_one({'email': email}):
-                flash('El email ya está registrado', 'danger')
-                return render_template('gestores/usuarios_cogestores/crear.html',
-                                    form_data=request.form)
-
+            # Si el usuario no existe, crear nuevo usuario y cogestor
             # Generar token de verificación
             token = generar_token_verificacion(email)
 
             # Crear el usuario
             usuario_id = db.usuarios.insert_one({
-                'nombre_usuario': nombre_usuario,
                 'email': email,
-                'telefono': telefono,
                 'estado': 'pendiente',
                 'verificado': False,
                 'token_verificacion': token,
@@ -123,15 +182,12 @@ def gestores_usuarios_cogestores_crear_vista():
                 'fecha_modificacion': datetime.now()
             }).inserted_id
 
+            # Obtener rol de cogestor y crear usuario_rol
+            rol_id = obtener_rol_cogestor()
+            usuario_rol_id = obtener_usuario_rol(usuario_id, rol_id)
+            
             # Crear el cogestor
-            db.usuarios_cogestores.insert_one({
-                'usuario_id': usuario_id,
-                'gestor_id': ObjectId(gestor_id),
-                'alias': alias,
-                'estado': 'pendiente',
-                'fecha_creacion': datetime.now(),
-                'fecha_modificacion': datetime.now()
-            })
+            crear_usuario_cogestor(usuario_rol_id, gestor_id, alias)
 
             # Enviar email de verificación
             link_verificacion = url_for('verificar_email', token=token, email=email, _external=True)
@@ -193,8 +249,7 @@ def gestores_usuarios_cogestores_actualizar_vista():
                 'alias': cogestor['alias'],
                 'estado': cogestor['estado']
             },
-            'email': usuario['email'],
-            'password': usuario['password']
+            'email': usuario['email']
         }
 
         if request.method == 'GET':
@@ -202,16 +257,8 @@ def gestores_usuarios_cogestores_actualizar_vista():
 
         if request.method == 'POST':
             # Obtener datos del formulario
-            alias = request.form.get('alias', '').strip()
-            email = request.form.get('email', '').strip().lower()
-            password = request.form.get('password', '').strip()
-            password_confirm = request.form.get('password_confirm', '').strip()
+            alias = request.form.get('alias', '').strip().upper()
             estado = request.form.get('estado', 'activo')
-
-            if password != password_confirm:
-                flash('Las contraseñas no coinciden', 'danger')
-                return render_template('gestores/usuarios_cogestores/actualizar.html',
-                                        cogestor=cogestor_data)
 
             # Verificar si el alias ya existe para este gestor (excluyendo el cogestor actual)
             if db.usuarios_cogestores.find_one({
@@ -221,25 +268,7 @@ def gestores_usuarios_cogestores_actualizar_vista():
             }):
                 flash('El alias ya está en uso para este gestor', 'danger')
                 return render_template('gestores/usuarios_cogestores/actualizar.html',
-                                        cogestor=cogestor_data)
-
-            # Verificar si el email ya existe en otro usuario
-            if email != usuario['email']:
-                if db.usuarios.find_one({'email': email}):
-                    flash('El email ya está en uso por otro usuario', 'danger')
-                    return render_template('gestores/usuarios_cogestores/actualizar.html',
-                                        cogestor=cogestor_data)
-
-            # Actualizar el usuario
-            db.usuarios.update_one(
-                {'_id': usuario['_id']},
-                {
-                    '$set': {
-                        'email': email,
-                        'fecha_modificacion': datetime.now()
-                    }
-                }
-            )
+                                    cogestor=cogestor_data)
 
             # Actualizar el cogestor
             db.usuarios_cogestores.update_one(

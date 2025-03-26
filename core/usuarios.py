@@ -11,37 +11,39 @@ from config import conexion_mongo
 db = conexion_mongo()
 
 def usuarios_vista():
-    
-    usuario_id = session.get('usuario_id')
-    usuario = db.usuarios.find_one({'_id': ObjectId(usuario_id)})
+    try:
+        # Obtener el ID del usuario actual
+        usuario_id = session.get('usuario_id')
+        
+        if not usuario_id:
+            flash('No hay usuario autenticado', 'danger')
+            return redirect(url_for('login'))
 
-    usuario_roles = list(db.usuarios_roles.find({'usuario_id': ObjectId(usuario_id)}))
+        # Obtener la información del usuario
+        usuario_actual = db.usuarios.find_one({'_id': ObjectId(usuario_id)})
+        
+        if not usuario_actual:
+            flash('Usuario no encontrado', 'danger')
+            return redirect(url_for('login'))
 
-    # Almacenar los IDs de usuarios_roles en la sesión
-    session['usuarios_roles_ids'] = [str(ur['_id']) for ur in usuario_roles]  # Convertir ObjectId a string
+        # Obtener los roles del usuario
+        usuario_roles = list(db.usuarios_roles.find({'usuario_id': ObjectId(usuario_id)}))
 
-    # Extraer los rol_id de la lista
-    rol_ids = [ObjectId(ur['rol_id']) for ur in usuario_roles]
-    
-    # Buscar los nombres de roles en la colección roles
-    roles = list(db.roles.find({'_id': {'$in': rol_ids}}, {'nombre_rol': 1}))
-    
-    # Crear variables en la sesión para cada rol usando el ID del usuario
-    for rol in roles:
-        nombre_variable = rol['nombre_rol'].lower()  # gestor, admin, etc.
-        session[nombre_variable] = str(usuario_id)  # Guardamos el ID del usuario directamente
-    
-    # Extraer solo los nombres de roles
-    nombres_roles = [rol['nombre_rol'].upper() for rol in roles]
-    
-    # Obtener mensaje_ok de los argumentos de la URL si existe
-    # mensaje_ok = request.args.get('mensaje_ok')
-    
-    return render_template('usuarios.html', 
-                         usuario=usuario, 
-                         nombres_roles=nombres_roles,
-                        #  mensaje_ok=mensaje_ok,
-                         )
+        # Obtener la información completa de los roles
+        roles = []
+        for usuario_rol in usuario_roles:
+            rol = db.roles.find_one({'_id': usuario_rol['rol_id']})
+            if rol:
+                rol['estado'] = usuario_rol['estado']  # Agregar el estado del rol
+                roles.append(rol)
+
+        return render_template('usuarios.html', 
+                             usuario_actual=usuario_actual,
+                             nombres_roles=roles)
+
+    except Exception as e:
+        flash(f'Error al cargar la vista de usuarios: {str(e)}', 'danger')
+        return redirect(url_for('login'))
     
 def usuario_actualizar_vista():
     if request.method == 'GET':

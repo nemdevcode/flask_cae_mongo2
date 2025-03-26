@@ -2,17 +2,13 @@ from flask import Flask
 import os
 from routes._routes import rutas
 from extensions import init_extensions
-from icecream import ic
-ic.disable()
 from dotenv import load_dotenv, find_dotenv
 from config import configurar_email
 
 def crear_app():
     # Forzar recarga del archivo .env, tomaba contraseñas antiguas
     dotenv_path = find_dotenv()
-    ic("Archivo .env encontrado en:", dotenv_path)
     load_dotenv(dotenv_path, override=True)
-    
     app = Flask(__name__)
     # Configuración de MongoDB y clave secreta para las sesiones
     app.config['MONGO_URI'] = os.getenv('MONGO_URI')

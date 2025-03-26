@@ -2,7 +2,6 @@ from dotenv import load_dotenv
 import os
 from pymongo import MongoClient
 import certifi
-from icecream import ic
 
 load_dotenv()
 
@@ -30,10 +29,8 @@ def conexion_mongo():
 
 def configurar_email(app):
     """Configura las opciones de email en la aplicación Flask"""
-    # Obtener y verificar la contraseña
+    # Obtener la contraseña
     mail_password = os.getenv('MAIL_PASSWORD')
-    ic("Variables de entorno disponibles:", os.environ.keys())
-    ic("Contraseña del .env:", mail_password)
     
     # Configuración de Flask-Mail para Gmail
     app.config.update(
@@ -48,11 +45,6 @@ def configurar_email(app):
         MAIL_ASCII_ATTACHMENTS=False,
         MAIL_DEBUG=True
     )
-
-    # Verificar la configuración final
-    ic("Configuración final:")
-    ic("Username:", app.config['MAIL_USERNAME'])
-    ic("Password configurada:", app.config['MAIL_PASSWORD'])
 
 
 

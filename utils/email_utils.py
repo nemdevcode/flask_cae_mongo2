@@ -2,6 +2,7 @@ from flask_mail import Message
 from flask import current_app
 from extensions import mail
 from icecream import ic
+ic.disable()
 from dotenv import load_dotenv
 import os
 
