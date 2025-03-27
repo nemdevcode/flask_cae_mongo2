@@ -53,7 +53,7 @@ Rutas para gestión de gestores, funciones:
     - gestores_eliminar_vista()
 '''
 
-@gestores_bp.route('/usuarios/usuarios_gestores', methods=['GET'])
+@gestores_bp.route('/usuarios/usuarios_gestores', methods=['GET', 'POST'])
 @login_requerido
 def gestores():
     return gestores_vista()

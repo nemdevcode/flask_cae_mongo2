@@ -35,6 +35,15 @@ def gestores_vista():
             flash('No tienes permisos para acceder a esta página', 'danger')
             return redirect(url_for('usuarios.usuarios'))
 
+        # Obtener parámetros de filtrado
+        filtrar_gestor = request.form.get('filtrar_gestor', '')
+        filtrar_estado = request.form.get('filtrar_estado', 'todos')
+        vaciar = request.args.get('vaciar', '0')
+
+        # Si se solicita vaciar filtros
+        if vaciar == '1':
+            return redirect(url_for('gestores.gestores'))
+
         # Obtener todos los gestores relacionados con el usuario_rol_id
         usuarios_gestores = list(db.usuarios_gestores.find({
             'usuario_rol_id': usuario_rol_id,
@@ -44,16 +53,35 @@ def gestores_vista():
         # Obtener los datos de los gestores
         gestores = []
         for usuario_gestor in usuarios_gestores:
-            gestor = db.gestores.find_one({
+            # Construir la consulta base para el gestor
+            query = {
                 '_id': usuario_gestor['gestor_id'],
                 'estado_gestor': 'activo'
-            })
+            }
+
+            # Aplicar filtro por estado si no es 'todos'
+            if filtrar_estado != 'todos':
+                query['estado_gestor'] = filtrar_estado
+
+            gestor = db.gestores.find_one(query)
             if gestor:
+                # Si hay filtro por texto, verificar si coincide con algún campo
+                if filtrar_gestor:
+                    if (filtrar_gestor.lower() not in gestor['nombre_gestor'].lower() and
+                        filtrar_gestor.lower() not in gestor['cif_dni'].lower() and
+                        filtrar_gestor.lower() not in gestor['domicilio'].lower() and
+                        filtrar_gestor.lower() not in gestor['codigo_postal'].lower() and
+                        filtrar_gestor.lower() not in gestor['poblacion'].lower() and
+                        filtrar_gestor.lower() not in gestor['provincia'].lower() and
+                        filtrar_gestor.lower() not in gestor['telefono_gestor'].lower()):
+                        continue
                 gestores.append(gestor)
 
         return render_template('usuarios/usuarios_gestores.html', 
                              nombre_gestor=usuario.get('nombre_usuario'),
-                             gestores=gestores)
+                             gestores=gestores,
+                             filtrar_gestor=filtrar_gestor,
+                             filtrar_estado=filtrar_estado)
 
     except Exception as e:
         flash(f'Error al cargar la vista de gestores: {str(e)}', 'danger')
