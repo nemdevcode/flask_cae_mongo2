@@ -116,15 +116,14 @@
                                 </span>
                             </td>
                             <td class="text-center">
-                                <a href="" 
-                                   class="btn btn-warning btn-sm">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <a href="" 
-                                   class="btn btn-danger btn-sm"
-                                   onclick="return confirm('¿Estás seguro de que deseas eliminar este gestor?')">
-                                    <i class="fas fa-trash"></i>
-                                </a>
+                                <a href="{{ url_for('gestores.gestores_editar', gestor_id=gestor._id) }}" 
+                                   class="btn btn-primary btn-sm">Editar</a>
+                                <button type="button" 
+                                        class="btn btn-danger btn-sm" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#confirmarEliminar{{ gestor._id }}">
+                                    Eliminar
+                                </button>
                             </td>
                         </tr>
                         {% endfor %}
@@ -137,4 +136,28 @@
             </table>
         </div>
     </div>
+
+    <!-- Modales de confirmación de eliminación -->
+    {% if gestores %}
+        {% for gestor in gestores %}
+        <div class="modal fade" id="confirmarEliminar{{ gestor._id }}" tabindex="-1" aria-labelledby="confirmarEliminarLabel{{ gestor._id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmarEliminarLabel{{ gestor._id }}">Confirmar eliminación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        ¿Estás seguro de que deseas eliminar el gestor "{{ gestor.nombre_gestor }}"?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <a href="{{ url_for('gestores.gestores_eliminar', gestor_id=gestor._id) }}" 
+                           class="btn btn-danger">Eliminar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
 {% endblock %}

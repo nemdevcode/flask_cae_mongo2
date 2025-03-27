@@ -59,7 +59,14 @@ def gestores_vista():
         flash(f'Error al cargar la vista de gestores: {str(e)}', 'danger')
         return redirect(url_for('usuarios.usuarios'))
 
+def gestores_crear_vista():
+    pass
 
+def gestores_editar_vista():
+    pass
+
+def gestores_eliminar_vista():
+    pass
 
 
 

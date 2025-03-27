@@ -1,7 +1,10 @@
 from flask import Blueprint
 
 from core.usuarios_gestores import (
-    gestores_vista
+    gestores_vista,
+    gestores_crear_vista,
+    gestores_editar_vista,
+    gestores_eliminar_vista
 )
 
 from core.usuarios_cogestores import (
@@ -42,10 +45,33 @@ from core.usuarios_contratas import (
 from core._decoradores import login_requerido
 gestores_bp = Blueprint('gestores', __name__)
 
+'''
+Rutas para gestión de gestores, funciones:
+    - gestores_vista()
+    - gestores_crear_vista()
+    - gestores_editar_vista()
+    - gestores_eliminar_vista()
+'''
+
 @gestores_bp.route('/usuarios/usuarios_gestores', methods=['GET'])
 @login_requerido
 def gestores():
     return gestores_vista()
+
+@gestores_bp.route('/usuarios/usuarios_gestores/crear', methods=['GET', 'POST'])
+@login_requerido
+def gestores_crear():
+    return gestores_crear_vista()
+
+@gestores_bp.route('/usuarios/usuarios_gestores/editar', methods=['GET', 'POST'])
+@login_requerido
+def gestores_editar():
+    return gestores_editar_vista()
+
+@gestores_bp.route('/usuarios/usuarios_gestores/eliminar', methods=['GET', 'POST'])
+@login_requerido
+def gestores_eliminar():
+    return gestores_eliminar_vista()
 
 '''
 Rutas para gestión de cogestores, funciones:
