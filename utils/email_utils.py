@@ -1,8 +1,7 @@
 from flask_mail import Message
 from flask import current_app
 from extensions import mail
-from icecream import ic
-ic.disable()
+# from icecream import ic
 from dotenv import load_dotenv
 import os
 
@@ -20,18 +19,18 @@ def enviar_email(destinatario, asunto, cuerpo):
     """
     try:
         # Verificar la contraseña directamente
-        ic("Verificando contraseña:")
-        password = current_app.config['MAIL_PASSWORD']
-        ic("Contraseña actual:", password)  # Mostrar la contraseña actual para debugging
+        # ic("Verificando contraseña:")
+        # password = current_app.config['MAIL_PASSWORD']
+        # ic("Contraseña actual:", password)  # Mostrar la contraseña actual para debugging
         
-        ic("Configuración de correo en Flask:")
-        ic(current_app.config['MAIL_SERVER'])
-        ic(current_app.config['MAIL_PORT'])
-        ic(current_app.config['MAIL_USE_TLS'])
-        ic(current_app.config['MAIL_USE_SSL'])
-        ic("Usuario:", current_app.config['MAIL_USERNAME'])
+        # ic("Configuración de correo en Flask:")
+        # ic(current_app.config['MAIL_SERVER'])
+        # ic(current_app.config['MAIL_PORT'])
+        # ic(current_app.config['MAIL_USE_TLS'])
+        # ic(current_app.config['MAIL_USE_SSL'])
+        # ic("Usuario:", current_app.config['MAIL_USERNAME'])
         
-        ic("Remitente:", current_app.config['MAIL_USERNAME'])
+        # ic("Remitente:", current_app.config['MAIL_USERNAME'])
         
         mensaje = Message(
             subject=asunto,
@@ -40,11 +39,11 @@ def enviar_email(destinatario, asunto, cuerpo):
             sender=current_app.config['MAIL_USERNAME']
         )
         
-        ic("Intentando enviar correo...")
+        # ic("Intentando enviar correo...")
         mail.send(mensaje)
-        ic("Correo enviado exitosamente")
+        # ic("Correo enviado exitosamente")
         return True
     except Exception as e:
-        ic("Error al enviar el correo:", str(e))
-        ic("Detalles completos del error:", e)
+        # ic("Error al enviar el correo:", str(e))
+        # ic("Detalles completos del error:", e)
         return False 

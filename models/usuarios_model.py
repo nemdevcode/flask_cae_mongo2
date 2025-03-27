@@ -2,7 +2,7 @@ class UsuariosCollection:
     def __init__(self,
                  nombre_usuario,
                  email,
-                 telefono,
+                 telefono_usuario,
                  password=None,
                  fecha_activacion=None,
                  fecha_modificacion=None,
@@ -12,7 +12,7 @@ class UsuariosCollection:
                  verificado=False):
         self.nombre_usuario = nombre_usuario
         self.email = email
-        self.telefono = telefono
+        self.telefono_usuario = telefono_usuario
         self.password = password
         self.fecha_activacion = fecha_activacion
         self.fecha_modificacion = fecha_modificacion

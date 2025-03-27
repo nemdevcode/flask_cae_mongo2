@@ -47,7 +47,7 @@ def verificar_email_vista():
                 '$set': {
                     'password': password,
                     'verificado': True,
-                    'estado': 'activo',
+                    'estado_usuario': 'activo',
                     'fecha_modificacion': datetime.now(),
                     'token_verificacion': None
                 }

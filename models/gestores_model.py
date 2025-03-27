@@ -6,7 +6,7 @@ class GestoresCollection:
                  codigo_postal,
                  poblacion,
                  provincia,
-                 telefono,
+                 telefono_gestor,
                  fecha_activacion,
                  fecha_modificacion,
                  fecha_inactivacion,
@@ -17,7 +17,7 @@ class GestoresCollection:
         self.codigo_postal = codigo_postal
         self.poblacion = poblacion
         self.provincia = provincia
-        self.telefono = telefono
+        self.telefono_gestor = telefono_gestor
         self.fecha_activacion = fecha_activacion
         self.fecha_modificacion = fecha_modificacion
         self.fecha_inactivacion = fecha_inactivacion
@@ -27,14 +27,14 @@ class UsuariosGestoresCollection:
     def __init__(self,
                  usuario_rol_id,
                  gestor_id,
-                 alias,
+                 alias_usuario_gestor,
                  fecha_activacion,
                  fecha_modificacion,
                  fecha_inactivacion,
                  estado_usuario_gestor):
         self.usuario_rol_id = usuario_rol_id
         self.gestor_id = gestor_id
-        self.alias = alias
+        self.alias_usuario_gestor = alias_usuario_gestor
         self.fecha_activacion = fecha_activacion
         self.fecha_modificacion = fecha_modificacion
         self.fecha_inactivacion = fecha_inactivacion

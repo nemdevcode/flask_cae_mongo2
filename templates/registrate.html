@@ -8,9 +8,14 @@
                 <div class="card-body">
                     <form action="{{ url_for('registrate') }}" method="post">
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="nombre_usuario" name="nombre_usuario" 
-                                   value="{{ form_data.nombre_usuario if form_data else '' }}" required>
-                            <label for="nombre_usuario">Nombre:</label>
+                            <input type="text" class="form-control" id="nombre_gestor" name="nombre_gestor" 
+                                   value="{{ form_data.nombre_gestor if form_data else '' }}" required>
+                            <label for="nombre_gestor">Nombre de la empresa:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="alias_usuario_gestor" name="alias_usuario_gestor" 
+                                   value="{{ form_data.alias_usuario_gestor if form_data else '' }}" required>
+                            <label for="alias_usuario_gestor">Nombre de usuario:</label>
                         </div>
                         <div class="form-floating mb-3">
                             <input type="text" class="form-control" id="cif_dni" name="cif_dni" 
@@ -38,14 +43,19 @@
                             <label for="provincia">Provincia:</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="telefono" name="telefono" 
-                                   value="{{ form_data.telefono if form_data else '' }}" required>
-                            <label for="telefono">Teléfono:</label>    
+                            <input type="text" class="form-control" id="telefono_gestor" name="telefono_gestor" 
+                                   value="{{ form_data.telefono_gestor if form_data else '' }}" required>
+                            <label for="telefono_gestor">Teléfono de la empresa:</label>    
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="telefono_usuario" name="telefono_usuario" 
+                                   value="{{ form_data.telefono_usuario if form_data else '' }}" required>
+                            <label for="telefono_usuario">Teléfono del usuario:</label>    
                         </div>
                         <div class="form-floating mb-3">
                             <input type="email" class="form-control" id="email" name="email" 
                                    value="{{ form_data.email if form_data else '' }}" required>
-                            <label for="email">Email:</label>
+                            <label for="email">Email del usuario:</label>
                         </div>
                         <div class="d-flex justify-content-end align-items-center gap-2">
                             <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancelar</a>

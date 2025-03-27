@@ -8,7 +8,7 @@ class TitularesCollection:
                  codigo_postal,
                  poblacion,
                  provincia,
-                 telefono,
+                 telefono_titular,
                  fecha_activacion, 
                  fecha_modificacion, 
                  fecha_inactivacion, 
@@ -20,7 +20,7 @@ class TitularesCollection:
         self.codigo_postal = codigo_postal
         self.poblacion = poblacion
         self.provincia = provincia
-        self.telefono = telefono
+        self.telefono_titular = telefono_titular
         self.fecha_activacion = fecha_activacion
         self.fecha_modificacion = fecha_modificacion
         self.fecha_inactivacion = fecha_inactivacion
@@ -30,14 +30,14 @@ class UsuariosTitularesCollection:
     def __init__(self, 
                  usuario_rol_id,
                  titular_id,
-                 alias,
+                 alias_usuario_titular,
                  fecha_activacion, 
                  fecha_modificacion, 
                  fecha_inactivacion, 
                  estado_usuario_titular):
         self.usuario_rol_id = usuario_rol_id
         self.titular_id = titular_id
-        self.alias = alias
+        self.alias_usuario_titular = alias_usuario_titular
         self.fecha_activacion = fecha_activacion
         self.fecha_modificacion = fecha_modificacion
         self.fecha_inactivacion = fecha_inactivacion

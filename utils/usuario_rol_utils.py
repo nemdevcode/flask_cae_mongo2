@@ -1,12 +1,14 @@
 from datetime import datetime
 from config import conexion_mongo
-from bson.objectid import ObjectId
+from models.roles_model import RolesCollection
+from models.usuarios_roles_model import UsuariosRolesCollection
+from models.usuarios_model import UsuariosCollection
 
 db = conexion_mongo()
 
 def obtener_rol(nombre_rol):
     """
-    Obtiene un rol por su nombre
+    Obtiene un rol por su nombre, creándolo si no existe
     Args:
         nombre_rol: Nombre del rol a buscar
     Retorna:
@@ -27,15 +29,15 @@ def crear_rol(nombre_rol):
         - ID del rol creado
     """
     fecha_actual = datetime.now()
-    rol_data = {
-        'nombre_rol': nombre_rol,
-        'descripcion': f'Rol de {nombre_rol}',
-        'fecha_activacion': fecha_actual,
-        'fecha_modificacion': fecha_actual,
-        'fecha_inactivacion': None,
-        'estado_rol': 'activo'
-    }
-    resultado_rol = db.roles.insert_one(rol_data)
+    rol = RolesCollection(
+        nombre_rol=nombre_rol,
+        descripcion=f'Rol de {nombre_rol}',
+        fecha_activacion=fecha_actual,
+        fecha_modificacion=fecha_actual,
+        fecha_inactivacion=None,
+        estado_rol='activo'
+    )
+    resultado_rol = db.roles.insert_one(rol.__dict__)
     return resultado_rol.inserted_id
 
 def obtener_usuario_rol(usuario_id, rol_id):
@@ -66,15 +68,15 @@ def crear_usuario_rol(usuario_id, rol_id):
         - ID del usuario_rol creado
     """
     fecha_actual = datetime.now()
-    usuario_rol_data = {
-        'usuario_id': usuario_id,
-        'rol_id': rol_id,
-        'fecha_activacion': fecha_actual,
-        'fecha_modificacion': fecha_actual,
-        'fecha_inactivacion': None,
-        'estado_usuario_rol': 'activo'
-    }
-    resultado_usuario_rol = db.usuarios_roles.insert_one(usuario_rol_data)
+    usuario_rol = UsuariosRolesCollection(
+        usuario_id=usuario_id,
+        rol_id=rol_id,
+        fecha_activacion=fecha_actual,
+        fecha_modificacion=fecha_actual,
+        fecha_inactivacion=None,
+        estado_usuario_rol='activo'
+    )
+    resultado_usuario_rol = db.usuarios_roles.insert_one(usuario_rol.__dict__)
     return resultado_usuario_rol.inserted_id
 
 def verificar_usuario_existente(email):
@@ -101,13 +103,13 @@ def crear_usuario(email, datos_usuario):
         - ID del usuario creado
     """
     fecha_actual = datetime.now()
-    usuario_data = {
-        'email': email,
-        'fecha_activacion': fecha_actual,
-        'fecha_modificacion': fecha_actual,
-        'fecha_inactivacion': None,
-        'estado_usuario': 'pendiente',
+    usuario = UsuariosCollection(
+        email=email,
+        fecha_activacion=fecha_actual,
+        fecha_modificacion=fecha_actual,
+        fecha_inactivacion=None,
+        estado_usuario='pendiente',
         **datos_usuario
-    }
-    resultado_usuario = db.usuarios.insert_one(usuario_data)
+    )
+    resultado_usuario = db.usuarios.insert_one(usuario.__dict__)
     return resultado_usuario.inserted_id 
