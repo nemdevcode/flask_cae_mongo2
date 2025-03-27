@@ -29,14 +29,31 @@ def gestores_vista():
             return redirect(url_for('usuarios.usuarios'))
 
         # Verificar si el usuario tiene el rol de gestor
-        tiene_rol, _ = obtener_usuario_rol(usuario_id, rol_gestor_id)
+        tiene_rol, usuario_rol_id = obtener_usuario_rol(usuario_id, rol_gestor_id)
         
         if not tiene_rol:
             flash('No tienes permisos para acceder a esta página', 'danger')
             return redirect(url_for('usuarios.usuarios'))
 
-        return render_template('gestores/index.html', 
-                             nombre_gestor=usuario.get('nombre_usuario'))
+        # Obtener todos los gestores relacionados con el usuario_rol_id
+        usuarios_gestores = list(db.usuarios_gestores.find({
+            'usuario_rol_id': usuario_rol_id,
+            'estado_usuario_gestor': 'activo'
+        }))
+
+        # Obtener los datos de los gestores
+        gestores = []
+        for usuario_gestor in usuarios_gestores:
+            gestor = db.gestores.find_one({
+                '_id': usuario_gestor['gestor_id'],
+                'estado_gestor': 'activo'
+            })
+            if gestor:
+                gestores.append(gestor)
+
+        return render_template('usuarios/usuarios_gestores.html', 
+                             nombre_gestor=usuario.get('nombre_usuario'),
+                             gestores=gestores)
 
     except Exception as e:
         flash(f'Error al cargar la vista de gestores: {str(e)}', 'danger')

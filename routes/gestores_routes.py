@@ -42,7 +42,7 @@ from core.usuarios_contratas import (
 from core._decoradores import login_requerido
 gestores_bp = Blueprint('gestores', __name__)
 
-@gestores_bp.route('/usuarios/gestores', methods=['GET'])
+@gestores_bp.route('/usuarios/usuarios_gestores', methods=['GET'])
 @login_requerido
 def gestores():
     return gestores_vista()
