@@ -34,7 +34,7 @@ def usuarios_vista():
         for usuario_rol in usuario_roles:
             rol = db.roles.find_one({'_id': usuario_rol['rol_id']})
             if rol:
-                rol['estado'] = usuario_rol['estado']  # Agregar el estado del rol
+                rol['estado_rol'] = usuario_rol['estado_rol']  # Agregar el estado del rol
                 roles.append(rol)
 
         return render_template('usuarios.html', 

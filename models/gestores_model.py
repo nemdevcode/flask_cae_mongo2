@@ -1,20 +1,17 @@
-
-class TitularesCollection:
-    def __init__(self, 
-                 gestor_id,
-                 nombre_titular,
+class GestoresCollection:
+    def __init__(self,
+                 nombre_gestor,
                  cif_dni,
                  domicilio,
                  codigo_postal,
                  poblacion,
                  provincia,
                  telefono,
-                 fecha_activacion, 
-                 fecha_modificacion, 
-                 fecha_inactivacion, 
-                 estado_titular):
-        self.gestor_id = gestor_id
-        self.nombre_titular = nombre_titular
+                 fecha_activacion,
+                 fecha_modificacion,
+                 fecha_inactivacion,
+                 estado_gestor):
+        self.nombre_gestor = nombre_gestor
         self.cif_dni = cif_dni
         self.domicilio = domicilio
         self.codigo_postal = codigo_postal
@@ -24,21 +21,22 @@ class TitularesCollection:
         self.fecha_activacion = fecha_activacion
         self.fecha_modificacion = fecha_modificacion
         self.fecha_inactivacion = fecha_inactivacion
-        self.estado_titular = estado_titular
-        
-class UsuariosTitularesCollection:
-    def __init__(self, 
+        self.estado_gestor = estado_gestor
+
+class UsuariosGestoresCollection:
+    def __init__(self,
                  usuario_rol_id,
-                 titular_id,
+                 gestor_id,
                  alias,
-                 fecha_activacion, 
-                 fecha_modificacion, 
-                 fecha_inactivacion, 
-                 estado_usuario_titular):
+                 fecha_activacion,
+                 fecha_modificacion,
+                 fecha_inactivacion,
+                 estado_usuario_gestor):
         self.usuario_rol_id = usuario_rol_id
-        self.titular_id = titular_id
+        self.gestor_id = gestor_id
         self.alias = alias
         self.fecha_activacion = fecha_activacion
         self.fecha_modificacion = fecha_modificacion
         self.fecha_inactivacion = fecha_inactivacion
-        self.estado_usuario_titular = estado_usuario_titular
+        self.estado_usuario_gestor = estado_usuario_gestor
+

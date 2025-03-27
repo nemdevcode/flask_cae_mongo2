@@ -6,6 +6,14 @@ from models.roles_model import RolesCollection
 from models.usuarios_roles_model import UsuariosRolesCollection
 from utils.email_utils import enviar_email
 from utils.token_utils import generar_token_verificacion
+from utils.usuario_rol_utils import (
+    obtener_rol, 
+    crear_rol, 
+    obtener_usuario_rol, 
+    crear_usuario_rol,
+    verificar_usuario_existente,
+    crear_usuario
+)
 from config import conexion_mongo
 from bson.objectid import ObjectId
 # from icecream import ic
@@ -17,105 +25,46 @@ def registrate_vista():
     if request.method == 'POST':
         try:
             # ic("Iniciando proceso de registro")
-            nombre_usuario = request.form['nombre_usuario'].strip().upper()
-            cif_dni = re.sub(r'[^A-Z0-9]', '', request.form.get('cif_dni').strip().upper())
-            domicilio = request.form['domicilio'].strip().capitalize()
-            codigo_postal = request.form['codigo_postal'].strip().upper()
-            poblacion = request.form['poblacion'].strip().upper()
-            provincia = request.form['provincia'].strip().upper()
-            telefono = request.form['telefono'].strip()
-            email = request.form['email'].strip().lower()
-            fecha_alta = datetime.now()
-            fecha_modificacion = datetime.now()
-            fecha_baja = None
-            nombre_rol = 'gestor'
-            descripcion = 'Gestor de coordinación'
-            
-            # ic(f"Datos recibidos - Email: {email}, Nombre: {nombre_usuario}")
-            
             # Verificar si el usuario existe
-            usuario_existente = db.usuarios.find_one({'email': email})
+            existe_usuario, usuario_id = verificar_usuario_existente(email)
             
-            if usuario_existente:
-                # ic("Usuario existente encontrado")
-                usuario_id = usuario_existente['_id']
-                
+            if existe_usuario:
                 # Verificar si ya tiene el rol de gestor
-                rol_gestor = db.roles.find_one({'nombre_rol': 'gestor'})
-                if not rol_gestor:
-                    # ic("Creando rol gestor")
-                    rol = RolesCollection(nombre_rol, descripcion, fecha_alta, fecha_modificacion, fecha_baja, estado='activo')
-                    resultado_rol = db.roles.insert_one(rol.__dict__)
-                    rol_gestor_id = resultado_rol.inserted_id
-                else:
-                    rol_gestor_id = rol_gestor['_id']
+                existe_rol, rol_gestor_id = obtener_rol('gestor')
+                if not existe_rol:
+                    rol_gestor_id = crear_rol('gestor')
                 
-                # Verificar si ya tiene el rol de gestor asignado
-                usuario_rol_existente = db.usuarios_roles.find_one({
-                    'usuario_id': usuario_id,
-                    'rol_id': rol_gestor_id
-                })
+                tiene_rol, _ = obtener_usuario_rol(usuario_id, rol_gestor_id)
                 
-                if usuario_rol_existente:
-                    # ic("Usuario ya tiene rol de gestor")
+                if tiene_rol:
                     flash("El email ya está registrado como gestor", "danger")
                     return render_template('registrate.html', form_data=request.form)
                 else:
-                    # ic("Creando nueva relación usuario-rol gestor")
-                    usuario_rol = UsuariosRolesCollection(
-                        usuario_id=usuario_id,
-                        rol_id=rol_gestor_id,
-                        fecha_alta=fecha_alta,
-                        fecha_modificacion=fecha_modificacion,
-                        fecha_baja=fecha_baja,
-                        estado='activo'
-                    )
-                    db.usuarios_roles.insert_one(usuario_rol.__dict__)
+                    crear_usuario_rol(usuario_id, rol_gestor_id)
             else:
-                # ic("Creando nuevo usuario")
-                # Generar token de verificación
+                # Si el usuario no existe, preparar datos para crear usuario
+                nombre_usuario = request.form['nombre_usuario'].strip().upper()
+                telefono = request.form['telefono'].strip()
+                email = request.form['email'].strip().lower()
                 token = generar_token_verificacion(email)
                 
-                # Crear nuevo usuario
-                usuario = UsuariosCollection(
-                    nombre_usuario=nombre_usuario,
-                    cif_dni=cif_dni,
-                    domicilio=domicilio,
-                    codigo_postal=codigo_postal,
-                    poblacion=poblacion,
-                    provincia=provincia,
-                    telefono=telefono,
-                    email=email,
-                    fecha_alta=fecha_alta,
-                    fecha_modificacion=fecha_modificacion,
-                    fecha_baja=fecha_baja,
-                    estado='pendiente',
-                    token_verificacion=token
-                )
+                # Crear diccionario con los datos del nuevo usuario
+                datos_usuario = {
+                    'nombre_usuario': nombre_usuario,
+                    'telefono': telefono,
+                    'token_verificacion': token
+                }
                 
-                resultado_usuario = db.usuarios.insert_one(usuario.__dict__)
-                usuario_id = resultado_usuario.inserted_id
+                # Crear el nuevo usuario
+                usuario_id = crear_usuario(email, datos_usuario)
                 
-                # Verificar si el rol gestor existe
-                rol_gestor = db.roles.find_one({'nombre_rol': 'gestor'})
-                if not rol_gestor:
-                    # ic("Creando rol gestor")
-                    rol = RolesCollection(nombre_rol, descripcion, fecha_alta, fecha_modificacion, fecha_baja, estado='activo')
-                    resultado_rol = db.roles.insert_one(rol.__dict__)
-                    rol_gestor_id = resultado_rol.inserted_id
-                else:
-                    rol_gestor_id = rol_gestor['_id']
+                # Obtener o crear el rol de gestor
+                existe_rol, rol_gestor_id = obtener_rol('gestor')
+                if not existe_rol:
+                    rol_gestor_id = crear_rol('gestor')
                 
-                # Crear relación usuario-rol
-                usuario_rol = UsuariosRolesCollection(
-                    usuario_id=usuario_id,
-                    rol_id=rol_gestor_id,
-                    fecha_alta=fecha_alta,
-                    fecha_modificacion=fecha_modificacion,
-                    fecha_baja=fecha_baja,
-                    estado='activo'
-                )
-                db.usuarios_roles.insert_one(usuario_rol.__dict__)
+                # Crear la relación usuario-rol
+                crear_usuario_rol(usuario_id, rol_gestor_id)
                 
                 # Enviar email de verificación
                 link_verificacion = url_for('verificar_email', token=token, email=email, _external=True)

@@ -4,6 +4,17 @@ from datetime import datetime
 from config import conexion_mongo
 from utils.token_utils import generar_token_verificacion
 from utils.email_utils import enviar_email
+from utils.usuario_rol_utils import (
+    crear_rol,
+    crear_usuario_rol,
+    verificar_usuario_existente,
+    crear_usuario,
+    obtener_rol,
+    obtener_usuario_rol
+)
+from models.usuarios_model import UsuariosCollection
+from models.roles_model import RolesCollection
+from models.usuarios_roles_model import UsuariosRolesCollection
 
 db = conexion_mongo()
 
@@ -76,55 +87,22 @@ def gestores_usuarios_cogestores_vista():
         flash(f'Error al listar los cogestores: {str(e)}', 'danger')
         return redirect(url_for('gestores.gestores_usuarios_cogestores'))
 
-def obtener_rol_cogestor():
-    
-    """Obtiene el rol de cogestor, lo crea si no existe"""
-    rol_cogestor = db.roles.find_one({'nombre_rol': 'cogestor'})
-    if not rol_cogestor:
-        rol_data = {
-            'nombre_rol': 'cogestor',
-            'descripcion': 'Rol de cogestor',
-            'fecha_alta': datetime.now(),
-            'fecha_modificacion': datetime.now(),
-            'fecha_baja': None,
-            'estado': 'activo'
-        }
-        resultado_rol = db.roles.insert_one(rol_data)
-        return resultado_rol.inserted_id
-    return rol_cogestor['_id']
-
-def obtener_usuario_rol(usuario_id, rol_id):
-
-    """Obtiene el usuario_rol, lo crea si no existe"""
-    usuario_rol_existente = db.usuarios_roles.find_one({
-        'usuario_id': usuario_id,
-        'rol_id': rol_id
-    })
-    
-    if not usuario_rol_existente:
-        usuario_rol_data = {
-            'usuario_id': usuario_id,
-            'rol_id': rol_id,
-            'fecha_alta': datetime.now(),
-            'fecha_modificacion': datetime.now(),
-            'fecha_baja': None,
-            'estado': 'activo'
-        }
-        resultado_usuario_rol = db.usuarios_roles.insert_one(usuario_rol_data)
-        return resultado_usuario_rol.inserted_id
-    return usuario_rol_existente['_id']
-
 def crear_usuario_cogestor(usuario_rol_id, gestor_id, alias):
-
-    """Crea un nuevo usuario_cogestor"""
-    return db.usuarios_cogestores.insert_one({
+    
+    """
+    Crea un nuevo usuario cogestor
+    """
+    fecha_actual = datetime.now()
+    usuario_cogestor = {
         'usuario_rol_id': usuario_rol_id,
-        'gestor_id': ObjectId(gestor_id),
+        'gestor_id': gestor_id,
         'alias': alias,
-        'estado': 'activo',
-        'fecha_creacion': datetime.now(),
-        'fecha_modificacion': datetime.now()
-    })
+        'fecha_activacion': fecha_actual,
+        'fecha_modificacion': fecha_actual,
+        'fecha_inactivacion': None,
+        'estado_usuario_cogestor': 'activo'
+    }
+    return db.usuarios_cogestores.insert_one(usuario_cogestor)
 
 def gestores_usuarios_cogestores_crear_vista():
     
@@ -139,16 +117,11 @@ def gestores_usuarios_cogestores_crear_vista():
                 flash('No hay gestor autenticado', 'danger')
                 return redirect(url_for('login'))
 
-            # Obtener datos del formulario
-            alias = request.form.get('alias', '').strip().upper()
-            email = request.form.get('email', '').strip().lower()
-
-            # Verificar si el email existe en la colección usuarios
-            usuario_existente = db.usuarios.find_one({'email': email})
+            # Verificar si el usuario existe
+            existe_usuario, usuario_id = verificar_usuario_existente(email)
             
-            if usuario_existente:
+            if existe_usuario:
                 # Si existe el usuario, verificar si ya es cogestor para este gestor
-                usuario_id = usuario_existente['_id']
                 cogestor_existente = db.usuarios_cogestores.find_one({
                     'usuario_id': usuario_id,
                     'gestor_id': ObjectId(gestor_id)
@@ -160,9 +133,18 @@ def gestores_usuarios_cogestores_crear_vista():
                                         form_data=request.form)
                 
                 # Obtener rol de cogestor y crear usuario_rol
-                rol_id = obtener_rol_cogestor()
-                usuario_rol_id = obtener_usuario_rol(usuario_id, rol_id)
+                existe_rol, rol_id = obtener_rol('cogestor')
+                if not existe_rol:
+                    rol_id = crear_rol('cogestor')
                 
+                tiene_rol, usuario_rol_id = obtener_usuario_rol(usuario_id, rol_id)
+                
+                if not tiene_rol:
+                    usuario_rol_id = crear_usuario_rol(usuario_id, rol_id)
+                
+                # Obtener datos del formulario
+                alias = request.form.get('alias', '').strip().upper()
+                email = request.form.get('email', '').strip().lower()
                 # Crear el cogestor
                 crear_usuario_cogestor(usuario_rol_id, gestor_id, alias)
                 flash('Cogestor creado correctamente', 'success')
@@ -171,20 +153,23 @@ def gestores_usuarios_cogestores_crear_vista():
             # Si el usuario no existe, crear nuevo usuario y cogestor
             # Generar token de verificación
             token = generar_token_verificacion(email)
-
-            # Crear el usuario
-            usuario_id = db.usuarios.insert_one({
-                'email': email,
-                'estado': 'pendiente',
-                'verificado': False,
+            
+            # Crear diccionario con los datos del nuevo usuario
+            datos_usuario = {
                 'token_verificacion': token,
-                'fecha_creacion': datetime.now(),
-                'fecha_modificacion': datetime.now()
-            }).inserted_id
-
+                'estado': 'pendiente',
+                'verificado': False
+            }
+            
+            # Crear el nuevo usuario
+            usuario_id = crear_usuario(email, datos_usuario)
+            
             # Obtener rol de cogestor y crear usuario_rol
-            rol_id = obtener_rol_cogestor()
-            usuario_rol_id = obtener_usuario_rol(usuario_id, rol_id)
+            existe_rol, rol_id = obtener_rol('cogestor')
+            if not existe_rol:
+                rol_id = crear_rol('cogestor')
+            
+            usuario_rol_id = crear_usuario_rol(usuario_id, rol_id)
             
             # Crear el cogestor
             crear_usuario_cogestor(usuario_rol_id, gestor_id, alias)
