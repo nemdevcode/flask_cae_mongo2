@@ -5,6 +5,7 @@ import re
 
 from utils.token_utils import generar_token_verificacion
 from utils.email_utils import enviar_email
+from utils.usuario_rol_utils import verificar_usuario_existente
 
 from config import conexion_mongo
 
@@ -34,7 +35,6 @@ def usuarios_vista():
         for usuario_rol in usuario_roles:
             rol = db.roles.find_one({'_id': usuario_rol['rol_id']})
             if rol:
-                rol['estado_rol'] = usuario_rol['estado_rol']  # Agregar el estado del rol
                 roles.append(rol)
 
         return render_template('usuarios.html', 
@@ -54,28 +54,23 @@ def usuario_actualizar_vista():
     if request.method == 'POST':
         try:
             usuario_id = session.get('usuario_id')
-            datos_actualizados = {
-                'nombre_usuario': request.form.get('nombre_usuario').strip().upper(),
-                'cif_dni': re.sub(r'[^A-Z0-9]', '', request.form.get('cif_dni').strip().upper()),
-                'domicilio': request.form.get('domicilio').strip(),
-                'codigo_postal': request.form.get('codigo_postal').strip().upper(),
-                'poblacion': request.form.get('poblacion').strip().upper(),
-                'provincia': request.form.get('provincia').strip().upper(),
-                'telefono': request.form.get('telefono').strip(),
-                'email': request.form.get('email').strip().lower(),
-                'fecha_modificacion': datetime.now()
-            }
+            email = request.form.get('email').strip().lower()
             
             # Verificar si el email ya existe en otro usuario
-            email_existente = db.usuarios.find_one({
-                '_id': {'$ne': ObjectId(usuario_id)},  # Excluir el usuario actual
-                'email': datos_actualizados['email']
-            })
+            existe_usuario, otro_usuario_id = verificar_usuario_existente(email)
             
-            if email_existente:
+            if existe_usuario and otro_usuario_id != ObjectId(usuario_id):
                 usuario = db.usuarios.find_one({'_id': ObjectId(usuario_id)})
                 flash('El email ya está registrado por otro usuario', 'danger')
                 return render_template('usuarios_actualizar.html', usuario=usuario)
+            
+            # Actualizar datos del usuario
+            datos_actualizados = {
+                'nombre_usuario': request.form.get('nombre_usuario').strip().upper(),
+                'telefono_usuario': request.form.get('telefono_usuario').strip(),
+                'email': email,
+                'fecha_modificacion': datetime.now()
+            }
             
             db.usuarios.update_one(
                 {'_id': ObjectId(usuario_id)},

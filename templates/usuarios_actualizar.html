@@ -12,27 +12,7 @@
                             <label for="floatingInput">Nombre:</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="cif_dni" name="cif_dni" value="{{ usuario.cif_dni }}" required>
-                            <label for="floatingInput">CIF/DNI:</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="domicilio" name="domicilio" value="{{ usuario.domicilio }}" required>
-                            <label for="floatingInput">Domicilio:</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="codigo_postal" name="codigo_postal" value="{{ usuario.codigo_postal }}" required>
-                            <label for="floatingInput">Código Postal:</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="poblacion" name="poblacion" value="{{ usuario.poblacion }}" required>
-                            <label for="floatingInput">Población:</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="provincia" name="provincia" value="{{ usuario.provincia }}" required>
-                            <label for="floatingInput">Provincia:</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="telefono" name="telefono" value="{{ usuario.telefono }}" required>
+                            <input type="text" class="form-control" id="telefono_usuario" name="telefono_usuario" value="{{ usuario.telefono_usuario }}" required>
                             <label for="floatingInput">Teléfono:</label>    
                         </div>
                         <div class="form-floating mb-3">
@@ -40,7 +20,7 @@
                             <label for="floatingInput">Email:</label>
                         </div>
                         <div class="d-flex justify-content-end align-items-center mb-3">
-                            <a href="{{ url_for('usuarios.solicitar_cambio_password') }}" class="text-white text-decoration-none">¿Quieres cambiar tu contraseña?</a>
+                            <a href="{{ url_for('usuarios.solicitar_cambio_password') }}" class="text-white text-decoration-none">¿Quieres cambiar tu contraseña?, click aquí</a>
                         </div>
                         <div class="d-flex justify-content-end align-items-center gap-2">
                             <a href="{{ url_for('usuarios.usuarios') }}" type="button" class="btn btn-secondary">Cancelar</a>
