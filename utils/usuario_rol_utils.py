@@ -3,6 +3,7 @@ from config import conexion_mongo
 from models.roles_model import RolesCollection
 from models.usuarios_roles_model import UsuariosRolesCollection
 from models.usuarios_model import UsuariosCollection
+from bson.objectid import ObjectId
 
 db = conexion_mongo()
 
@@ -51,8 +52,8 @@ def obtener_usuario_rol(usuario_id, rol_id):
         - Si no existe: (False, None)
     """
     usuario_rol = db.usuarios_roles.find_one({
-        'usuario_id': usuario_id,
-        'rol_id': rol_id
+        'usuario_id': ObjectId(usuario_id),
+        'rol_id': ObjectId(rol_id)
     })
     if usuario_rol:
         return True, usuario_rol['_id']

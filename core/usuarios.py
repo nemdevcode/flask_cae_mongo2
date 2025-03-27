@@ -37,7 +37,7 @@ def usuarios_vista():
             if rol:
                 roles.append(rol)
 
-        return render_template('usuarios.html', 
+        return render_template('usuarios/index.html', 
                              usuario_actual=usuario_actual,
                              nombres_roles=roles)
 
