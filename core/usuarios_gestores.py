@@ -5,7 +5,7 @@ from utils.usuario_rol_utils import obtener_rol, obtener_usuario_rol
 
 db = conexion_mongo()
 
-def gestores_vista():
+def usuarios_gestores_vista():
     try:
         # Obtener el ID del usuario actual
         usuario_id = session.get('usuario_id')
@@ -87,16 +87,20 @@ def gestores_vista():
         flash(f'Error al cargar la vista de gestores: {str(e)}', 'danger')
         return redirect(url_for('usuarios.usuarios'))
 
-def gestores_crear_vista():
+def usuarios_gestores_crear_vista():
     pass
 
-def gestores_editar_vista():
+def usuarios_gestores_editar_vista():
     pass
 
-def gestores_eliminar_vista():
+def usuarios_gestores_eliminar_vista():
     pass
 
-
+def gestores_vista():
+    # Obtener el ID del usuario actual
+    usuario_id = session.get('usuario_id')
+    usuario = db.usuarios.find_one({'_id': ObjectId(usuario_id)})
+    return render_template('gestores/index.html', nombre_gestor=usuario.get('nombre_usuario'))
 
 
 

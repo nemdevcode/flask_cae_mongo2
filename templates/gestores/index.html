@@ -8,7 +8,7 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
-            <a class="navbar-brand" href="#">CAE Accesible. Panel de gestión de: {{ nombre_gestor }}</a>
+            <a class="navbar-brand" href="#">CAE Accesible. Panel de gestión para el gestor: de: {{ nombre_gestor }}</a>
             <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="/usuarios">Inicio</a>
@@ -17,6 +17,7 @@
             <div class="d-grid gap-2 d-md-flex justify-content-md-end align-items-center">
                 <span class="my-auto">Ir a usuario:</span>
                 <div class="btn-group" role="group" aria-label="Navegación entre tipos de usuarios">
+                    <a href="{{ url_for('gestores.usuarios_gestores') }}" class="btn btn-outline-primary">Gestores</a>
                     <a href="{{ url_for('gestores.gestores_usuarios_cogestores') }}" class="btn btn-outline-primary">Cogestores</a>
                     <a href="{{ url_for('gestores.gestores_usuarios_titulares') }}" class="btn btn-outline-primary">Titulares</a>
                     <a href="{{ url_for('gestores.gestores_usuarios_centros') }}" class="btn btn-outline-primary">Centros</a>

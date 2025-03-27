@@ -1,10 +1,11 @@
 from flask import Blueprint
 
 from core.usuarios_gestores import (
-    gestores_vista,
-    gestores_crear_vista,
-    gestores_editar_vista,
-    gestores_eliminar_vista
+    usuarios_gestores_vista,
+    usuarios_gestores_crear_vista,
+    usuarios_gestores_editar_vista,
+    usuarios_gestores_eliminar_vista,
+    gestores_vista
 )
 
 from core.usuarios_cogestores import (
@@ -47,31 +48,37 @@ gestores_bp = Blueprint('gestores', __name__)
 
 '''
 Rutas para gestión de gestores, funciones:
+    - usuarios_gestores_vista()
+    - usuarios_gestores_crear_vista()
+    - usuarios_gestores_editar_vista()
+    - usuarios_gestores_eliminar_vista()
     - gestores_vista()
-    - gestores_crear_vista()
-    - gestores_editar_vista()
-    - gestores_eliminar_vista()
 '''
 
-@gestores_bp.route('/usuarios/usuarios_gestores', methods=['GET', 'POST'])
+@gestores_bp.route('/usuarios/usuarios-gestores', methods=['GET', 'POST'])
+@login_requerido
+def usuarios_gestores():
+    return usuarios_gestores_vista()
+
+@gestores_bp.route('/usuarios/usuarios-gestores/crear', methods=['GET', 'POST'])
+@login_requerido
+def usuarios_gestores_crear():
+    return usuarios_gestores_crear_vista()
+
+@gestores_bp.route('/usuarios/usuarios-gestores/editar', methods=['GET', 'POST'])
+@login_requerido
+def usuarios_gestores_editar():
+    return usuarios_gestores_editar_vista()
+
+@gestores_bp.route('/usuarios/usuarios-gestores/eliminar', methods=['GET', 'POST'])
+@login_requerido
+def usuarios_gestores_eliminar():
+    return usuarios_gestores_eliminar_vista()
+
+@gestores_bp.route('/usuarios/gestores', methods=['GET', 'POST'])
 @login_requerido
 def gestores():
     return gestores_vista()
-
-@gestores_bp.route('/usuarios/usuarios_gestores/crear', methods=['GET', 'POST'])
-@login_requerido
-def gestores_crear():
-    return gestores_crear_vista()
-
-@gestores_bp.route('/usuarios/usuarios_gestores/editar', methods=['GET', 'POST'])
-@login_requerido
-def gestores_editar():
-    return gestores_editar_vista()
-
-@gestores_bp.route('/usuarios/usuarios_gestores/eliminar', methods=['GET', 'POST'])
-@login_requerido
-def gestores_eliminar():
-    return gestores_eliminar_vista()
 
 '''
 Rutas para gestión de cogestores, funciones:

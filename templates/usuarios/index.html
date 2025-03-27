@@ -42,7 +42,7 @@
                       <p class="card-text">{{ rol.descripcion }}</p>
                         <a href="
                           {%- if rol.nombre_rol == 'gestor' -%}
-                          {{ url_for('gestores.gestores') }}
+                          {{ url_for('gestores.usuarios_gestores') }}
                           {%- elif rol.nombre_rol == 'cogestor' -%}
                           {{ url_for('cogestores.cogestores') }}
                           {%- elif rol.nombre_rol == 'titular' -%}
