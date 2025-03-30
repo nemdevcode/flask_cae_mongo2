@@ -90,8 +90,8 @@ def usuarios_gestores_vista():
 def usuarios_gestores_crear_vista():
     pass
 
-def usuarios_gestores_editar_vista():
-    pass
+def usuarios_gestores_actualizar_vista():
+    return render_template('gestores/actualizar.html')
 
 def usuarios_gestores_eliminar_vista():
     pass
