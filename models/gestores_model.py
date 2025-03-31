@@ -1,5 +1,6 @@
 class GestoresCollection:
     def __init__(self,
+                 usuario_rol_id,
                  nombre_gestor,
                  cif_dni,
                  domicilio,
@@ -11,6 +12,7 @@ class GestoresCollection:
                  fecha_modificacion,
                  fecha_inactivacion,
                  estado_gestor):
+        self.usuario_rol_id = usuario_rol_id
         self.nombre_gestor = nombre_gestor
         self.cif_dni = cif_dni
         self.domicilio = domicilio
@@ -27,14 +29,12 @@ class UsuariosGestoresCollection:
     def __init__(self,
                  usuario_rol_id,
                  gestor_id,
-                 alias_usuario_gestor,
                  fecha_activacion,
                  fecha_modificacion,
                  fecha_inactivacion,
                  estado_usuario_gestor):
         self.usuario_rol_id = usuario_rol_id
         self.gestor_id = gestor_id
-        self.alias_usuario_gestor = alias_usuario_gestor
         self.fecha_activacion = fecha_activacion
         self.fecha_modificacion = fecha_modificacion
         self.fecha_inactivacion = fecha_inactivacion

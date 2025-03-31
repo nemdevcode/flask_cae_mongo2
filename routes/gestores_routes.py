@@ -2,11 +2,13 @@ from flask import Blueprint
 
 from core.usuarios_gestores import (
     usuarios_gestores_vista,
-    usuarios_gestores_crear_vista,
-    usuarios_gestores_actualizar_vista,
     usuarios_gestores_eliminar_vista,
-    gestores_vista,
-    gestores_actualizar_vista
+)
+
+from core.gestores import (
+    gestores_crear_vista,
+    gestores_actualizar_vista,
+    gestores_eliminar_vista
 )
 
 from core.usuarios_cogestores import (
@@ -48,12 +50,9 @@ from core._decoradores import login_requerido
 gestores_bp = Blueprint('gestores', __name__)
 
 '''
-Rutas para gestión de gestores, funciones:
+Rutas para gestión de usuarios gestores, funciones:
     - usuarios_gestores_vista()
-    - usuarios_gestores_crear_vista()
-    - usuarios_gestores_actualizar_vista()
     - usuarios_gestores_eliminar_vista()
-    - gestores_vista()
 '''
 
 @gestores_bp.route('/usuarios/usuarios-gestores', methods=['GET', 'POST'])
@@ -61,30 +60,32 @@ Rutas para gestión de gestores, funciones:
 def usuarios_gestores():
     return usuarios_gestores_vista()
 
-@gestores_bp.route('/usuarios/usuarios-gestores/crear', methods=['GET', 'POST'])
-@login_requerido
-def usuarios_gestores_crear():
-    return usuarios_gestores_crear_vista()
-
-@gestores_bp.route('/usuarios/usuarios-gestores/actualizar', methods=['GET', 'POST'])
-@login_requerido
-def usuarios_gestores_actualizar():
-    return usuarios_gestores_actualizar_vista()
-
 @gestores_bp.route('/usuarios/usuarios-gestores/eliminar', methods=['GET', 'POST'])
 @login_requerido
 def usuarios_gestores_eliminar():
     return usuarios_gestores_eliminar_vista()
 
-@gestores_bp.route('/usuarios/gestores', methods=['GET', 'POST'])
+'''
+Rutas para gestión de gestores, funciones:
+    - gestores_crear_vista()
+    - gestores_actualizar_vista()
+    - gestores_eliminar_vista()
+'''
+
+@gestores_bp.route('/usuarios/gestores/crear', methods=['GET', 'POST'])
 @login_requerido
-def gestores():
-    return gestores_vista()
+def gestores_crear():
+    return gestores_crear_vista()
 
 @gestores_bp.route('/usuarios/gestores/actualizar', methods=['GET', 'POST'])
 @login_requerido
 def gestores_actualizar():
     return gestores_actualizar_vista()
+
+@gestores_bp.route('/usuarios/gestores/eliminar', methods=['GET', 'POST'])
+@login_requerido
+def gestores_eliminar():
+    return gestores_eliminar_vista()
 
 '''
 Rutas para gestión de cogestores, funciones:

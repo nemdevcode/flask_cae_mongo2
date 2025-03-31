@@ -2,6 +2,7 @@ from flask import render_template, request, redirect, url_for, session, flash
 from bson.objectid import ObjectId
 from config import conexion_mongo
 from utils.usuario_rol_utils import obtener_rol, obtener_usuario_rol
+from datetime import datetime
 
 db = conexion_mongo()
 
@@ -42,40 +43,33 @@ def usuarios_gestores_vista():
 
         # Si se solicita vaciar filtros
         if vaciar == '1':
-            return redirect(url_for('gestores.gestores'))
+            return redirect(url_for('gestores.usuarios_gestores'))
 
         # Obtener todos los gestores relacionados con el usuario_rol_id
-        usuarios_gestores = list(db.usuarios_gestores.find({
+        query = {
             'usuario_rol_id': usuario_rol_id,
-            'estado_usuario_gestor': 'activo'
-        }))
+            'estado_gestor': 'activo'
+        }
 
-        # Obtener los datos de los gestores
-        gestores = []
-        for usuario_gestor in usuarios_gestores:
-            # Construir la consulta base para el gestor
-            query = {
-                '_id': usuario_gestor['gestor_id'],
-                'estado_gestor': 'activo'
-            }
+        # Aplicar filtro por estado si no es 'todos'
+        if filtrar_estado != 'todos':
+            query['estado_gestor'] = filtrar_estado
 
-            # Aplicar filtro por estado si no es 'todos'
-            if filtrar_estado != 'todos':
-                query['estado_gestor'] = filtrar_estado
+        # Obtener los gestores
+        gestores = list(db.gestores.find(query))
 
-            gestor = db.gestores.find_one(query)
-            if gestor:
-                # Si hay filtro por texto, verificar si coincide con algún campo
-                if filtrar_gestor:
-                    if (filtrar_gestor.lower() not in gestor['nombre_gestor'].lower() and
-                        filtrar_gestor.lower() not in gestor['cif_dni'].lower() and
-                        filtrar_gestor.lower() not in gestor['domicilio'].lower() and
-                        filtrar_gestor.lower() not in gestor['codigo_postal'].lower() and
-                        filtrar_gestor.lower() not in gestor['poblacion'].lower() and
-                        filtrar_gestor.lower() not in gestor['provincia'].lower() and
-                        filtrar_gestor.lower() not in gestor['telefono_gestor'].lower()):
-                        continue
-                gestores.append(gestor)
+        # Filtrar por texto si se especifica
+        if filtrar_gestor:
+            gestores = [
+                gestor for gestor in gestores
+                if (filtrar_gestor.lower() in gestor['nombre_gestor'].lower() or
+                    filtrar_gestor.lower() in gestor['cif_dni'].lower() or
+                    filtrar_gestor.lower() in gestor['domicilio'].lower() or
+                    filtrar_gestor.lower() in gestor['codigo_postal'].lower() or
+                    filtrar_gestor.lower() in gestor['poblacion'].lower() or
+                    filtrar_gestor.lower() in gestor['provincia'].lower() or
+                    filtrar_gestor.lower() in gestor['telefono_gestor'].lower())
+            ]
 
         return render_template('usuarios/usuarios_gestores.html', 
                              nombre_gestor=usuario.get('nombre_usuario'),
@@ -87,20 +81,9 @@ def usuarios_gestores_vista():
         flash(f'Error al cargar la vista de gestores: {str(e)}', 'danger')
         return redirect(url_for('usuarios.usuarios'))
 
-def usuarios_gestores_crear_vista():
-    pass
-
-def usuarios_gestores_actualizar_vista():
-    return render_template('gestores/actualizar.html')
-
 def usuarios_gestores_eliminar_vista():
     pass
 
-def gestores_vista():
-    # Obtener el ID del usuario actual
-    usuario_id = session.get('usuario_id')
-    usuario = db.usuarios.find_one({'_id': ObjectId(usuario_id)})
-    return render_template('gestores/index.html', nombre_gestor=usuario.get('nombre_usuario'))
 
 
 

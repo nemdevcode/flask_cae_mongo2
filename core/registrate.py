@@ -75,6 +75,7 @@ def registrate_vista():
                 
                 # Crear el gestor
                 gestor = GestoresCollection(
+                    usuario_rol_id=usuario_rol_id,
                     nombre_gestor=nombre_gestor,
                     cif_dni=cif_dni,
                     domicilio=domicilio,
@@ -87,19 +88,21 @@ def registrate_vista():
                     fecha_inactivacion=None,
                     estado_gestor='activo'
                 )
-                gestor_id = db.gestores.insert_one(gestor.__dict__).inserted_id
+                
+                # Insertar el gestor en la colección de gestores
+                db.gestores.insert_one(gestor.__dict__)
+                # gestor_id = db.gestores.insert_one(gestor.__dict__).inserted_id
                 
                 # Crear la relación usuario-gestor
-                usuario_gestor = UsuariosGestoresCollection(
-                    usuario_rol_id=usuario_rol_id,
-                    gestor_id=gestor_id,
-                    alias_usuario_gestor=nombre_usuario,
-                    fecha_activacion=fecha_actual,
-                    fecha_modificacion=fecha_actual,
-                    fecha_inactivacion=None,
-                    estado_usuario_gestor='activo'
-                )
-                db.usuarios_gestores.insert_one(usuario_gestor.__dict__)
+                # usuario_gestor = UsuariosGestoresCollection(
+                #     usuario_rol_id=usuario_rol_id,
+                #     gestor_id=gestor_id,
+                #     fecha_activacion=fecha_actual,
+                #     fecha_modificacion=fecha_actual,
+                #     fecha_inactivacion=None,
+                #     estado_usuario_gestor='activo'
+                # )
+                # db.usuarios_gestores.insert_one(usuario_gestor.__dict__)
                 
                 # Enviar email de verificación
                 link_verificacion = url_for('verificar_email', token=token, email=email, _external=True)
