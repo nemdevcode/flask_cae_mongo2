@@ -3,6 +3,7 @@ from flask import Blueprint
 from core.usuarios_gestores import (
     usuarios_gestores_vista,
     usuarios_gestores_eliminar_vista,
+    usuarios_gestores_gestor_vista
 )
 
 from core.gestores import (
@@ -64,6 +65,11 @@ def usuarios_gestores():
 @login_requerido
 def usuarios_gestores_eliminar():
     return usuarios_gestores_eliminar_vista()
+
+@gestores_bp.route('/usuarios/usuarios-gestores/gestor', methods=['GET', 'POST'])
+@login_requerido
+def usuarios_gestores_gestor():
+    return usuarios_gestores_gestor_vista()
 
 '''
 Rutas para gestión de gestores, funciones:

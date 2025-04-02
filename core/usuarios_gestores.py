@@ -84,7 +84,6 @@ def usuarios_gestores_vista():
 def usuarios_gestores_eliminar_vista():
     pass
 
-
-
-
+def usuarios_gestores_gestor_vista():
+    return render_template('usuarios_gestores/index.html')
 

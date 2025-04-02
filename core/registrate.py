@@ -1,7 +1,7 @@
 from datetime import datetime
 import re
 from flask import request, redirect, url_for, render_template, flash, session
-from models.gestores_model import GestoresCollection, UsuariosGestoresCollection
+from models.gestores_model import GestoresCollection
 from utils.email_utils import enviar_email
 from utils.token_utils import generar_token_verificacion
 from utils.usuario_rol_utils import (
