@@ -32,18 +32,20 @@ def gestores_crear_vista():
 
         if request.method == 'POST':
             # Obtener datos del formulario
-            nombre_gestor = request.form.get('nombre_gestor')
-            cif_dni = request.form.get('cif_dni')
+            nombre_gestor = request.form.get('nombre_gestor').upper()
+            cif_dni = request.form.get('cif_dni').upper()
             domicilio = request.form.get('domicilio')
             codigo_postal = request.form.get('codigo_postal')
-            poblacion = request.form.get('poblacion')
-            provincia = request.form.get('provincia')
+            poblacion = request.form.get('poblacion').upper()
+            provincia = request.form.get('provincia').upper()
             telefono_gestor = request.form.get('telefono_gestor')
 
             # Validar campos requeridos
             if not all([nombre_gestor, cif_dni, domicilio, codigo_postal, poblacion, provincia, telefono_gestor]):
                 flash('Todos los campos son obligatorios', 'danger')
-                return render_template('gestores/gestores/crear.html')
+                return render_template('usuarios_gestores/gestores/crear.html',
+                                    usuario_rol_id=usuario_rol_id,
+                                    form_data=request.form)
 
             # Crear instancia del modelo
             fecha_actual = datetime.now()
@@ -74,7 +76,8 @@ def gestores_crear_vista():
             else:
                 flash('Error al crear el gestor', 'danger')
 
-        return render_template('usuarios_gestores/gestores/crear.html')
+        return render_template('usuarios_gestores/gestores/crear.html',
+                             usuario_rol_id=usuario_rol_id)
 
     except Exception as e:
         flash(f'Error al crear el gestor: {str(e)}', 'danger')
@@ -83,6 +86,50 @@ def gestores_crear_vista():
 def gestores_actualizar_vista():
     return render_template('gestores/gestores/actualizar.html')
 
-def gestores_eliminar_vista():
-    return render_template('gestores/gestores/eliminar.html')
+def gestores_eliminar_vista(gestor_id):
+    try:
+        # Obtener el ID del usuario actual
+        usuario_id = session.get('usuario_id')
+        
+        if not usuario_id:
+            flash('No hay usuario autenticado', 'danger')
+            return redirect(url_for('login'))
+
+        # Obtener el rol de gestor
+        existe_rol, rol_gestor_id = obtener_rol('gestor')
+        
+        if not existe_rol:
+            flash('Rol de gestor no encontrado', 'danger')
+            return redirect(url_for('usuarios.usuarios'))
+
+        # Verificar si el usuario tiene el rol de gestor
+        tiene_rol, usuario_rol_id = obtener_usuario_rol(usuario_id, rol_gestor_id)
+        
+        if not tiene_rol:
+            flash('No tienes permisos para acceder a esta página', 'danger')
+            return redirect(url_for('usuarios.usuarios'))
+
+        # Buscar el gestor
+        gestor = db.gestores.find_one({
+            '_id': ObjectId(gestor_id),
+            'usuario_rol_id': usuario_rol_id
+        })
+
+        if not gestor:
+            flash('Gestor no encontrado o no tienes permisos para eliminarlo', 'danger')
+            return redirect(url_for('gestores.usuarios_gestores'))
+
+        # Eliminar el gestor de la base de datos
+        resultado = db.gestores.delete_one({'_id': ObjectId(gestor_id)})
+
+        if resultado.deleted_count > 0:
+            flash('Gestor eliminado exitosamente', 'success')
+        else:
+            flash('Error al eliminar el gestor', 'danger')
+
+        return redirect(url_for('gestores.usuarios_gestores'))
+
+    except Exception as e:
+        flash(f'Error al eliminar el gestor: {str(e)}', 'danger')
+        return redirect(url_for('gestores.usuarios_gestores'))
 

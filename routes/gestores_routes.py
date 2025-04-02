@@ -82,10 +82,10 @@ def gestores_crear():
 def gestores_actualizar():
     return gestores_actualizar_vista()
 
-@gestores_bp.route('/usuarios/gestores/eliminar', methods=['GET', 'POST'])
+@gestores_bp.route('/usuarios/gestores/eliminar/<gestor_id>', methods=['GET', 'POST'])
 @login_requerido
-def gestores_eliminar():
-    return gestores_eliminar_vista()
+def gestores_eliminar(gestor_id):
+    return gestores_eliminar_vista(gestor_id)
 
 '''
 Rutas para gestión de cogestores, funciones:
