@@ -15,13 +15,6 @@ def usuarios_gestores_vista():
             flash('No hay usuario autenticado', 'danger')
             return redirect(url_for('login'))
 
-        # Obtener la información del usuario
-        usuario = db.usuarios.find_one({'_id': ObjectId(usuario_id)})
-        
-        if not usuario:
-            flash('Usuario no encontrado', 'danger')
-            return redirect(url_for('login'))
-
         # Obtener el rol de gestor
         existe_rol, rol_gestor_id = obtener_rol('gestor')
         
@@ -35,6 +28,9 @@ def usuarios_gestores_vista():
         if not tiene_rol:
             flash('No tienes permisos para acceder a esta página', 'danger')
             return redirect(url_for('usuarios.usuarios'))
+
+        # Obtener la información del usuario
+        usuario = db.usuarios.find_one({'_id': ObjectId(usuario_id)})
 
         # Obtener parámetros de filtrado
         filtrar_gestor = request.form.get('filtrar_gestor', '')
@@ -72,7 +68,7 @@ def usuarios_gestores_vista():
             ]
 
         return render_template('usuarios/usuarios_gestores.html', 
-                             nombre_gestor=usuario.get('nombre_usuario'),
+                             nombre_usuario=usuario.get('nombre_usuario'),
                              gestores=gestores,
                              filtrar_gestor=filtrar_gestor,
                              filtrar_estado=filtrar_estado)
@@ -84,6 +80,46 @@ def usuarios_gestores_vista():
 def usuarios_gestores_eliminar_vista():
     pass
 
-def usuarios_gestores_gestor_vista():
-    return render_template('usuarios_gestores/index.html')
+def usuarios_gestores_gestor_vista(gestor_id):
+    try:
+        # Obtener el ID del usuario actual
+        usuario_id = session.get('usuario_id')
+        
+        if not usuario_id:
+            flash('No hay usuario autenticado', 'danger')
+            return redirect(url_for('login'))
+
+        # Obtener el rol de gestor
+        existe_rol, rol_gestor_id = obtener_rol('gestor')
+        
+        if not existe_rol:
+            flash('Rol de gestor no encontrado', 'danger')
+            return redirect(url_for('usuarios.usuarios'))
+
+        # Verificar si el usuario tiene el rol de gestor
+        tiene_rol, usuario_rol_id = obtener_usuario_rol(usuario_id, rol_gestor_id)
+        
+        if not tiene_rol:
+            flash('No tienes permisos para acceder a esta página', 'danger')
+            return redirect(url_for('usuarios.usuarios'))
+
+        # Obtener la información del usuario y gestor
+        usuario = db.usuarios.find_one({'_id': ObjectId(usuario_id)})
+        gestor = db.gestores.find_one({
+            '_id': ObjectId(gestor_id),
+            'usuario_rol_id': usuario_rol_id,
+            'estado_gestor': 'activo'
+        })
+
+        if not gestor:
+            flash('Gestor no encontrado o no tienes permisos para acceder', 'danger')
+            return redirect(url_for('gestores.usuarios_gestores'))
+
+        return render_template('usuarios_gestores/index.html',
+                             nombre_usuario=usuario.get('nombre_usuario'),
+                             nombre_gestor=gestor.get('nombre_gestor'))
+
+    except Exception as e:
+        flash(f'Error al cargar la vista del gestor: {str(e)}', 'danger')
+        return redirect(url_for('usuarios.usuarios'))
 
