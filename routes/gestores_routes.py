@@ -66,6 +66,11 @@ def usuarios_gestores():
 def usuarios_gestores_eliminar():
     return usuarios_gestores_eliminar_vista()
 
+'''
+Rutas para gestión de usuarios de cada gestor, funciones:
+    - usuarios_gestores_gestor_vista()
+'''
+
 @gestores_bp.route('/usuarios/usuarios-gestores/gestor/<gestor_id>', methods=['GET', 'POST'])
 @login_requerido
 def usuarios_gestores_gestor(gestor_id):
