@@ -115,14 +115,13 @@ def gestores_usuarios_cogestores_vista():
         flash(f'Error al listar los cogestores: {str(e)}', 'danger')
         return redirect(url_for('usuarios.usuarios'))
 
-def crear_usuario_cogestor(usuario_rol_id, gestor_id, alias):
+def crear_usuario_cogestor(usuario_rol_id, alias):
     """
     Crea un nuevo usuario cogestor
     """
     fecha_actual = datetime.now()
     usuario_cogestor = {
         'usuario_rol_id': usuario_rol_id,
-        'gestor_id': gestor_id,
         'alias_usuario_cogestor': alias,
         'fecha_activacion': fecha_actual,
         'fecha_modificacion': fecha_actual,
@@ -132,48 +131,75 @@ def crear_usuario_cogestor(usuario_rol_id, gestor_id, alias):
     return db.usuarios_cogestores.insert_one(usuario_cogestor)
 
 def gestores_usuarios_cogestores_crear_vista():
-    
-    if request.method == 'GET':
-        return render_template('gestores/usuarios_cogestores/crear.html')
-    
-    if request.method == 'POST':
-        try:
-            # Obtener el ID del gestor actual
-            gestor_id = session.get('usuario_id')
-            if not gestor_id:
-                flash('No hay gestor autenticado', 'danger')
-                return redirect(url_for('login'))
+    try:
+        # Obtener el ID del usuario actual
+        usuario_id = session.get('usuario_id')
+        ic("usuario_id:", usuario_id)
+        
+        if not usuario_id:
+            flash('No hay usuario autenticado', 'danger')
+            return redirect(url_for('login'))
+
+        # Obtener el rol de gestor
+        existe_rol, rol_gestor_id = obtener_rol('gestor')
+        ic("existe_rol:", existe_rol, "rol_gestor_id:", rol_gestor_id)
+        
+        if not existe_rol:
+            flash('Rol de gestor no encontrado', 'danger')
+            return redirect(url_for('usuarios.usuarios'))
+
+        # Verificar si el usuario tiene el rol de gestor
+        tiene_rol, usuario_rol_id = obtener_usuario_rol(usuario_id, rol_gestor_id)
+        ic("tiene_rol:", tiene_rol, "usuario_rol_id:", usuario_rol_id)
+        
+        if not tiene_rol:
+            flash('No tienes permisos para acceder a esta página', 'danger')
+            return redirect(url_for('usuarios.usuarios'))
+
+        if request.method == 'GET':
+            return render_template('usuarios_gestores/usuarios_cogestores/crear.html')
+        
+        if request.method == 'POST':
+            # Obtener datos del formulario
+            email = request.form.get('email', '').strip().lower()
+            alias = request.form.get('alias', '').strip().upper()
+            
+            if not email or not alias:
+                flash('El email y el alias son obligatorios', 'danger')
+                return render_template('usuarios_gestores/usuarios_cogestores/crear.html',
+                                    form_data=request.form)
 
             # Verificar si el usuario existe
-            existe_usuario, usuario_id = verificar_usuario_existente(email)
+            existe_usuario, usuario_cogestor_id = verificar_usuario_existente(email)
+            ic("existe_usuario:", existe_usuario, "usuario_cogestor_id:", usuario_cogestor_id)
             
             if existe_usuario:
-                # Si existe el usuario, verificar si ya es cogestor para este gestor
-                cogestor_existente = db.usuarios_cogestores.find_one({
-                    'usuario_id': usuario_id,
-                    'gestor_id': ObjectId(gestor_id)
-                })
-                
-                if cogestor_existente:
-                    flash('Este email ya está registrado como cogestor para este gestor', 'danger')
-                    return render_template('gestores/usuarios_cogestores/crear.html',
-                                        form_data=request.form)
-                
-                # Obtener rol de cogestor y crear usuario_rol
-                existe_rol, rol_id = obtener_rol('cogestor')
+                # Obtener rol de cogestor
+                existe_rol, rol_cogestor_id = obtener_rol('cogestor')
                 if not existe_rol:
-                    rol_id = crear_rol('cogestor')
+                    rol_cogestor_id = crear_rol('cogestor')
                 
-                tiene_rol, usuario_rol_id = obtener_usuario_rol(usuario_id, rol_id)
+                # Verificar si el usuario ya tiene el rol de cogestor
+                tiene_rol_cogestor, usuario_rol_cogestor_id = obtener_usuario_rol(usuario_cogestor_id, rol_cogestor_id)
+                ic("tiene_rol_cogestor:", tiene_rol_cogestor, "usuario_rol_cogestor_id:", usuario_rol_cogestor_id)
                 
-                if not tiene_rol:
-                    usuario_rol_id = crear_usuario_rol(usuario_id, rol_id)
+                if tiene_rol_cogestor:
+                    # Verificar si ya es cogestor para este gestor específico
+                    cogestor_existente = db.usuarios_cogestores.find_one({
+                        'usuario_rol_id': usuario_rol_cogestor_id,
+                        'usuario_rol_id_gestor': usuario_rol_id
+                    })
+                    
+                    if cogestor_existente:
+                        flash('Este email ya está registrado como cogestor para este gestor, será asignado a su cuenta con las credenciales que ya tiene', 'danger')
+                        return render_template('usuarios_gestores/usuarios_cogestores/crear.html',
+                                            form_data=request.form)
+                else:
+                    # Si no tiene el rol de cogestor, crearlo
+                    usuario_rol_cogestor_id = crear_usuario_rol(usuario_cogestor_id, rol_cogestor_id)
                 
-                # Obtener datos del formulario
-                alias = request.form.get('alias', '').strip().upper()
-                email = request.form.get('email', '').strip().lower()
                 # Crear el cogestor
-                crear_usuario_cogestor(usuario_rol_id, gestor_id, alias)
+                crear_usuario_cogestor(usuario_rol_cogestor_id, usuario_rol_id, alias)
                 flash('Cogestor creado correctamente', 'success')
                 return redirect(url_for('gestores.gestores_usuarios_cogestores'))
 
@@ -189,27 +215,27 @@ def gestores_usuarios_cogestores_crear_vista():
             }
             
             # Crear el nuevo usuario
-            usuario_id = crear_usuario(email, datos_usuario)
+            nuevo_usuario_id = crear_usuario(email, datos_usuario)
+            ic("nuevo_usuario_id:", nuevo_usuario_id)
             
             # Obtener rol de cogestor y crear usuario_rol
-            existe_rol, rol_id = obtener_rol('cogestor')
+            existe_rol, rol_cogestor_id = obtener_rol('cogestor')
             if not existe_rol:
-                rol_id = crear_rol('cogestor')
+                rol_cogestor_id = crear_rol('cogestor')
             
-            usuario_rol_id = crear_usuario_rol(usuario_id, rol_id)
+            usuario_rol_cogestor_id = crear_usuario_rol(nuevo_usuario_id, rol_cogestor_id)
+            ic("usuario_rol_cogestor_id:", usuario_rol_cogestor_id)
             
             # Crear el cogestor
-            crear_usuario_cogestor(usuario_rol_id, gestor_id, alias)
+            crear_usuario_cogestor(usuario_rol_cogestor_id, usuario_rol_id, alias)
 
             # Enviar email de verificación
             link_verificacion = url_for('verificar_email', token=token, email=email, _external=True)
-            cuerpo_email = f"""
-            <h2>Bienvenido a CAE Accesible</h2>
-            <p>Has sido registrado como cogestor en CAE Accesible. Para activar tu cuenta, haz clic en el siguiente enlace:</p>
-            <p><a href="{link_verificacion}">Activar cuenta</a></p>
-            <p>Este enlace expirará en 1 hora.</p>
-            <p>Si no solicitaste este registro, puedes ignorar este correo.</p>
-            """
+            cuerpo_email = render_template(
+                    'emails/registro_cogestor.html',
+                    alias=alias,
+                    link_verificacion=link_verificacion
+                )
 
             if enviar_email(email, "Activación de cuenta - CAE Accesible", cuerpo_email):
                 flash('Cogestor creado correctamente. Se ha enviado un email de activación.', 'success')
@@ -218,10 +244,11 @@ def gestores_usuarios_cogestores_crear_vista():
 
             return redirect(url_for('gestores.gestores_usuarios_cogestores'))
 
-        except Exception as e:
-            flash(f'Error al crear el cogestor: {str(e)}', 'danger')
-            return render_template('gestores/usuarios_cogestores/crear.html',
-                                form_data=request.form)
+    except Exception as e:
+        ic("Error en gestores_usuarios_cogestores_crear_vista:", str(e))
+        flash(f'Error al crear el cogestor: {str(e)}', 'danger')
+        return render_template('usuarios_gestores/usuarios_cogestores/crear.html',
+                            form_data=request.form)
 
 def gestores_usuarios_cogestores_actualizar_vista():
     
