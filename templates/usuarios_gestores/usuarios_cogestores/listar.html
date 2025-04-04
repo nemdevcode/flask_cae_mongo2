@@ -106,7 +106,7 @@
                                 <td>{{ cogestor.cogestor_info.telefono }}</td>
                                 <td>{{ cogestor.email }}</td>
                                 <td class="text-center">
-                                    {% if cogestor.cogestor_info.estado == 'activo' %}
+                                    {% if cogestor.cogestor_info.estado_usuario_cogestor == 'activo' %}
                                         <span class="badge bg-success">Activo</span>
                                     {% else %}
                                         <span class="badge bg-secondary">Inactivo</span>

@@ -94,7 +94,7 @@ def gestores_usuarios_cogestores_vista():
                         'alias': uc['alias_usuario_cogestor'],
                         'nombre_usuario': usuario_cogestor['nombre_usuario'],
                         'telefono': usuario_cogestor['telefono'],
-                        'estado': uc['estado_usuario_cogestor']
+                        'estado_usuario_cogestor': uc['estado_usuario_cogestor']
                     },
                     'email': usuario_cogestor['email']
                 }
@@ -199,7 +199,7 @@ def gestores_usuarios_cogestores_crear_vista():
                     usuario_rol_cogestor_id = crear_usuario_rol(usuario_cogestor_id, rol_cogestor_id)
                 
                 # Crear el cogestor
-                crear_usuario_cogestor(usuario_rol_cogestor_id, usuario_rol_id, alias)
+                crear_usuario_cogestor(usuario_rol_cogestor_id, alias)
                 flash('Cogestor creado correctamente', 'success')
                 return redirect(url_for('gestores.gestores_usuarios_cogestores'))
 
@@ -210,7 +210,6 @@ def gestores_usuarios_cogestores_crear_vista():
             # Crear diccionario con los datos del nuevo usuario
             datos_usuario = {
                 'token_verificacion': token,
-                'estado': 'pendiente',
                 'verificado': False
             }
             
@@ -227,7 +226,7 @@ def gestores_usuarios_cogestores_crear_vista():
             ic("usuario_rol_cogestor_id:", usuario_rol_cogestor_id)
             
             # Crear el cogestor
-            crear_usuario_cogestor(usuario_rol_cogestor_id, usuario_rol_id, alias)
+            crear_usuario_cogestor(usuario_rol_cogestor_id, alias)
 
             # Enviar email de verificación
             link_verificacion = url_for('verificar_email', token=token, email=email, _external=True)
@@ -286,7 +285,7 @@ def gestores_usuarios_cogestores_actualizar_vista():
             '_id': cogestor['_id'],
             'cogestor_info': {
                 'alias': cogestor['alias'],
-                'estado': cogestor['estado']
+                'estado_usuario_cogestor': cogestor['estado_usuario_cogestor']
             },
             'email': usuario['email']
         }
@@ -297,7 +296,7 @@ def gestores_usuarios_cogestores_actualizar_vista():
         if request.method == 'POST':
             # Obtener datos del formulario
             alias = request.form.get('alias', '').strip().upper()
-            estado = request.form.get('estado', 'activo')
+            estado_usuario_cogestor = request.form.get('estado_usuario_cogestor', 'activo')
 
             # Verificar si el alias ya existe para este gestor (excluyendo el cogestor actual)
             if db.usuarios_cogestores.find_one({
@@ -315,7 +314,7 @@ def gestores_usuarios_cogestores_actualizar_vista():
                 {
                     '$set': {
                         'alias': alias,
-                        'estado': estado,
+                        'estado_usuario_cogestor': estado_usuario_cogestor,
                         'fecha_modificacion': datetime.now()
                     }
                 }
