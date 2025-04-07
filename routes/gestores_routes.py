@@ -157,10 +157,10 @@ def gestores_titulares():
 def gestores_titulares_crear():
     return gestores_titulares_crear_vista()
 
-@gestores_bp.route('/usuarios/usuarios-gestores/titulares/actualizar', methods=['GET', 'POST'])
+@gestores_bp.route('/usuarios/usuarios-gestores/titulares/actualizar/<titular_id>', methods=['GET', 'POST'])
 @login_requerido
-def gestores_titulares_actualizar():
-    return gestores_titulares_actualizar_vista()
+def gestores_titulares_actualizar(titular_id):
+    return gestores_titulares_actualizar_vista(titular_id)
 
 @gestores_bp.route('/usuarios/usuarios-gestores/titulares/eliminar', methods=['GET', 'POST'])
 @login_requerido

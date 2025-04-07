@@ -1,0 +1,79 @@
+{% extends "_base.html" %}
+
+{% block main %}
+    <div class="d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card shadow bg-dark text-white" style="min-width: 500px;">
+            <div class="card-body">
+                <h4 class="card-title text-center">Editar Titular</h4>
+                <div class="card-body">
+                    <form action="{{ url_for('gestores.gestores_titulares_actualizar', titular_id=titular._id) }}" method="post">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="nombre_titular" name="nombre_titular" 
+                                   value="{{ titular.nombre_titular }}" required>
+                            <label for="nombre_titular">Nombre del titular:</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="cif_dni" name="cif_dni" 
+                                   value="{{ titular.cif_dni }}" required>
+                            <label for="cif_dni">CIF/DNI:</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="domicilio" name="domicilio" 
+                                   value="{{ titular.domicilio }}" required>
+                            <label for="domicilio">Dirección:</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="codigo_postal" name="codigo_postal" 
+                                   value="{{ titular.codigo_postal }}" required>
+                            <label for="codigo_postal">Código Postal:</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="poblacion" name="poblacion" 
+                                   value="{{ titular.poblacion }}" required>
+                            <label for="poblacion">Población:</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="provincia" name="provincia" 
+                                   value="{{ titular.provincia }}" required>
+                            <label for="provincia">Provincia:</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="tel" class="form-control" id="telefono_titular" name="telefono_titular" 
+                                   value="{{ titular.telefono_titular }}" required>
+                            <label for="telefono_titular">Teléfono:</label>
+                        </div>
+
+                        <div class="btn-group text-center w-100 mb-3" role="group" aria-label="Basic radio toggle button group">
+                            <input type="radio" 
+                                   class="btn-check" 
+                                   name="estado_titular" 
+                                   id="estado-activo{{ titular._id }}" 
+                                   value="activo" 
+                                   {% if titular.estado_titular == 'activo' %}checked{% endif %}>
+                            <label class="btn btn-outline-success" for="estado-activo{{ titular._id }}">Activo</label> 
+                            
+                            <input type="radio" 
+                                   class="btn-check" 
+                                   name="estado_titular" 
+                                   id="estado-inactivo{{ titular._id }}" 
+                                   value="inactivo"
+                                   {% if titular.estado_titular == 'inactivo' %}checked{% endif %}>
+                            <label class="btn btn-outline-secondary" for="estado-inactivo{{ titular._id }}">Inactivo</label>
+                        </div>
+
+                        <div class="d-flex justify-content-end align-items-center gap-2">
+                            <a href="{{ url_for('gestores.gestores_titulares') }}" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Actualizar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
