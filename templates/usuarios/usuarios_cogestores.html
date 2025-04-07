@@ -1,0 +1,124 @@
+{% extends "_base.html" %}
+
+{% block header %}
+    <nav class="navbar navbar-expand-lg" style="background-color: #e3f2fd;">
+        <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+            <a class="navbar-brand" href="#">CAE Accesible. Panel de gestión de cogestores de: {{ nombre_cogestor }}</a>
+            <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/usuarios">Inicio</a>
+                </li>
+            </ul>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end align-items-center">
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-dark">Cerrar sesión</a>
+            </div>
+                
+        </div>
+    </nav>
+{% endblock %}
+
+{% block main %}
+    <div class="container mt-5">
+        <h3 class="text-center">Listado de GESTORES </h3>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <!-- Formulario para filtrar gestores -->
+            <form action="{{ url_for('cogestores.usuarios_cogestores') }}" method="post" id="filtroForm" class="flex-grow-1 me-3">
+                <div class="d-flex gap-3 align-items-center">
+                    <!-- Input para filtrar gestor por nombre -->
+                    <div class="form-floating" style="flex: 2;">
+                        <input type="text" 
+                            class="form-control" 
+                            id="filtrar_gestor" 
+                            name="filtrar_gestor"
+                            value="{{ filtrar_gestor }}"
+                            oninput="this.form.submit()"
+                            autocomplete="off"
+                            autofocus
+                            onfocus="this.setSelectionRange(this.value.length, this.value.length)">
+                        <label for="filtrar_gestor">Escriba el nombre, alias, teléfono o email para filtrar</label>
+                    </div>
+                    
+                    <!-- Filtro por estado -->
+                    <div class="btn-group" role="group" aria-label="Filtrar por estado" style="flex: 2;">
+                        <input type="radio" 
+                        class="btn-check" 
+                        name="filtrar_estado" 
+                        id="todos" 
+                                value="todos" 
+                                {% if not filtrar_estado or filtrar_estado == 'todos' %}checked{% endif %}
+                                onchange="this.form.submit()">
+                                <label class="btn btn-outline-primary" for="todos">Todos</label>
+        
+                        <input type="radio" 
+                                class="btn-check" 
+                                name="filtrar_estado" 
+                                id="activos" 
+                                value="activo"
+                                {% if filtrar_estado == 'activo' %}checked{% endif %}
+                                onchange="this.form.submit()">
+                        <label class="btn btn-outline-success" for="activos">Activos</label>
+        
+                        <input type="radio" 
+                            class="btn-check" 
+                            name="filtrar_estado" 
+                            id="inactivos" 
+                            value="inactivo"
+                            {% if filtrar_estado == 'inactivo' %}checked{% endif %}
+                            onchange="this.form.submit()">
+                        <label class="btn btn-outline-secondary" for="inactivos">Inactivos</label>
+                    </div>
+                    <!-- Boton para limpiar filtro -->
+                    <div style="flex: 1;">
+                        <a href="{{ url_for('cogestores.usuarios_cogestores', vaciar=1) }}" class="btn btn-secondary">Limpiar filtros</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tabla de gestores -->
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="text-center">
+                    <tr>
+                        <th>Alias</th>
+                        <th>Nombre</th>
+                        <th>Teléfono</th>
+                        <th>EMail</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if gestores %}
+                        {% for gestor in gestores %}
+                            <tr>
+                                <td>{{ gestor.gestor_info.alias }}</td>
+                                <td>{{ gestor.gestor_info.nombre_usuario }}</td>
+                                <td>{{ gestor.gestor_info.telefono_usuario }}</td>
+                                <td>{{ gestor.email }}</td>
+                                <td class="text-center">
+                                    {% if gestor.gestor_info.estado == 'activo' %}
+                                        <span class="badge bg-success">Activo</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactivo</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <a href="{{ url_for('cogestores.usuarios_cogestores_gestor', gestor_id=gestor.gestor_info._id) }}" class="btn btn-primary">Ir</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">No hay gestores registrados</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
