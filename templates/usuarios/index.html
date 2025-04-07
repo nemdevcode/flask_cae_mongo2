@@ -44,7 +44,7 @@
                           {%- if rol.nombre_rol == 'gestor' -%}
                           {{ url_for('gestores.usuarios_gestores') }}
                           {%- elif rol.nombre_rol == 'cogestor' -%}
-                          {{ url_for('cogestores.cogestores') }}
+                          {{ url_for('cogestores.usuarios_cogestores') }}
                           {%- elif rol.nombre_rol == 'titular' -%}
                           {{ url_for('titulares.titulares') }}
                           {%- elif rol.nombre_rol == 'centro' -%}
