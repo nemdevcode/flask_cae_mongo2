@@ -85,7 +85,8 @@ def gestores_titulares_vista():
                              titulares=titulares,
                              nombre_gestor=nombre_gestor,
                              filtrar_titular=filtrar_titular,
-                             filtrar_estado=filtrar_estado)
+                             filtrar_estado=filtrar_estado,
+                             gestor_id=gestor['_id'])
 
     except Exception as e:
         flash(f'Error al listar los titulares: {str(e)}', 'danger')
