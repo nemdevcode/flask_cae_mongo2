@@ -51,6 +51,8 @@ def registrate_vista():
                     return render_template('registrate.html', form_data=request.form)
                 else:
                     crear_usuario_rol(usuario_id, rol_gestor_id)
+                    flash("Su email ya está registrado como usuario sera asignado como gestor", "info")
+                    return redirect(url_for('login'))
             else:
                 # Si el usuario no existe, crear el token de verificación
                 token = generar_token_verificacion(email)
