@@ -28,14 +28,14 @@ class TitularesCollection:
         
 class UsuariosTitularesCollection:
     def __init__(self, 
-                 usuario_rol_id,
+                 usuario_rol_titular_id,
                  titular_id,
                  alias_usuario_titular,
                  fecha_activacion, 
                  fecha_modificacion, 
                  fecha_inactivacion, 
                  estado_usuario_titular):
-        self.usuario_rol_id = usuario_rol_id
+        self.usuario_rol_titular_id = usuario_rol_titular_id
         self.titular_id = titular_id
         self.alias_usuario_titular = alias_usuario_titular
         self.fecha_activacion = fecha_activacion

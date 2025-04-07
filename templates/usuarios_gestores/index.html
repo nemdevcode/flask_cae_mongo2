@@ -15,14 +15,15 @@
                 </li>
             </ul>
             <div class="d-grid gap-2 d-md-flex justify-content-md-end align-items-center">
-                <span class="my-auto">Ir a usuario:</span>
+                <span class="my-auto">Volver a usuario:</span>
                 <div class="btn-group" role="group" aria-label="Navegación entre tipos de usuarios">
                     <a href="{{ url_for('gestores.usuarios_gestores') }}" class="btn btn-outline-primary">Gestores</a>
-                    <a href="{{ url_for('gestores.gestores_usuarios_titulares') }}" class="btn btn-outline-primary">Titulares</a>
-                    <a href="{{ url_for('gestores.gestores_usuarios_centros') }}" class="btn btn-outline-primary">Centros</a>
-                    <a href="{{ url_for('gestores.gestores_usuarios_contratas') }}" class="btn btn-outline-primary">Contratas</a>
                 </div>
-                <a href="{{ url_for('gestores.gestores_centros') }}" class="btn btn-warning">Centros</a>
+                <div class="btn-group" role="group" aria-label="Navegación entre elementos de usuario">
+                    <a href="{{ url_for('gestores.gestores_titulares') }}" class="btn btn-warning">Titulares</a>
+                    <a href="{{ url_for('gestores.gestores_centros') }}" class="btn btn-warning">Centros</a>
+                    <a href="{{ url_for('gestores.gestores_contratas') }}" class="btn btn-warning">Contratas</a>
+                </div>
                 <a href="{{ url_for('logout') }}" class="btn btn-outline-dark">Cerrar sesión</a>
             </div>
         </div>

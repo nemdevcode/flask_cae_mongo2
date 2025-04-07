@@ -18,12 +18,25 @@ from core.usuarios_cogestores import (
     gestores_usuarios_cogestores_actualizar_vista,
     gestores_usuarios_cogestores_eliminar_vista
 )
+from core.titulares import (
+    gestores_titulares_vista,
+    gestores_titulares_crear_vista,
+    gestores_titulares_actualizar_vista,
+    gestores_titulares_eliminar_vista
+)
 
 from core.usuarios_titulares import (
     gestores_usuarios_titulares_vista,
     gestores_usuarios_titulares_crear_vista,
     gestores_usuarios_titulares_actualizar_vista,
     gestores_usuarios_titulares_eliminar_vista
+)
+
+from core.centros import (
+    gestores_centros_vista,
+    gestores_centros_crear_vista,
+    gestores_centros_actualizar_vista,
+    gestores_centros_eliminar_vista
 )
 
 from core.usuarios_centros import (
@@ -33,11 +46,11 @@ from core.usuarios_centros import (
     gestores_usuarios_centros_eliminar_vista
 )
 
-from core.centros import (
-    gestores_centros_vista,
-    gestores_centros_crear_vista,
-    gestores_centros_actualizar_vista,
-    gestores_centros_eliminar_vista
+from core.contratas import (
+    gestores_contratas_vista,
+    gestores_contratas_crear_vista,
+    gestores_contratas_actualizar_vista,
+    gestores_contratas_eliminar_vista
 )
 
 from core.usuarios_contratas import (
@@ -127,6 +140,34 @@ def gestores_usuarios_cogestores_eliminar():
     return gestores_usuarios_cogestores_eliminar_vista()
 
 '''
+Rutas para gestión de titulares, funciones:
+    - gestores_titulares_vista()
+    - gestores_titulares_crear_vista()
+    - gestores_titulares_actualizar_vista()
+    - gestores_titulares_eliminar_vista()
+'''
+
+@gestores_bp.route('/usuarios/usuarios-gestores/titulares', methods=['GET', 'POST'])
+@login_requerido
+def gestores_titulares():
+    return gestores_titulares_vista()
+
+@gestores_bp.route('/usuarios/usuarios-gestores/titulares/crear', methods=['GET', 'POST'])
+@login_requerido
+def gestores_titulares_crear():
+    return gestores_titulares_crear_vista()
+
+@gestores_bp.route('/usuarios/usuarios-gestores/titulares/actualizar', methods=['GET', 'POST'])
+@login_requerido
+def gestores_titulares_actualizar():
+    return gestores_titulares_actualizar_vista()
+
+@gestores_bp.route('/usuarios/usuarios-gestores/titulares/eliminar', methods=['GET', 'POST'])
+@login_requerido
+def gestores_titulares_eliminar():
+    return gestores_titulares_eliminar_vista()
+
+'''
 Rutas para gestión de usuarios titulares, funciones:
     - gestores_usuarios_titulares_vista()
     - gestores_usuarios_titulares_crear_vista()
@@ -209,6 +250,33 @@ def gestores_usuarios_centros_actualizar():
 @login_requerido
 def gestores_usuarios_centros_eliminar():
     return gestores_usuarios_centros_eliminar_vista()
+
+'''
+Rutas para gestión de contratas, funciones:
+    - gestores_contratas_vista()
+    - gestores_contratas_crear_vista()
+    - gestores_contratas_actualizar_vista()
+    - gestores_contratas_eliminar_vista()
+'''
+@gestores_bp.route('/usuarios/usuarios-gestores/contratas', methods=['GET', 'POST'])
+@login_requerido
+def gestores_contratas():
+    return gestores_contratas_vista()
+
+@gestores_bp.route('/usuarios/usuarios-gestores/contratas/crear', methods=['GET', 'POST'])
+@login_requerido
+def gestores_contratas_crear():
+    return gestores_contratas_crear_vista()
+
+@gestores_bp.route('/usuarios/usuarios-gestores/contratas/actualizar', methods=['GET', 'POST'])
+@login_requerido
+def gestores_contratas_actualizar():
+    return gestores_contratas_actualizar_vista()
+
+@gestores_bp.route('/usuarios/usuarios-gestores/contratas/eliminar', methods=['GET', 'POST'])
+@login_requerido
+def gestores_contratas_eliminar():
+    return gestores_contratas_eliminar_vista()
 
 '''
 Rutas para gestión de contratas, funciones:

@@ -1,0 +1,61 @@
+{% extends "_base.html" %}
+
+{% block main %}
+    <div class="d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card shadow bg-dark text-white" style="min-width: 500px;">
+            <div class="card-body">
+                <h4 class="card-title text-center">Crear Nuevo Titular</h4>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('gestores.gestores_titulares_crear') }}">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="nombre_titular" name="nombre_titular" 
+                                   value="{{ form_data.nombre_titular if form_data else '' }}" required>
+                            <label for="nombre_titular">Nombre del titular:</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="cif_dni" name="cif_dni" 
+                                   value="{{ form_data.cif_dni if form_data else '' }}" required>
+                            <label for="cif_dni">CIF/DNI:</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="domicilio" name="domicilio" 
+                                   value="{{ form_data.domicilio if form_data else '' }}" required>
+                            <label for="domicilio">Dirección:</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="codigo_postal" name="codigo_postal" 
+                                   value="{{ form_data.codigo_postal if form_data else '' }}" required>
+                            <label for="codigo_postal">Código Postal:</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="poblacion" name="poblacion" 
+                                   value="{{ form_data.poblacion if form_data else '' }}" required>
+                            <label for="poblacion">Población:</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="provincia" name="provincia" 
+                                   value="{{ form_data.provincia if form_data else '' }}" required>
+                            <label for="provincia">Provincia:</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="tel" class="form-control" id="telefono_titular" name="telefono_titular" 
+                                   value="{{ form_data.telefono_titular if form_data else '' }}" required>
+                            <label for="telefono_titular">Teléfono:</label>
+                        </div>
+
+                        <div class="d-flex justify-content-end align-items-center gap-2">
+                            <a href="{{ url_for('gestores.gestores_titulares') }}" class="btn btn-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-success">Crear</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
