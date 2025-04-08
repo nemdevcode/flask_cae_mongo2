@@ -118,19 +118,17 @@
                                 </span>
                             </td>
                             <td class="text-center">
-                                <a href="{{ url_for('gestores.gestores_titulares_actualizar', titular_id=titular._id|string) }}" 
+                                <a href="{{ url_for('gestores.gestores_titulares_titular', titular_id=titular._id|string) }}" 
                                    class="btn btn-primary btn-sm">
-                                Editar</a>
-                                <a href="" 
+                                Ir</a>
+                                <a href="{{ url_for('gestores.gestores_titulares_actualizar', titular_id=titular._id|string) }}" 
                                    class="btn btn-warning btn-sm">
-                                Usuarios</a>
-                                
+                                Editar</a>
                                 <button type="button" 
                                         class="btn btn-danger btn-sm" 
                                         data-bs-toggle="modal" 
                                         data-bs-target="#confirmarEliminar{{ titular._id }}">
-                                    Eliminar
-                                </button>
+                                Eliminar</button>
                             </td>
                         </tr>
                         <!-- Modal de confirmación de eliminación -->

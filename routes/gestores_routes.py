@@ -22,7 +22,8 @@ from core.titulares import (
     gestores_titulares_vista,
     gestores_titulares_crear_vista,
     gestores_titulares_actualizar_vista,
-    gestores_titulares_eliminar_vista
+    gestores_titulares_eliminar_vista,
+    gestores_titulares_titular_vista
 )
 
 from core.usuarios_titulares import (
@@ -168,6 +169,16 @@ def gestores_titulares_eliminar():
     return gestores_titulares_eliminar_vista()
 
 '''
+Rutas para gestión de elementos de cada titular, funciones:
+    - gestores_titulares_titular_vista()
+'''
+
+@gestores_bp.route('/usuarios/usuarios-gestores/titulares/<titular_id>', methods=['GET', 'POST'])
+@login_requerido
+def gestores_titulares_titular(titular_id):
+    return gestores_titulares_titular_vista(titular_id)
+
+'''
 Rutas para gestión de usuarios titulares, funciones:
     - gestores_usuarios_titulares_vista()
     - gestores_usuarios_titulares_crear_vista()
@@ -175,25 +186,25 @@ Rutas para gestión de usuarios titulares, funciones:
     - gestores_usuarios_titulares_eliminar_vista()
 '''
 
-@gestores_bp.route('/usuarios/usuarios-gestores/usuarios-titulares', methods=['GET', 'POST'])
+@gestores_bp.route('/usuarios/usuarios-gestores/usuarios-titulares/<titular_id>', methods=['GET', 'POST'])
 @login_requerido
-def gestores_usuarios_titulares():
-    return gestores_usuarios_titulares_vista()
+def gestores_usuarios_titulares(titular_id):
+    return gestores_usuarios_titulares_vista(titular_id)
 
-@gestores_bp.route('/usuarios/usuarios-gestores/usuarios-titulares/crear', methods=['GET', 'POST'])
+@gestores_bp.route('/usuarios/usuarios-gestores/usuarios-titulares/crear/<titular_id>', methods=['GET', 'POST'])
 @login_requerido
-def gestores_usuarios_titulares_crear():
-    return gestores_usuarios_titulares_crear_vista()
+def gestores_usuarios_titulares_crear(titular_id):
+    return gestores_usuarios_titulares_crear_vista(titular_id)
 
-@gestores_bp.route('/usuarios/usuarios-gestores/usuarios-titulares/actualizar', methods=['GET', 'POST'])
+@gestores_bp.route('/usuarios/usuarios-gestores/usuarios-titulares/actualizar/<titular_id>', methods=['GET', 'POST'])
 @login_requerido
-def gestores_usuarios_titulares_actualizar():
-    return gestores_usuarios_titulares_actualizar_vista()
+def gestores_usuarios_titulares_actualizar(titular_id):
+    return gestores_usuarios_titulares_actualizar_vista(titular_id)
 
-@gestores_bp.route('/usuarios/usuarios-gestores/usuarios-titulares/eliminar', methods=['GET', 'POST'])
+@gestores_bp.route('/usuarios/usuarios-gestores/usuarios-titulares/eliminar/<titular_id>', methods=['GET', 'POST'])
 @login_requerido
-def gestores_usuarios_titulares_eliminar():
-    return gestores_usuarios_titulares_eliminar_vista()
+def gestores_usuarios_titulares_eliminar(titular_id):
+    return gestores_usuarios_titulares_eliminar_vista(titular_id)
 
 '''
 Rutas para gestión de centros, funciones:

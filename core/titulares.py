@@ -315,3 +315,43 @@ def gestores_titulares_eliminar_vista():
     except Exception as e:
         flash(f'Error al eliminar el titular: {str(e)}', 'danger')
         return redirect(url_for('gestores.gestores_titulares'))
+
+def gestores_titulares_titular_vista(titular_id):
+    try:
+        # Obtener el ID del usuario actual
+        usuario_id = session.get('usuario_id')
+        if not usuario_id:
+            flash('No hay usuario autenticado', 'danger')
+            return redirect(url_for('login'))
+
+        # Obtener el rol de gestor
+        existe_rol, rol_gestor_id = obtener_rol('gestor')
+        if not existe_rol:
+            flash('Rol de gestor no encontrado', 'danger')
+            return redirect(url_for('usuarios.usuarios'))
+
+        # Verificar si el usuario tiene el rol de gestor
+        tiene_rol, usuario_rol_id = obtener_usuario_rol(usuario_id, rol_gestor_id)
+        if not tiene_rol:
+            flash('No tienes permisos para acceder a esta página', 'danger')
+            return redirect(url_for('usuarios.usuarios'))
+
+        # Obtener el gestor asociado al usuario_rol_id
+        gestor = db.gestores.find_one({'usuario_rol_id': ObjectId(usuario_rol_id)})
+        if not gestor:
+            flash('Gestor no encontrado', 'danger')
+            return redirect(url_for('usuarios.usuarios'))
+
+        # Obtener el titular
+        titular = db.titulares.find_one({'_id': ObjectId(titular_id), 'gestor_id': ObjectId(gestor['_id'])})
+        if not titular:
+            flash('Titular no encontrado', 'danger')
+            return redirect(url_for('gestores.gestores_titulares'))
+
+        return render_template('usuarios_gestores/titulares/index.html', 
+                             titular=titular,
+                             titular_id=titular_id)
+
+    except Exception as e:
+        flash(f'Error al acceder a la página: {str(e)}', 'danger')
+        return redirect(url_for('usuarios.usuarios'))
