@@ -20,7 +20,7 @@
                     <a href="{{ url_for('gestores.usuarios_gestores') }}" class="btn btn-outline-primary">Gestores</a>
                 </div>
                 <div class="btn-group" role="group" aria-label="Navegación entre elementos de usuario">
-                    <a href="{{ url_for('gestores.gestores_titulares') }}" class="btn btn-warning">Titulares</a>
+                    <a href="{{ url_for('gestores.gestores_titulares', gestor_id=gestor_id|string) }}" class="btn btn-warning">Titulares</a>
                 </div>
                 <a href="{{ url_for('logout') }}" class="btn btn-outline-dark">Cerrar sesión</a>
             </div>

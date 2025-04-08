@@ -148,10 +148,10 @@ Rutas para gestión de titulares, funciones:
     - gestores_titulares_eliminar_vista()
 '''
 
-@gestores_bp.route('/usuarios/usuarios-gestores/titulares', methods=['GET', 'POST'])
+@gestores_bp.route('/usuarios/usuarios-gestores/titulares/<gestor_id>', methods=['GET', 'POST'])
 @login_requerido
-def gestores_titulares():
-    return gestores_titulares_vista()
+def gestores_titulares(gestor_id):
+    return gestores_titulares_vista(gestor_id)
 
 @gestores_bp.route('/usuarios/usuarios-gestores/titulares/crear', methods=['GET', 'POST'])
 @login_requerido

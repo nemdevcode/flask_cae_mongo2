@@ -117,7 +117,8 @@ def usuarios_gestores_gestor_vista(gestor_id):
 
         return render_template('usuarios_gestores/index.html',
                              nombre_usuario=usuario.get('nombre_usuario'),
-                             nombre_gestor=gestor.get('nombre_gestor'))
+                             nombre_gestor=gestor.get('nombre_gestor'),
+                             gestor_id=gestor_id)
 
     except Exception as e:
         flash(f'Error al cargar la vista del gestor: {str(e)}', 'danger')

@@ -118,7 +118,7 @@
                                 </span>
                             </td>
                             <td class="text-center">
-                                <a href="{{ url_for('gestores.usuarios_gestores_gestor', gestor_id=gestor._id) }}" 
+                                <a href="{{ url_for('gestores.usuarios_gestores_gestor', gestor_id=gestor._id|string) }}" 
                                    class="btn btn-primary btn-sm">
                                 Ir</a>
                                 

@@ -7,7 +7,7 @@ from datetime import datetime
 
 db = conexion_mongo()
 
-def gestores_titulares_vista():
+def gestores_titulares_vista(gestor_id):
     try:
         # Obtener el ID del usuario actual
         usuario_id = session.get('usuario_id')
@@ -28,9 +28,13 @@ def gestores_titulares_vista():
             return redirect(url_for('usuarios.usuarios'))
 
         # Obtener el gestor asociado al usuario_rol_id
-        gestor = db.gestores.find_one({'usuario_rol_id': ObjectId(usuario_rol_id)})
+        gestor = db.gestores.find_one({
+            '_id': ObjectId(gestor_id),
+            'usuario_rol_id': usuario_rol_id,
+            'estado_gestor': 'activo'
+        })
         if not gestor:
-            flash('Gestor no encontrado', 'danger')
+            flash('Gestor no encontrado o no tienes permisos para acceder', 'danger')
             return redirect(url_for('usuarios.usuarios'))
 
         # Obtener la información del usuario
@@ -39,7 +43,7 @@ def gestores_titulares_vista():
             flash('Usuario no encontrado', 'danger')
             return redirect(url_for('usuarios.usuarios'))
 
-        nombre_gestor = usuario.get('nombre_usuario', 'Gestor')
+        nombre_gestor = gestor.get('nombre_gestor', 'Gestor')
 
         # Obtener parámetros de filtrado
         filtrar_titular = request.form.get('filtrar_titular', '')
@@ -48,10 +52,10 @@ def gestores_titulares_vista():
 
         # Si se solicita vaciar filtros
         if vaciar == '1':
-            return redirect(url_for('gestores.gestores_titulares'))
+            return redirect(url_for('gestores.gestores_titulares', gestor_id=gestor_id))
 
         # Construir la consulta base - buscar titulares donde el gestor_id sea el del gestor actual
-        query = {'gestor_id': ObjectId(gestor['_id'])}
+        query = {'gestor_id': ObjectId(gestor_id)}
         
         # Aplicar filtros si existen
         if filtrar_estado != 'todos':
@@ -86,11 +90,11 @@ def gestores_titulares_vista():
                              nombre_gestor=nombre_gestor,
                              filtrar_titular=filtrar_titular,
                              filtrar_estado=filtrar_estado,
-                             gestor_id=gestor['_id'])
+                             gestor_id=gestor_id)
 
     except Exception as e:
         flash(f'Error al listar los titulares: {str(e)}', 'danger')
-        return redirect(url_for('usuarios.usuarios'))
+        return redirect(url_for('gestores.usuarios_gestores_gestor', gestor_id=gestor_id))
 
 def gestores_titulares_crear_vista():
     try:
