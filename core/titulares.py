@@ -96,7 +96,7 @@ def gestores_titulares_vista(gestor_id):
         flash(f'Error al listar los titulares: {str(e)}', 'danger')
         return redirect(url_for('gestores.usuarios_gestores_gestor', gestor_id=gestor_id))
 
-def gestores_titulares_crear_vista():
+def gestores_titulares_crear_vista(gestor_id):
     try:
         # Obtener el ID del usuario actual
         usuario_id = session.get('usuario_id')
@@ -116,10 +116,14 @@ def gestores_titulares_crear_vista():
             flash('No tienes permisos para acceder a esta página', 'danger')
             return redirect(url_for('usuarios.usuarios'))
 
-        # Obtener el gestor asociado al usuario_rol_id
-        gestor = db.gestores.find_one({'usuario_rol_id': ObjectId(usuario_rol_id)})
+        # Obtener el gestor asociado al usuario_rol_id y gestor_id
+        gestor = db.gestores.find_one({
+            '_id': ObjectId(gestor_id),
+            'usuario_rol_id': usuario_rol_id,
+            'estado_gestor': 'activo'
+        })
         if not gestor:
-            flash('Gestor no encontrado', 'danger')
+            flash('Gestor no encontrado o no tienes permisos para acceder', 'danger')
             return redirect(url_for('usuarios.usuarios'))
 
         # Si es una petición POST, procesar el formulario
@@ -138,11 +142,12 @@ def gestores_titulares_crear_vista():
                 if not all([nombre_titular, cif_dni, domicilio, codigo_postal, poblacion, provincia, telefono_titular]):
                     flash('Todos los campos son obligatorios', 'danger')
                     return render_template('usuarios_gestores/titulares/crear.html', 
-                                         form_data=request.form)
+                                         form_data=request.form,
+                                         gestor_id=gestor_id)
 
                 # Crear el titular
                 titular = TitularesCollection(
-                    gestor_id=ObjectId(gestor['_id']),
+                    gestor_id=ObjectId(gestor_id),
                     nombre_titular=nombre_titular,
                     cif_dni=cif_dni,
                     domicilio=domicilio,
@@ -160,25 +165,28 @@ def gestores_titulares_crear_vista():
                 result = db.titulares.insert_one(titular.__dict__)
                 if result.inserted_id:
                     flash('Titular creado exitosamente', 'success')
-                    return redirect(url_for('gestores.gestores_titulares'))
+                    return redirect(url_for('gestores.gestores_titulares', gestor_id=gestor_id))
                 else:
                     flash('Error al crear el titular', 'danger')
                     return render_template('usuarios_gestores/titulares/crear.html', 
-                                         form_data=request.form)
+                                         form_data=request.form,
+                                         gestor_id=gestor_id)
 
             except Exception as e:
                 flash(f'Error al procesar el formulario: {str(e)}', 'danger')
                 return render_template('usuarios_gestores/titulares/crear.html', 
-                                     form_data=request.form)
+                                     form_data=request.form,
+                                     gestor_id=gestor_id)
 
         # Si es una petición GET, mostrar el formulario vacío
-        return render_template('usuarios_gestores/titulares/crear.html')
+        return render_template('usuarios_gestores/titulares/crear.html',
+                             gestor_id=gestor_id)
 
     except Exception as e:
         flash(f'Error al acceder a la página: {str(e)}', 'danger')
-        return redirect(url_for('usuarios.usuarios'))
+        return redirect(url_for('gestores.gestores_titulares', gestor_id=gestor_id))
 
-def gestores_titulares_actualizar_vista(titular_id):
+def gestores_titulares_actualizar_vista(titular_id, gestor_id):
     try:
         # Obtener el ID del usuario actual
         usuario_id = session.get('usuario_id')
@@ -198,17 +206,21 @@ def gestores_titulares_actualizar_vista(titular_id):
             flash('No tienes permisos para acceder a esta página', 'danger')
             return redirect(url_for('usuarios.usuarios'))
 
-        # Obtener el gestor asociado al usuario_rol_id
-        gestor = db.gestores.find_one({'usuario_rol_id': ObjectId(usuario_rol_id)})
+        # Obtener el gestor asociado al usuario_rol_id y gestor_id
+        gestor = db.gestores.find_one({
+            '_id': ObjectId(gestor_id),
+            'usuario_rol_id': usuario_rol_id,
+            'estado_gestor': 'activo'
+        })
         if not gestor:
-            flash('Gestor no encontrado', 'danger')
+            flash('Gestor no encontrado o no tienes permisos para acceder', 'danger')
             return redirect(url_for('usuarios.usuarios'))
 
         # Obtener el titular
-        titular = db.titulares.find_one({'_id': ObjectId(titular_id), 'gestor_id': ObjectId(gestor['_id'])})
+        titular = db.titulares.find_one({'_id': ObjectId(titular_id), 'gestor_id': ObjectId(gestor_id)})
         if not titular:
             flash('Titular no encontrado', 'danger')
-            return redirect(url_for('gestores.gestores_titulares'))
+            return redirect(url_for('gestores.gestores_titulares', gestor_id=gestor_id))
 
         # Si es una petición POST, procesar el formulario
         if request.method == 'POST':
@@ -227,7 +239,8 @@ def gestores_titulares_actualizar_vista(titular_id):
                 if not all([nombre_titular, cif_dni, domicilio, codigo_postal, poblacion, provincia, telefono_titular, estado_titular]):
                     flash('Todos los campos son obligatorios', 'danger')
                     return render_template('usuarios_gestores/titulares/actualizar.html', 
-                                         titular=titular)
+                                         titular=titular,
+                                         gestor_id=gestor_id)
 
                 # Actualizar el titular
                 result = db.titulares.update_one(
@@ -247,25 +260,27 @@ def gestores_titulares_actualizar_vista(titular_id):
 
                 if result.modified_count > 0:
                     flash('Titular actualizado exitosamente', 'success')
-                    return redirect(url_for('gestores.gestores_titulares'))
+                    return redirect(url_for('gestores.gestores_titulares', gestor_id=gestor_id))
                 else:
                     flash('No se realizaron cambios en el titular', 'info')
-                    return redirect(url_for('gestores.gestores_titulares'))
+                    return redirect(url_for('gestores.gestores_titulares', gestor_id=gestor_id))
 
             except Exception as e:
                 flash(f'Error al procesar el formulario: {str(e)}', 'danger')
                 return render_template('usuarios_gestores/titulares/actualizar.html', 
-                                     titular=titular)
+                                     titular=titular,
+                                     gestor_id=gestor_id)
 
         # Si es una petición GET, mostrar el formulario con los datos del titular
         return render_template('usuarios_gestores/titulares/actualizar.html', 
-                             titular=titular)
+                             titular=titular,
+                             gestor_id=gestor_id)
 
     except Exception as e:
         flash(f'Error al acceder a la página: {str(e)}', 'danger')
-        return redirect(url_for('usuarios.usuarios'))
+        return redirect(url_for('gestores.gestores_titulares', gestor_id=gestor_id))
 
-def gestores_titulares_eliminar_vista():
+def gestores_titulares_eliminar_vista(titular_id, gestor_id):
     try:
         # Obtener el ID del usuario actual
         usuario_id = session.get('usuario_id')
@@ -291,21 +306,15 @@ def gestores_titulares_eliminar_vista():
             flash('Gestor no encontrado', 'danger')
             return redirect(url_for('usuarios.usuarios'))
 
-        # Obtener el ID del titular a eliminar
-        titular_id = request.args.get('titular_id')
-        if not titular_id:
-            flash('ID de titular no proporcionado', 'danger')
-            return redirect(url_for('gestores.gestores_titulares'))
-
         # Verificar que el titular pertenece al gestor actual
         titular = db.titulares.find_one({
             '_id': ObjectId(titular_id),
-            'gestor_id': ObjectId(gestor['_id'])
+            'gestor_id': ObjectId(gestor_id)
         })
 
         if not titular:
             flash('Titular no encontrado o no pertenece a este gestor', 'danger')
-            return redirect(url_for('gestores.gestores_titulares'))
+            return redirect(url_for('gestores.gestores_titulares', gestor_id=gestor_id))
 
         # Eliminar el titular
         result = db.titulares.delete_one({'_id': ObjectId(titular_id)})
@@ -314,11 +323,11 @@ def gestores_titulares_eliminar_vista():
         else:
             flash('No se pudo eliminar el titular', 'danger')
 
-        return redirect(url_for('gestores.gestores_titulares'))
+        return redirect(url_for('gestores.gestores_titulares', gestor_id=gestor_id))
 
     except Exception as e:
         flash(f'Error al eliminar el titular: {str(e)}', 'danger')
-        return redirect(url_for('gestores.gestores_titulares'))
+        return redirect(url_for('gestores.gestores_titulares', gestor_id=gestor_id))
 
 def gestores_titulares_titular_vista(titular_id):
     try:

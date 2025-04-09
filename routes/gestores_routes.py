@@ -153,27 +153,27 @@ Rutas para gestión de titulares, funciones:
 def gestores_titulares(gestor_id):
     return gestores_titulares_vista(gestor_id)
 
-@gestores_bp.route('/usuarios/usuarios-gestores/titulares/crear', methods=['GET', 'POST'])
+@gestores_bp.route('/usuarios/usuarios-gestores/titulares/crear/<gestor_id>', methods=['GET', 'POST'])
 @login_requerido
-def gestores_titulares_crear():
-    return gestores_titulares_crear_vista()
+def gestores_titulares_crear(gestor_id):
+    return gestores_titulares_crear_vista(gestor_id)
 
-@gestores_bp.route('/usuarios/usuarios-gestores/titulares/actualizar/<titular_id>', methods=['GET', 'POST'])
+@gestores_bp.route('/usuarios/usuarios-gestores/titulares/actualizar/<titular_id>/<gestor_id>', methods=['GET', 'POST'])
 @login_requerido
-def gestores_titulares_actualizar(titular_id):
-    return gestores_titulares_actualizar_vista(titular_id)
+def gestores_titulares_actualizar(titular_id, gestor_id):
+    return gestores_titulares_actualizar_vista(titular_id, gestor_id)
 
-@gestores_bp.route('/usuarios/usuarios-gestores/titulares/eliminar', methods=['GET', 'POST'])
+@gestores_bp.route('/usuarios/usuarios-gestores/titulares/eliminar/<gestor_id>/<titular_id>', methods=['POST'])
 @login_requerido
-def gestores_titulares_eliminar():
-    return gestores_titulares_eliminar_vista()
+def gestores_titulares_eliminar(gestor_id, titular_id):
+    return gestores_titulares_eliminar_vista(titular_id, gestor_id)
 
 '''
 Rutas para gestión de elementos de cada titular, funciones:
     - gestores_titulares_titular_vista()
 '''
 
-@gestores_bp.route('/usuarios/usuarios-gestores/titulares/<titular_id>', methods=['GET', 'POST'])
+@gestores_bp.route('/usuarios/usuarios-gestores/titulares/titular/<titular_id>', methods=['GET', 'POST'])
 @login_requerido
 def gestores_titulares_titular(titular_id):
     return gestores_titulares_titular_vista(titular_id)
