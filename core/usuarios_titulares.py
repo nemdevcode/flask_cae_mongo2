@@ -71,7 +71,7 @@ def gestores_usuarios_titulares_vista(titular_id):
         flash(f'Error al listar los usuarios titulares: {str(e)}', 'danger')
         return redirect(url_for('login'))
 
-def gestores_usuarios_titulares_crear_vista(titular_id):
+def gestores_usuarios_titulares_crear_vista(gestor_id, titular_id):
     try:
         # Obtener el ID del usuario actual
         usuario_id = session.get('usuario_id')
@@ -109,12 +109,13 @@ def gestores_usuarios_titulares_crear_vista(titular_id):
         titular = db.titulares.find_one({'_id': ObjectId(titular_id)})
         if not titular:
             flash('Titular no encontrado', 'danger')
-            return redirect(url_for('gestores.gestores_titulares'))
+            return redirect(url_for('gestores.gestores_titulares', gestor_id=gestor_id))
 
         if request.method == 'GET':
             return render_template('usuarios_gestores/usuarios_titulares/crear.html',
                                  nombre_gestor=nombre_gestor,
-                                 titular=titular)
+                                 titular=titular,
+                                 gestor_id=gestor_id)
 
         if request.method == 'POST':
             # Obtener datos del formulario
@@ -126,7 +127,8 @@ def gestores_usuarios_titulares_crear_vista(titular_id):
                 return render_template('usuarios_gestores/usuarios_titulares/crear.html',
                                      form_data=request.form,
                                      nombre_gestor=nombre_gestor,
-                                     titular=titular)
+                                     titular=titular,
+                                     gestor_id=gestor_id)
 
             # Verificar si el usuario existe
             existe_usuario, usuario_titular_id = verificar_usuario_existente(email)
@@ -153,7 +155,8 @@ def gestores_usuarios_titulares_crear_vista(titular_id):
                         return render_template('usuarios_gestores/usuarios_titulares/crear.html',
                                             form_data=request.form,
                                             nombre_gestor=nombre_gestor,
-                                            titular=titular)
+                                            titular=titular,
+                                            gestor_id=gestor_id)
                 else:
                     # Si no tiene el rol de titular, crearlo
                     usuario_rol_titular_id = crear_usuario_rol(usuario_titular_id, rol_titular_id)
@@ -170,7 +173,7 @@ def gestores_usuarios_titulares_crear_vista(titular_id):
                 }
                 db.usuarios_titulares.insert_one(titular_data)
                 flash('Este email ya está registrado, será asignado como usuario titular para este titular', 'success')
-                return redirect(url_for('gestores.gestores_usuarios_titulares'))
+                return redirect(url_for('gestores.gestores_usuarios_titulares', titular_id=titular_id))
 
             # Si el usuario no existe, crear nuevo usuario y usuario titular
             # Generar token de verificación
@@ -178,8 +181,10 @@ def gestores_usuarios_titulares_crear_vista(titular_id):
             
             # Crear diccionario con los datos del nuevo usuario
             datos_usuario = {
+                'email': email,
                 'token_verificacion': token,
-                'verificado': False
+                'verificado': False,
+                'estado_usuario': 'pendiente'
             }
             
             # Crear el nuevo usuario
@@ -217,14 +222,15 @@ def gestores_usuarios_titulares_crear_vista(titular_id):
             else:
                 flash('Usuario titular creado pero hubo un error al enviar el email de activación.', 'warning')
 
-            return redirect(url_for('gestores.gestores_usuarios_titulares'))
+            return redirect(url_for('gestores.gestores_usuarios_titulares', gestor_id=gestor_id, titular_id=titular_id))
 
     except Exception as e:
         flash(f'Error al crear el usuario titular: {str(e)}', 'danger')
         return render_template('usuarios_gestores/usuarios_titulares/crear.html',
                              form_data=request.form,
                              nombre_gestor=nombre_gestor,
-                             titular=titular)
+                             titular=titular,
+                             gestor_id=gestor_id)
 
 def gestores_usuarios_titulares_actualizar_vista(titular_id):
     try:

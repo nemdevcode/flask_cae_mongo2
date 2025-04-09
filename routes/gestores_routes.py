@@ -191,10 +191,10 @@ Rutas para gestión de usuarios titulares, funciones:
 def gestores_usuarios_titulares(titular_id):
     return gestores_usuarios_titulares_vista(titular_id)
 
-@gestores_bp.route('/usuarios/usuarios-gestores/usuarios-titulares/crear/<titular_id>', methods=['GET', 'POST'])
+@gestores_bp.route('/usuarios/usuarios-gestores/usuarios-titulares/crear/<gestor_id>/<titular_id>', methods=['GET', 'POST'])
 @login_requerido
-def gestores_usuarios_titulares_crear(titular_id):
-    return gestores_usuarios_titulares_crear_vista(titular_id)
+def gestores_usuarios_titulares_crear(gestor_id, titular_id):
+    return gestores_usuarios_titulares_crear_vista(gestor_id, titular_id)
 
 @gestores_bp.route('/usuarios/usuarios-gestores/usuarios-titulares/actualizar/<titular_id>', methods=['GET', 'POST'])
 @login_requerido
