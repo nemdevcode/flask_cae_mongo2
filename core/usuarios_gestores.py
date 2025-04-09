@@ -105,12 +105,16 @@ def usuarios_gestores_gestor_vista(gestor_id):
 
         # Obtener la información del usuario y gestor
         usuario = db.usuarios.find_one({'_id': ObjectId(usuario_id)})
+        if not usuario:
+            flash('Usuario no encontrado', 'danger')
+            return redirect(url_for('usuarios.usuarios'))
+
+        # Verificar que el gestor existe y pertenece al usuario actual
         gestor = db.gestores.find_one({
             '_id': ObjectId(gestor_id),
             'usuario_rol_id': usuario_rol_id,
             'estado_gestor': 'activo'
         })
-
         if not gestor:
             flash('Gestor no encontrado o no tienes permisos para acceder', 'danger')
             return redirect(url_for('gestores.usuarios_gestores'))

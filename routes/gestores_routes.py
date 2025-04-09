@@ -173,10 +173,10 @@ Rutas para gestión de elementos de cada titular, funciones:
     - gestores_titulares_titular_vista()
 '''
 
-@gestores_bp.route('/usuarios/usuarios-gestores/titulares/titular/<titular_id>', methods=['GET', 'POST'])
+@gestores_bp.route('/usuarios/usuarios-gestores/titulares/titular/<gestor_id>/<titular_id>', methods=['GET', 'POST'])
 @login_requerido
-def gestores_titulares_titular(titular_id):
-    return gestores_titulares_titular_vista(titular_id)
+def gestores_titulares_titular(gestor_id, titular_id):
+    return gestores_titulares_titular_vista(gestor_id, titular_id)
 
 '''
 Rutas para gestión de usuarios titulares, funciones:

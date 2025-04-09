@@ -48,59 +48,24 @@ def gestores_usuarios_titulares_vista(titular_id):
             return redirect(url_for('login'))
 
         nombre_gestor = usuario.get('nombre_usuario', 'Gestor')
+        gestor_id = str(gestor['_id'])
 
-        # Obtener el titular
+        # Obtener los usuarios titulares asociados al titular_id
+        usuarios_titulares = list(db.usuarios_titulares.find({'titular_id': ObjectId(titular_id)}))
+        
+        # Obtener la información del titular
         titular = db.titulares.find_one({'_id': ObjectId(titular_id)})
         if not titular:
             flash('Titular no encontrado', 'danger')
-            return redirect(url_for('gestores.gestores_titulares'))
+            return redirect(url_for('gestores.gestores_titulares', gestor_id=gestor_id))
 
-        # Obtener parámetros de filtrado
-        filtrar_titular = request.form.get('filtrar_titular', '')
-        filtrar_estado = request.form.get('filtrar_estado', 'todos')
-        vaciar = request.args.get('vaciar', '0')
-
-        # Si se solicita vaciar filtros
-        if vaciar == '1':
-            return redirect(url_for('gestores.gestores_usuarios_titulares', titular_id=titular_id))
-
-        # Construir la consulta base - buscar usuarios titulares donde el titular_id sea el del titular actual
-        query = {'titular_id': ObjectId(titular_id)}
-        
-        # Aplicar filtros si existen
-        if filtrar_estado != 'todos':
-            query['estado_usuario_titular'] = filtrar_estado
-
-        # Obtener los usuarios titulares asociados al titular
-        usuarios_titulares = []
-        usuarios_titulares_cursor = db.usuarios_titulares.find(query)
-        
-        for ut in usuarios_titulares_cursor:
-            # Obtener la información del usuario titular
-            usuario_rol_titular = db.usuarios_roles.find_one({'_id': ut['usuario_rol_titular_id']})
-            if usuario_rol_titular:
-                usuario_titular = db.usuarios.find_one({'_id': usuario_rol_titular['usuario_id']})
-                if usuario_titular:
-                    # Si hay filtro por nombre, verificar si coincide
-                    if filtrar_titular:
-                        if (filtrar_titular.lower() not in usuario_titular['email'].lower() and 
-                            filtrar_titular.lower() not in ut['alias_usuario_titular'].lower()):
-                            continue
-
-                    usuarios_titulares.append({
-                        '_id': ut['_id'],
-                        'alias_usuario_titular': ut['alias_usuario_titular'],
-                        'email': usuario_titular['email'],
-                        'nombre_usuario': usuario_titular.get('nombre_usuario', ''),
-                        'estado_usuario_titular': ut['estado_usuario_titular']
-                    })
-
-        return render_template('usuarios_gestores/usuarios_titulares/listar.html', 
-                             usuarios_titulares=usuarios_titulares,
-                             nombre_gestor=nombre_gestor,
-                             filtrar_titular=filtrar_titular,
-                             filtrar_estado=filtrar_estado,
-                             titular_id=titular_id)
+        return render_template(
+            'usuarios_gestores/usuarios_titulares/listar.html',
+            usuarios_titulares=usuarios_titulares,
+            titular_id=titular_id,
+            gestor_id=gestor_id,
+            nombre_gestor=nombre_gestor
+        )
 
     except Exception as e:
         flash(f'Error al listar los usuarios titulares: {str(e)}', 'danger')

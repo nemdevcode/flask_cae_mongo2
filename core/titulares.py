@@ -35,7 +35,7 @@ def gestores_titulares_vista(gestor_id):
         })
         if not gestor:
             flash('Gestor no encontrado o no tienes permisos para acceder', 'danger')
-            return redirect(url_for('usuarios.usuarios'))
+            return redirect(url_for('gestores.gestores_titulares', gestor_id=gestor_id))
 
         # Obtener la información del usuario
         usuario = db.usuarios.find_one({'_id': ObjectId(usuario_id)})
@@ -329,7 +329,7 @@ def gestores_titulares_eliminar_vista(titular_id, gestor_id):
         flash(f'Error al eliminar el titular: {str(e)}', 'danger')
         return redirect(url_for('gestores.gestores_titulares', gestor_id=gestor_id))
 
-def gestores_titulares_titular_vista(titular_id):
+def gestores_titulares_titular_vista(gestor_id, titular_id):
     try:
         # Obtener el ID del usuario actual
         usuario_id = session.get('usuario_id')
@@ -349,22 +349,34 @@ def gestores_titulares_titular_vista(titular_id):
             flash('No tienes permisos para acceder a esta página', 'danger')
             return redirect(url_for('usuarios.usuarios'))
 
-        # Obtener el gestor asociado al usuario_rol_id
-        gestor = db.gestores.find_one({'usuario_rol_id': ObjectId(usuario_rol_id)})
+        # Obtener el gestor asociado al usuario_rol_id y gestor_id
+        gestor = db.gestores.find_one({
+            '_id': ObjectId(gestor_id),
+            'usuario_rol_id': usuario_rol_id,
+            'estado_gestor': 'activo'
+        })
         if not gestor:
-            flash('Gestor no encontrado', 'danger')
-            return redirect(url_for('usuarios.usuarios'))
+            flash('Gestor no encontrado o no tienes permisos para acceder', 'danger')
+            return redirect(url_for('gestores.usuarios_gestores_gestor', gestor_id=gestor_id))
 
-        # Obtener el titular
-        titular = db.titulares.find_one({'_id': ObjectId(titular_id), 'gestor_id': ObjectId(gestor['_id'])})
+        # Verificar que el titular pertenece al gestor actual
+        titular = db.titulares.find_one({
+            '_id': ObjectId(titular_id),
+            'gestor_id': ObjectId(gestor_id)
+        })
         if not titular:
-            flash('Titular no encontrado', 'danger')
-            return redirect(url_for('gestores.gestores_titulares'))
+            flash('Titular no encontrado o no pertenece a este gestor', 'danger')
+            return redirect(url_for('gestores.usuarios_gestores_gestor', gestor_id=gestor_id))
 
-        return render_template('usuarios_gestores/titulares/index.html', 
+        # Obtener los usuarios titulares asociados al titular
+        usuarios_titulares = list(db.usuarios_titulares.find({'titular_id': ObjectId(titular_id)}))
+
+        return render_template('usuarios_gestores/usuarios_titulares/listar.html', 
                              titular=titular,
-                             titular_id=titular_id)
+                             titular_id=titular_id,
+                             gestor_id=gestor_id,
+                             usuarios_titulares=usuarios_titulares)
 
     except Exception as e:
         flash(f'Error al acceder a la página: {str(e)}', 'danger')
-        return redirect(url_for('usuarios.usuarios'))
+        return redirect(url_for('gestores.usuarios_gestores_gestor', gestor_id=gestor_id))
