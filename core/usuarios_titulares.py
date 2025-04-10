@@ -51,7 +51,28 @@ def gestores_usuarios_titulares_vista(titular_id):
         gestor_id = str(gestor['_id'])
 
         # Obtener los usuarios titulares asociados al titular_id
-        usuarios_titulares = list(db.usuarios_titulares.find({'titular_id': ObjectId(titular_id)}))
+        usuarios_titulares = []
+        usuarios_titulares_cursor = db.usuarios_titulares.find({'titular_id': ObjectId(titular_id)})
+        
+        for ut in usuarios_titulares_cursor:
+            # Obtener el usuario_rol del titular usando usuario_rol_titular_id
+            usuario_rol = db.usuarios_roles.find_one({'_id': ObjectId(ut['usuario_rol_titular_id'])})
+            
+            if usuario_rol:
+                # Obtener la información del usuario titular
+                usuario_titular = db.usuarios.find_one({'_id': ObjectId(usuario_rol['usuario_id'])})
+                
+                if usuario_titular:
+                    titular_info = {
+                        '_id': ut['_id'],
+                        'titular_info': {
+                            'alias': ut['alias_usuario_titular'],
+                            'estado_usuario_titular': ut['estado_usuario_titular']
+                        },
+                        'email': usuario_titular['email'],
+                        'nombre_usuario': usuario_titular.get('nombre_usuario', '')
+                    }
+                    usuarios_titulares.append(titular_info)
         
         # Obtener la información del titular
         titular = db.titulares.find_one({'_id': ObjectId(titular_id)})
@@ -64,7 +85,8 @@ def gestores_usuarios_titulares_vista(titular_id):
             usuarios_titulares=usuarios_titulares,
             titular_id=titular_id,
             gestor_id=gestor_id,
-            nombre_gestor=nombre_gestor
+            nombre_gestor=nombre_gestor,
+            titular=titular
         )
 
     except Exception as e:
@@ -173,7 +195,7 @@ def gestores_usuarios_titulares_crear_vista(gestor_id, titular_id):
                 }
                 db.usuarios_titulares.insert_one(titular_data)
                 flash('Este email ya está registrado, será asignado como usuario titular para este titular', 'success')
-                return redirect(url_for('gestores.gestores_usuarios_titulares', titular_id=titular_id))
+                return redirect(url_for('gestores.gestores_usuarios_titulares', gestor_id=gestor_id, titular_id=titular_id))
 
             # Si el usuario no existe, crear nuevo usuario y usuario titular
             # Generar token de verificación
@@ -181,7 +203,6 @@ def gestores_usuarios_titulares_crear_vista(gestor_id, titular_id):
             
             # Crear diccionario con los datos del nuevo usuario
             datos_usuario = {
-                'email': email,
                 'token_verificacion': token,
                 'verificado': False,
                 'estado_usuario': 'pendiente'

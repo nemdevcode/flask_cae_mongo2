@@ -100,11 +100,11 @@
                     {% if usuarios_titulares %}
                         {% for usuario_titular in usuarios_titulares %}
                             <tr>
-                                <td>{{ usuario_titular.alias_usuario_titular }}</td>
+                                <td>{{ usuario_titular.titular_info.alias }}</td>
                                 <td>{{ usuario_titular.email }}</td>
                                 <td>{{ usuario_titular.nombre_usuario }}</td>
                                 <td class="text-center">
-                                    {% if usuario_titular.estado_usuario_titular == 'activo' %}
+                                    {% if usuario_titular.titular_info.estado_usuario_titular == 'activo' %}
                                         <span class="badge bg-success">Activo</span>
                                     {% else %}
                                         <span class="badge bg-secondary">Inactivo</span>
@@ -130,7 +130,7 @@
                                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
-                                            ¿Está seguro que desea eliminar al usuario titular "{{ usuario_titular.alias_usuario_titular }}"?
+                                            ¿Está seguro que desea eliminar al usuario titular "{{ usuario_titular.titular_info.alias }}"?
                                             <br>
                                             <strong>Email:</strong> {{ usuario_titular.email }}
                                         </div>
