@@ -39,7 +39,7 @@ def usuarios_gestores_vista():
 
         # Si se solicita vaciar filtros
         if vaciar == '1':
-            return redirect(url_for('gestores.usuarios_gestores'))
+            return redirect(url_for('usuarios_gestores.usuarios_gestores'))
 
         # Obtener todos los gestores relacionados con el usuario_rol_id
         query = {
@@ -117,7 +117,7 @@ def usuarios_gestores_gestor_vista(gestor_id):
         })
         if not gestor:
             flash('Gestor no encontrado o no tienes permisos para acceder', 'danger')
-            return redirect(url_for('gestores.usuarios_gestores'))
+            return redirect(url_for('usuarios_gestores.usuarios_gestores'))
 
         return render_template('usuarios_gestores/index.html',
                              nombre_usuario=usuario.get('nombre_usuario'),

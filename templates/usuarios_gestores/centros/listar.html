@@ -15,7 +15,7 @@
                 </ul>
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end align-items-center">
                     <span class="my-auto">Ir a usuario:</span>
-                    <a href="{{ url_for('gestores.gestores') }}" class="btn btn-outline-primary">Gestor</a>
+                    <a href="{{ url_for('usuarios_gestores.usuarios_gestores') }}" class="btn btn-outline-primary">Gestor</a>
                     <a href="{{ url_for('logout') }}" class="btn btn-outline-dark">Cerrar sesión</a>
                 </div>
             </div>
@@ -31,7 +31,7 @@
         <!-- Formulario de búsqueda de titulares -->
         <div class="card mb-4">
             <div class="card-body">
-                <form action="{{ url_for('gestores.gestores_centros') }}" method="post">
+                <form action="{{ url_for('centros.gestores_centros') }}" method="post">
                     <input type="hidden" name="expandir_titular" value="{{ expandir_titular }}">
                     <div class="d-flex gap-3 align-items-center">
                         <div class="form-floating" style="flex: 1">
@@ -49,7 +49,7 @@
                         </div>
                         <!-- Botón para limpiar filtro de titulares -->
                         <div>
-                            <a href="{{ url_for('gestores.gestores_centros', expandir_titular=expandir_titular) }}" class="btn btn-secondary">Limpiar filtro</a>
+                            <a href="{{ url_for('centros.gestores_centros', expandir_titular=expandir_titular) }}" class="btn btn-secondary">Limpiar filtro</a>
                         </div>
                     </div>
                 </form>
@@ -75,7 +75,7 @@
                         <div class="card-body">
                             <!-- Formulario de búsqueda para este titular -->
                             <div class="d-flex justify-content-between align-items-center mb-4">
-                                <form action="{{ url_for('gestores.gestores_centros') }}" method="post" class="flex-grow-1 me-3">
+                                <form action="{{ url_for('centros.gestores_centros') }}" method="post" class="flex-grow-1 me-3">
                                     <input type="hidden" name="expandir_titular" value="{{ titular._id }}">
                                     <div class="d-flex gap-3 align-items-center">
                                         <!-- Input para filtrar centro -->
@@ -125,12 +125,12 @@
                                         
                                         <!-- Botón para limpiar filtro -->
                                         <div style="flex: 1;">
-                                            <a href="{{ url_for('gestores.gestores_centros', expandir_titular=titular._id) }}" class="btn btn-secondary">Limpiar filtros</a>
+                                            <a href="{{ url_for('centros.gestores_centros', expandir_titular=titular._id) }}" class="btn btn-secondary">Limpiar filtros</a>
                                         </div>
                                     </div>
                                 </form>
                                 <!-- Botón crear -->
-                                <a href="{{ url_for('gestores.gestores_centros_crear', titular_id=titular._id) }}" class="btn btn-success">Crear</a>
+                                <a href="{{ url_for('centros.gestores_centros_crear', titular_id=titular._id) }}" class="btn btn-success">Crear</a>
                             </div>
 
                             <!-- Tabla de centros -->
@@ -164,7 +164,7 @@
                                                         {% endif %}
                                                     </td>
                                                     <td>
-                                                        <a href="{{ url_for('gestores.gestores_centros_actualizar', centro_id=centro._id, expandir_titular=titular._id) }}" 
+                                                        <a href="{{ url_for('centros.gestores_centros_actualizar', centro_id=centro._id, expandir_titular=titular._id) }}" 
                                                            class="btn btn-primary btn-sm">Editar</a>
                                                         <button type="button" 
                                                                 class="btn btn-danger btn-sm" 
@@ -183,13 +183,13 @@
                                                                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                                             </div>
                                                             <div class="modal-body">
-                                                                ¿Está seguro que desea eliminar el centro "{{ centro.nombre_centro }}"?
+                                                                ¿Está seguro que desea eliminar el centro "{{ centro.nombre_centro }}"? 
                                                                 <br>
                                                                 <strong>Domicilio:</strong> {{ centro.domicilio }}
                                                             </div>
                                                             <div class="modal-footer">
                                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                                                <a href="{{ url_for('gestores.gestores_centros_eliminar', centro_id=centro._id, expandir_titular=titular._id) }}" 
+                                                                <a href="{{ url_for('centros.gestores_centros_eliminar', centro_id=centro._id, expandir_titular=titular._id) }}" 
                                                                    class="btn btn-danger">Eliminar</a>
                                                             </div>
                                                         </div>
@@ -200,15 +200,17 @@
                                     </table>
                                 </div>
                             {% else %}
-                                <p class="text-center">No hay centros registrados para este titular</p>
+                                <div class="alert alert-info">
+                                    No hay centros registrados para este titular.
+                                </div>
                             {% endif %}
                         </div>
                     </div>
                 </div>
             {% endfor %}
         {% else %}
-            <div class="alert alert-info text-center">
-                No hay titulares registrados
+            <div class="alert alert-info">
+                No hay titulares registrados.
             </div>
         {% endif %}
     </div>

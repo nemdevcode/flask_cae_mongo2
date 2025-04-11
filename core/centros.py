@@ -140,7 +140,7 @@ def gestores_centros_vista():
                              
     except Exception as e:
         flash(f'Error al cargar los centros: {str(e)}', 'danger')
-        return redirect(url_for('gestores.gestores_centros'))
+        return redirect(url_for('centros.gestores_centros'))
 
 def gestores_centros_crear_vista():
     
@@ -161,7 +161,7 @@ def gestores_centros_crear_vista():
         ic("Titular ID recibido:", titular_id)
         if not titular_id:
             flash('ID de titular no proporcionado', 'danger')
-            return redirect(url_for('gestores.gestores_centros'))
+            return redirect(url_for('centros.gestores_centros'))
 
         # Verificar que el titular pertenece al gestor actual
         ic("Buscando titular con ID:", titular_id, "y gestor_id:", gestor_id)
@@ -173,14 +173,14 @@ def gestores_centros_crear_vista():
         ic("Titular encontrado:", titular)
         if not titular:
             flash('Titular no encontrado o no pertenece a este gestor', 'danger')
-            return redirect(url_for('gestores.gestores_centros'))
+            return redirect(url_for('centros.gestores_centros'))
 
         # Obtener la información del titular
         titular_info = db.usuarios.find_one({'_id': titular['usuario_id']})
         ic("Titular info encontrada:", titular_info)
         if not titular_info:
             flash('Titular no encontrado', 'danger')
-            return redirect(url_for('gestores.gestores_centros'))
+            return redirect(url_for('centros.gestores_centros'))
 
         if request.method == 'GET':
             return render_template('gestores/centros/crear.html',
@@ -198,46 +198,42 @@ def gestores_centros_crear_vista():
             poblacion = request.form.get('poblacion', '').strip().upper()
             provincia = request.form.get('provincia', '').strip().upper()
 
-            # Verificar si ya existe un centro con el mismo nombre para este titular
-            if db.centros.find_one({
-                'nombre_centro': nombre_centro,
-                'titular_id': ObjectId(titular_id)
-            }):
-                flash('Ya existe un centro con este nombre para este titular', 'danger')
+            # Validar datos
+            if not all([nombre_centro, domicilio, codigo_postal, poblacion, provincia]):
+                flash('Todos los campos son obligatorios', 'danger')
                 return render_template('gestores/centros/crear.html',
-                                    titular_id=titular_id,
-                                    titular_info={
-                                        'alias': titular['alias'],
-                                        'nombre': titular_info['nombre_usuario']
-                                    },
-                                    form_data=request.form)
+                                     titular_id=titular_id,
+                                     titular_info={
+                                         'alias': titular['alias'],
+                                         'nombre': titular_info['nombre_usuario']
+                                     },
+                                     form_data=request.form)
 
             # Crear el centro
-            centro_data = {
-                'titular_id': ObjectId(titular_id),
+            centro = {
                 'nombre_centro': nombre_centro,
                 'domicilio': domicilio,
                 'codigo_postal': codigo_postal,
                 'poblacion': poblacion,
                 'provincia': provincia,
-                'estado': 'activo',  # Siempre se crea como activo
-                'fecha_alta': datetime.now(),
-                'fecha_modificacion': datetime.now(),
-                'fecha_baja': None
+                'titular_id': ObjectId(titular_id),
+                'estado': 'activo',
+                'fecha_creacion': datetime.now(),
+                'fecha_actualizacion': datetime.now()
             }
-            
-            db.centros.insert_one(centro_data)
-            flash('Centro creado exitosamente', 'success')
-            return redirect(url_for('gestores.gestores_centros', 
-                                    expandir_titular=titular_id))
+
+            # Insertar el centro
+            resultado = db.centros.insert_one(centro)
+            if resultado.inserted_id:
+                flash('Centro creado correctamente', 'success')
+                return redirect(url_for('centros.gestores_centros', expandir_titular=titular_id))
+            else:
+                flash('Error al crear el centro', 'danger')
+                return redirect(url_for('centros.gestores_centros'))
 
     except Exception as e:
         flash(f'Error al crear el centro: {str(e)}', 'danger')
-        ic("Error en gestores_centros_crear_vista:", str(e))
-        return render_template('gestores/centros/crear.html',
-                             titular_id=titular_id if 'titular_id' in locals() else None,
-                             titular_info=titular_info if 'titular_info' in locals() else None,
-                             form_data=request.form if request.method == 'POST' else None)
+        return redirect(url_for('centros.gestores_centros'))
 
 def gestores_centros_actualizar_vista():
     
@@ -252,53 +248,40 @@ def gestores_centros_actualizar_vista():
         centro_id = request.args.get('centro_id')
         if not centro_id:
             flash('ID de centro no proporcionado', 'danger')
-            return redirect(url_for('gestores.gestores_centros'))
+            return redirect(url_for('centros.gestores_centros'))
 
-        # Obtener el ID del titular a expandir (tanto de GET como de POST)
-        expandir_titular = request.args.get('expandir_titular') or request.form.get('expandir_titular')
-
-        # Obtener el centro y verificar que pertenece a un titular del gestor actual
+        # Obtener el centro
         centro = db.centros.find_one({'_id': ObjectId(centro_id)})
         if not centro:
             flash('Centro no encontrado', 'danger')
-            return redirect(url_for('gestores.gestores_centros'))
+            return redirect(url_for('centros.gestores_centros'))
 
         # Verificar que el titular del centro pertenece al gestor actual
         titular = db.usuarios_titulares.find_one({
             'usuario_id': centro['titular_id'],
             'gestor_id': ObjectId(gestor_id)
         })
-
         if not titular:
-            flash('Centro no pertenece a un titular de este gestor', 'danger')
-            return redirect(url_for('gestores.gestores_centros'))
+            flash('Centro no encontrado o no pertenece a este gestor', 'danger')
+            return redirect(url_for('centros.gestores_centros'))
 
         # Obtener la información del titular
-        titular_info = db.usuarios.find_one({'_id': titular['usuario_id']})
+        titular_info = db.usuarios.find_one({'_id': centro['titular_id']})
         if not titular_info:
             flash('Titular no encontrado', 'danger')
-            return redirect(url_for('gestores.gestores_centros'))
+            return redirect(url_for('centros.gestores_centros'))
 
-        # Preparar los datos para el template
-        centro_data = {
-            '_id': centro['_id'],
-            'nombre_centro': centro['nombre_centro'],
-            'domicilio': centro['domicilio'],
-            'codigo_postal': centro['codigo_postal'],
-            'poblacion': centro['poblacion'],
-            'provincia': centro['provincia'],
-            'estado': centro['estado'],
-            'titular_id': str(titular['_id']),
-            'titular_info': {
+        if request.method == 'GET':
+            # Convertir ObjectId a string para el template
+            centro['_id'] = str(centro['_id'])
+            centro['titular_id'] = str(centro['titular_id'])
+            centro['titular_info'] = {
                 'alias': titular['alias'],
                 'nombre': titular_info['nombre_usuario']
             }
-        }
-
-        if request.method == 'GET':
-            return render_template('gestores/centros/actualizar.html', 
-                                 centro=centro_data,
-                                 expandir_titular=expandir_titular)
+            return render_template('gestores/centros/actualizar.html',
+                                 centro=centro,
+                                 expandir_titular=request.args.get('expandir_titular'))
 
         if request.method == 'POST':
             # Obtener datos del formulario
@@ -309,20 +292,15 @@ def gestores_centros_actualizar_vista():
             provincia = request.form.get('provincia', '').strip().upper()
             estado = request.form.get('estado', 'activo')
 
-            # Verificar si ya existe un centro con el mismo nombre para este titular
-            if db.centros.find_one({
-                'nombre_centro': nombre_centro,
-                'titular_id': centro['titular_id'],
-                '_id': {'$ne': ObjectId(centro_id)}
-            }):
-                flash('Ya existe un centro con este nombre para este titular', 'danger')
-                return render_template('gestores/centros/actualizar.html',
-                                    centro=centro_data,
-                                    expandir_titular=expandir_titular,
-                                    form_data=request.form)
+            # Validar datos
+            if not all([nombre_centro, domicilio, codigo_postal, poblacion, provincia]):
+                flash('Todos los campos son obligatorios', 'danger')
+                return redirect(url_for('centros.gestores_centros_actualizar',
+                                      centro_id=centro_id,
+                                      expandir_titular=request.form.get('expandir_titular')))
 
             # Actualizar el centro
-            db.centros.update_one(
+            resultado = db.centros.update_one(
                 {'_id': ObjectId(centro_id)},
                 {
                     '$set': {
@@ -332,24 +310,23 @@ def gestores_centros_actualizar_vista():
                         'poblacion': poblacion,
                         'provincia': provincia,
                         'estado': estado,
-                        'fecha_modificacion': datetime.now()
+                        'fecha_actualizacion': datetime.now()
                     }
                 }
             )
-            flash('Centro actualizado exitosamente', 'success')
-            return redirect(url_for('gestores.gestores_centros', 
-                                  expandir_titular=expandir_titular))
+            if resultado.modified_count > 0:
+                flash('Centro actualizado correctamente', 'success')
+                return redirect(url_for('centros.gestores_centros', expandir_titular=request.form.get('expandir_titular')))
+            else:
+                flash('Error al actualizar el centro', 'danger')
+                return redirect(url_for('centros.gestores_centros'))
 
     except Exception as e:
         flash(f'Error al actualizar el centro: {str(e)}', 'danger')
-        return render_template('gestores/centros/actualizar.html',
-                             centro=centro_data if 'centro_data' in locals() else None,
-                             expandir_titular=expandir_titular if 'expandir_titular' in locals() else None,
-                             form_data=request.form if request.method == 'POST' else None)
+        return redirect(url_for('centros.gestores_centros'))
 
 def gestores_centros_eliminar_vista():
     
-    """Elimina un centro de un titular del gestor actual"""
     try:
         # Obtener el ID del gestor actual
         gestor_id = session.get('usuario_id')
@@ -361,32 +338,32 @@ def gestores_centros_eliminar_vista():
         centro_id = request.args.get('centro_id')
         if not centro_id:
             flash('ID de centro no proporcionado', 'danger')
-            return redirect(url_for('gestores.gestores_centros'))
+            return redirect(url_for('centros.gestores_centros'))
 
-        # Obtener el centro y verificar que pertenece a un titular del gestor actual
+        # Obtener el centro
         centro = db.centros.find_one({'_id': ObjectId(centro_id)})
         if not centro:
             flash('Centro no encontrado', 'danger')
-            return redirect(url_for('gestores.gestores_centros'))
+            return redirect(url_for('centros.gestores_centros'))
 
         # Verificar que el titular del centro pertenece al gestor actual
         titular = db.usuarios_titulares.find_one({
             'usuario_id': centro['titular_id'],
             'gestor_id': ObjectId(gestor_id)
         })
-
         if not titular:
-            flash('Centro no pertenece a un titular de este gestor', 'danger')
-            return redirect(url_for('gestores.gestores_centros'))
+            flash('Centro no encontrado o no pertenece a este gestor', 'danger')
+            return redirect(url_for('centros.gestores_centros'))
 
         # Eliminar el centro
-        db.centros.delete_one({'_id': ObjectId(centro_id)})
-        
-        # Redirigir de vuelta a la vista de centros con mensaje de éxito
-        flash('Centro eliminado correctamente', 'success')
-        return redirect(url_for('gestores.gestores_centros', expandir_titular=request.args.get('expandir_titular')))
-        
+        resultado = db.centros.delete_one({'_id': ObjectId(centro_id)})
+        if resultado.deleted_count > 0:
+            flash('Centro eliminado correctamente', 'success')
+            return redirect(url_for('centros.gestores_centros', expandir_titular=request.args.get('expandir_titular')))
+        else:
+            flash('Error al eliminar el centro', 'danger')
+            return redirect(url_for('centros.gestores_centros'))
+
     except Exception as e:
-        # En caso de error, redirigir con mensaje de error
         flash(f'Error al eliminar el centro: {str(e)}', 'danger')
-        return redirect(url_for('gestores.gestores_centros', expandir_titular=request.args.get('expandir_titular')))
+        return redirect(url_for('centros.gestores_centros'))

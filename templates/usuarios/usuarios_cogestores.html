@@ -26,7 +26,7 @@
         <h3 class="text-center">Listado de GESTORES </h3>
         <div class="d-flex justify-content-between align-items-center mb-4">
             <!-- Formulario para filtrar gestores -->
-            <form action="{{ url_for('cogestores.usuarios_cogestores') }}" method="post" id="filtroForm" class="flex-grow-1 me-3">
+            <form action="{{ url_for('usuarios_cogestores.usuarios_cogestores') }}" method="post" id="filtroForm" class="flex-grow-1 me-3">
                 <div class="d-flex gap-3 align-items-center">
                     <!-- Input para filtrar gestor por nombre -->
                     <div class="form-floating" style="flex: 2;">
@@ -73,7 +73,7 @@
                     </div>
                     <!-- Boton para limpiar filtro -->
                     <div style="flex: 1;">
-                        <a href="{{ url_for('cogestores.usuarios_cogestores', vaciar=1) }}" class="btn btn-secondary">Limpiar filtros</a>
+                        <a href="{{ url_for('usuarios_cogestores.usuarios_cogestores', vaciar=1) }}" class="btn btn-secondary">Limpiar filtros</a>
                     </div>
                 </div>
             </form>
@@ -108,7 +108,7 @@
                                     {% endif %}
                                 </td>
                                 <td class="text-center">
-                                    <a href="{{ url_for('cogestores.usuarios_cogestores_gestor', gestor_id=gestor.gestor_info._id) }}" class="btn btn-primary">Ir</a>
+                                    <a href="{{ url_for('usuarios_cogestores.usuarios_cogestores_gestor', gestor_id=gestor.gestor_info._id) }}" class="btn btn-primary">Ir</a>
                                 </td>
                             </tr>
                         {% endfor %}

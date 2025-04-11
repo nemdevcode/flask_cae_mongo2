@@ -42,13 +42,13 @@
                       <p class="card-text">{{ rol.descripcion }}</p>
                         <a href="
                           {%- if rol.nombre_rol == 'gestor' -%}
-                          {{ url_for('gestores.usuarios_gestores') }}
+                          {{ url_for('usuarios_gestores.usuarios_gestores') }}
                           {%- elif rol.nombre_rol == 'cogestor' -%}
-                          {{ url_for('cogestores.usuarios_cogestores') }}
+                          {{ url_for('usuarios_cogestores.usuarios_cogestores') }}
                           {%- elif rol.nombre_rol == 'titular' -%}
-                          {{ url_for('titulares.titulares') }}
+                          {{ url_for('usuarios_titulares.titulares') }}
                           {%- elif rol.nombre_rol == 'centro' -%}
-                          {{ url_for('centros.centros') }}
+                          {{ url_for('usuarios_centros.usuarios_centros') }}
                           {%- endif -%}"
                           class="btn btn-primary">
                         Ir a rol</a>
