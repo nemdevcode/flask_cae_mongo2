@@ -1,12 +1,9 @@
 from flask import render_template, redirect, url_for, request, session, flash
 from bson import ObjectId
 from datetime import datetime
-from icecream import ic
-ic.enable()
-
 from models.centros_model import UsuariosCentrosCollection
 from models.centros_model import CentrosCollection
-
+from utils.usuario_rol_utils import obtener_usuario_rol
 from config import conexion_mongo
 
 db = conexion_mongo()
@@ -64,7 +61,7 @@ def obtener_centros_titular(titular_id):
     
     return centros
 
-def gestores_usuarios_centros_vista():
+def usuarios_centros_vista():
     
     try:
         # Obtener el ID del gestor actual
@@ -179,7 +176,7 @@ def gestores_usuarios_centros_vista():
         flash(f'Error al cargar los usuarios de centros: {str(e)}', 'danger')
         return redirect(url_for('gestores.gestores_usuarios_centros'))
 
-def gestores_usuarios_centros_crear_vista():
+def usuarios_centros_crear_vista():
     
     try:
         # Obtener el ID del gestor actual
@@ -350,8 +347,8 @@ def gestores_usuarios_centros_crear_vista():
                                 nombre_gestor=nombre_gestor if 'nombre_gestor' in locals() else None,
                                 form_data=request.form if 'request' in locals() else None)
 
-def gestores_usuarios_centros_actualizar_vista():
+def usuarios_centros_actualizar_vista():
     return render_template('gestores/usuarios_centros/actualizar.html')
 
-def gestores_usuarios_centros_eliminar_vista():
+def usuarios_centros_eliminar_vista():
     return render_template('gestores/usuarios_centros/eliminar.html')

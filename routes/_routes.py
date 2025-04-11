@@ -1,15 +1,15 @@
 from flask import render_template, session, redirect, url_for, flash, request
 
 from routes.usuarios_routes import usuarios_bp
-from routes.gestores.centros_routes import centros_bp
-from routes.gestores.contratas_routes import contratas_bp
-from routes.gestores.gestores_routes import gestores_bp
-from routes.gestores.titulares_routes import titulares_bp
-from routes.gestores.usuarios_centros_routes import usuarios_centros_bp
-from routes.gestores.usuarios_contratas_routes import usuarios_contratas_bp
-from routes.gestores.usuarios_cogestores_routes import usuarios_cogestores_bp
-from routes.gestores.usuarios_gestores_routes import usuarios_gestores_bp
-from routes.gestores.usuarios_titulares_routes import usuarios_titulares_bp
+from routes.usuarios_gestores.usuarios_gestores_routes import usuarios_gestores_bp
+from routes.usuarios_gestores.centros_routes import ug_centros_bp
+from routes.usuarios_gestores.contratas_routes import ug_contratas_bp
+from routes.usuarios_gestores.gestores_routes import ug_gestores_bp
+from routes.usuarios_gestores.titulares_routes import ug_titulares_bp
+from routes.usuarios_gestores.usuarios_centros_routes import ug_usuarios_centros_bp
+from routes.usuarios_gestores.usuarios_contratas_routes import ug_usuarios_contratas_bp
+from routes.usuarios_gestores.usuarios_cogestores_routes import ug_usuarios_cogestores_bp
+from routes.usuarios_gestores.usuarios_titulares_routes import ug_usuarios_titulares_bp
 
 from core.login import login_vista
 from core.registrate import registrate_vista
@@ -19,15 +19,15 @@ def rutas(app):
     """Registra todas las rutas de la aplicación"""
     # Registrar blueprints
     app.register_blueprint(usuarios_bp)
-    app.register_blueprint(centros_bp)
-    app.register_blueprint(contratas_bp)
-    app.register_blueprint(gestores_bp)
-    app.register_blueprint(titulares_bp)
-    app.register_blueprint(usuarios_centros_bp)
-    app.register_blueprint(usuarios_cogestores_bp)
-    app.register_blueprint(usuarios_contratas_bp)
     app.register_blueprint(usuarios_gestores_bp)
-    app.register_blueprint(usuarios_titulares_bp)
+    app.register_blueprint(ug_centros_bp)
+    app.register_blueprint(ug_contratas_bp)
+    app.register_blueprint(ug_gestores_bp)
+    app.register_blueprint(ug_titulares_bp)
+    app.register_blueprint(ug_usuarios_centros_bp)
+    app.register_blueprint(ug_usuarios_cogestores_bp)
+    app.register_blueprint(ug_usuarios_contratas_bp)
+    app.register_blueprint(ug_usuarios_titulares_bp)
 
     # Rutas comunes
     @app.route('/')

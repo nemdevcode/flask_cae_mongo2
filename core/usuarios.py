@@ -5,62 +5,57 @@ import re
 
 from utils.token_utils import generar_token_verificacion
 from utils.email_utils import enviar_email
-from utils.usuario_rol_utils import verificar_usuario_existente
+from utils.usuario_rol_utils import obtener_roles_usuario
+from utils.usuario_utils import obtener_usuario_autenticado, verificar_usuario_existente
 
 from config import conexion_mongo
 
 db = conexion_mongo()
 
 def usuarios_vista():
+    """
+    Vista principal de usuarios que muestra la información del usuario autenticado y sus roles
+    """
     try:
-        # Obtener el ID del usuario actual
-        usuario_id = session.get('usuario_id')
+        # Obtener usuario autenticado y verificar permisos
+        usuario, respuesta_redireccion = obtener_usuario_autenticado()
+        if respuesta_redireccion:
+            return respuesta_redireccion
+
+        # Obtener los roles del usuario usando la función de utilidad
+        nombres_roles = obtener_roles_usuario(usuario['_id'])
         
-        if not usuario_id:
-            flash('No hay usuario autenticado', 'danger')
-            return redirect(url_for('login'))
+        if not nombres_roles:
+            flash('No se encontraron roles asociados al usuario', 'warning')
 
-        # Obtener la información del usuario
-        usuario_actual = db.usuarios.find_one({'_id': ObjectId(usuario_id)})
-        
-        if not usuario_actual:
-            flash('Usuario no encontrado', 'danger')
-            return redirect(url_for('login'))
-
-        # Obtener los roles del usuario
-        usuario_roles = list(db.usuarios_roles.find({'usuario_id': ObjectId(usuario_id)}))
-
-        # Obtener la información completa de los roles
-        roles = []
-        for usuario_rol in usuario_roles:
-            rol = db.roles.find_one({'_id': usuario_rol['rol_id']})
-            if rol:
-                roles.append(rol)
-
-        return render_template('usuarios/index.html', 
-                             usuario_actual=usuario_actual,
-                             nombres_roles=roles)
+        return render_template('usuarios/index.html',
+                             usuario_actual=usuario,
+                             nombres_roles=nombres_roles)
 
     except Exception as e:
         flash(f'Error al cargar la vista de usuarios: {str(e)}', 'danger')
         return redirect(url_for('login'))
     
 def usuario_actualizar_vista():
-    if request.method == 'GET':
-        usuario_id = session.get('usuario_id')
-        usuario = db.usuarios.find_one({'_id': ObjectId(usuario_id)})
-        return render_template('usuarios_actualizar.html', usuario=usuario)
+    """
+    Vista para actualizar los datos del usuario autenticado
+    """
+    try:
+        # Obtener usuario autenticado
+        usuario, respuesta_redireccion = obtener_usuario_autenticado()
+        if respuesta_redireccion:
+            return respuesta_redireccion
 
-    if request.method == 'POST':
-        try:
-            usuario_id = session.get('usuario_id')
+        if request.method == 'GET':
+            return render_template('usuarios_actualizar.html', usuario=usuario)
+
+        if request.method == 'POST':
             email = request.form.get('email').strip().lower()
             
             # Verificar si el email ya existe en otro usuario
             existe_usuario, otro_usuario_id = verificar_usuario_existente(email)
             
-            if existe_usuario and otro_usuario_id != ObjectId(usuario_id):
-                usuario = db.usuarios.find_one({'_id': ObjectId(usuario_id)})
+            if existe_usuario and otro_usuario_id != usuario['_id']:
                 flash('El email ya está registrado por otro usuario', 'danger')
                 return render_template('usuarios_actualizar.html', usuario=usuario)
             
@@ -73,31 +68,23 @@ def usuario_actualizar_vista():
             }
             
             db.usuarios.update_one(
-                {'_id': ObjectId(usuario_id)},
+                {'_id': usuario['_id']},
                 {'$set': datos_actualizados}
             )
             
             flash('Usuario actualizado correctamente', 'success')
             return redirect(url_for('usuarios.usuarios'))
             
-        except Exception as e:
-            usuario_id = session.get('usuario_id')
-            usuario = db.usuarios.find_one({'_id': ObjectId(usuario_id)})
-            flash(f'Error al actualizar el usuario: {str(e)}', 'danger')
-            return render_template('usuarios_actualizar.html', usuario=usuario)
+    except Exception as e:
+        flash(f'Error al actualizar el usuario: {str(e)}', 'danger')
+        return render_template('usuarios_actualizar.html', usuario=usuario)
 
 def usuario_solicitar_cambio_password():
     try:
-        usuario_id = session.get('usuario_id')
-        if not usuario_id:
-            flash('No hay usuario autenticado', 'danger')
-            return redirect(url_for('login'))
-
-        # Obtener el email del usuario
-        usuario = db.usuarios.find_one({'_id': ObjectId(usuario_id)})
-        if not usuario:
-            flash('Usuario no encontrado', 'danger')
-            return redirect(url_for('usuarios.usuarios'))
+        # Obtener usuario autenticado
+        usuario, respuesta_redireccion = obtener_usuario_autenticado()
+        if respuesta_redireccion:
+            return respuesta_redireccion
 
         email = usuario['email']
 
@@ -106,19 +93,18 @@ def usuario_solicitar_cambio_password():
 
         # Actualizar usuario con el token
         db.usuarios.update_one(
-            {'_id': ObjectId(usuario_id)},
+            {'_id': usuario['_id']},
             {'$set': {'token_recuperacion': token}}
         )
 
         # Enviar email con el enlace de recuperación
         link_recuperacion = url_for('reset_password', token=token, email=email, _external=True)
-        cuerpo_email = f"""
-        <h2>Cambio de Contraseña</h2>
-        <p>Has solicitado cambiar tu contraseña. Haz clic en el siguiente enlace para crear una nueva:</p>
-        <p><a href="{link_recuperacion}">Cambiar contraseña</a></p>
-        <p>Este enlace expirará en 1 hora.</p>
-        <p>Si no solicitaste este cambio, puedes ignorar este correo.</p>
-        """
+        
+        cuerpo_email = render_template(
+            'emails/reset_password.html',
+            nombre_usuario=usuario.get('nombre_usuario', 'Usuario'),
+            link_recuperacion=link_recuperacion
+        )
 
         if enviar_email(email, "Cambio de contraseña - CAE Accesible", cuerpo_email):
             flash('Te hemos enviado un email con las instrucciones para cambiar tu contraseña', 'success')

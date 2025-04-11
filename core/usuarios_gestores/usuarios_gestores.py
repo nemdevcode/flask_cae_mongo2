@@ -1,36 +1,31 @@
 from flask import render_template, request, redirect, url_for, session, flash
 from bson.objectid import ObjectId
-from config import conexion_mongo
-from utils.usuario_rol_utils import obtener_rol, obtener_usuario_rol
+from utils.usuario_utils import obtener_usuario_autenticado
+from utils.rol_utils import obtener_rol
+from utils.usuario_rol_utils import obtener_usuario_rol
 from datetime import datetime
+from config import conexion_mongo
 
 db = conexion_mongo()
 
 def usuarios_gestores_vista():
     try:
-        # Obtener el ID del usuario actual
-        usuario_id = session.get('usuario_id')
-        
-        if not usuario_id:
-            flash('No hay usuario autenticado', 'danger')
-            return redirect(url_for('login'))
+        # Obtener usuario autenticado y verificar permisos
+        usuario, respuesta_redireccion = obtener_usuario_autenticado()
+        if respuesta_redireccion:
+            return respuesta_redireccion
 
         # Obtener el rol de gestor
         existe_rol, rol_gestor_id = obtener_rol('gestor')
-        
         if not existe_rol:
             flash('Rol de gestor no encontrado', 'danger')
             return redirect(url_for('usuarios.usuarios'))
 
         # Verificar si el usuario tiene el rol de gestor
-        tiene_rol, usuario_rol_id = obtener_usuario_rol(usuario_id, rol_gestor_id)
-        
+        tiene_rol, usuario_rol_id = obtener_usuario_rol(usuario['_id'], rol_gestor_id)
         if not tiene_rol:
             flash('No tienes permisos para acceder a esta página', 'danger')
             return redirect(url_for('usuarios.usuarios'))
-
-        # Obtener la información del usuario
-        usuario = db.usuarios.find_one({'_id': ObjectId(usuario_id)})
 
         # Obtener parámetros de filtrado
         filtrar_gestor = request.form.get('filtrar_gestor', '')
@@ -39,7 +34,7 @@ def usuarios_gestores_vista():
 
         # Si se solicita vaciar filtros
         if vaciar == '1':
-            return redirect(url_for('usuarios_gestores.usuarios_gestores'))
+            return redirect(url_for('gestores.gestores'))
 
         # Obtener todos los gestores relacionados con el usuario_rol_id
         query = {
@@ -68,7 +63,7 @@ def usuarios_gestores_vista():
             ]
 
         return render_template('usuarios/usuarios_gestores.html', 
-                             nombre_usuario=usuario.get('nombre_usuario'),
+                             nombre_gestor=usuario.get('nombre_usuario'),
                              gestores=gestores,
                              filtrar_gestor=filtrar_gestor,
                              filtrar_estado=filtrar_estado)

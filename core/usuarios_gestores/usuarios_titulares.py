@@ -1,21 +1,25 @@
 from flask import render_template, request, redirect, url_for, session, flash
 from bson import ObjectId
 from datetime import datetime
-from config import conexion_mongo
-from utils.usuario_rol_utils import (
+from utils.usuario_utils import (
+    crear_usuario,
+    verificar_usuario_existente
+)
+from utils.rol_utils import (
     obtener_rol, 
-    obtener_usuario_rol, 
-    crear_usuario, 
-    crear_usuario_rol, 
-    verificar_usuario_existente,
     crear_rol
+)
+from utils.usuario_rol_utils import (
+    obtener_usuario_rol, 
+    crear_usuario_rol
 )
 from utils.token_utils import generar_token_verificacion
 from utils.email_utils import enviar_email
+from config import conexion_mongo
 
 db = conexion_mongo()
 
-def gestores_usuarios_titulares_vista(titular_id):
+def usuarios_titulares_vista(titular_id):
     try:
         # Obtener el ID del usuario actual
         usuario_id = session.get('usuario_id')
@@ -93,7 +97,7 @@ def gestores_usuarios_titulares_vista(titular_id):
         flash(f'Error al listar los usuarios titulares: {str(e)}', 'danger')
         return redirect(url_for('login'))
 
-def gestores_usuarios_titulares_crear_vista(gestor_id, titular_id):
+def usuarios_titulares_crear_vista(gestor_id, titular_id):
     try:
         # Obtener el ID del usuario actual
         usuario_id = session.get('usuario_id')
@@ -253,7 +257,7 @@ def gestores_usuarios_titulares_crear_vista(gestor_id, titular_id):
                              titular=titular,
                              gestor_id=gestor_id)
 
-def gestores_usuarios_titulares_actualizar_vista(titular_id):
+def usuarios_titulares_actualizar_vista(titular_id):
     try:
         # Obtener el ID del usuario actual
         usuario_id = session.get('usuario_id')
@@ -348,7 +352,7 @@ def gestores_usuarios_titulares_actualizar_vista(titular_id):
         flash(f'Error al actualizar el usuario titular: {str(e)}', 'danger')
         return redirect(url_for('gestores.gestores_titulares'))
 
-def gestores_usuarios_titulares_eliminar_vista(titular_id):
+def usuarios_titulares_eliminar_vista(titular_id):
     
     try:
         # Obtener el ID del gestor actual

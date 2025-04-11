@@ -1,9 +1,10 @@
 from flask import render_template, request, redirect, url_for, session, flash
 from bson.objectid import ObjectId
-from config import conexion_mongo
-from utils.usuario_rol_utils import obtener_rol, obtener_usuario_rol
-from models.gestores_model import GestoresCollection
 from datetime import datetime
+from utils.rol_utils import obtener_rol
+from utils.usuario_rol_utils import obtener_usuario_rol
+from models.gestores_model import GestoresCollection
+from config import conexion_mongo
 
 db = conexion_mongo()
 

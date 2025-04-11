@@ -1,13 +1,14 @@
 from flask import render_template, session, flash, redirect, url_for, request
 from bson.objectid import ObjectId
-from config import conexion_mongo
-from models.titulares_model import TitularesCollection
-from utils.usuario_rol_utils import obtener_rol, obtener_usuario_rol
 from datetime import datetime
+from models.titulares_model import TitularesCollection
+from utils.rol_utils import obtener_rol
+from utils.usuario_rol_utils import obtener_usuario_rol
+from config import conexion_mongo
 
 db = conexion_mongo()
 
-def gestores_titulares_vista(gestor_id):
+def titulares_vista(gestor_id):
     try:
         # Obtener el ID del usuario actual
         usuario_id = session.get('usuario_id')
@@ -96,7 +97,7 @@ def gestores_titulares_vista(gestor_id):
         flash(f'Error al listar los titulares: {str(e)}', 'danger')
         return redirect(url_for('gestores.usuarios_gestores_gestor', gestor_id=gestor_id))
 
-def gestores_titulares_crear_vista(gestor_id):
+def titulares_crear_vista(gestor_id):
     try:
         # Obtener el ID del usuario actual
         usuario_id = session.get('usuario_id')
@@ -186,7 +187,7 @@ def gestores_titulares_crear_vista(gestor_id):
         flash(f'Error al acceder a la página: {str(e)}', 'danger')
         return redirect(url_for('gestores.gestores_titulares', gestor_id=gestor_id))
 
-def gestores_titulares_actualizar_vista(titular_id, gestor_id):
+def titulares_actualizar_vista(titular_id, gestor_id):
     try:
         # Obtener el ID del usuario actual
         usuario_id = session.get('usuario_id')
@@ -280,7 +281,7 @@ def gestores_titulares_actualizar_vista(titular_id, gestor_id):
         flash(f'Error al acceder a la página: {str(e)}', 'danger')
         return redirect(url_for('gestores.gestores_titulares', gestor_id=gestor_id))
 
-def gestores_titulares_eliminar_vista(titular_id, gestor_id):
+def titulares_eliminar_vista(titular_id, gestor_id):
     try:
         # Obtener el ID del usuario actual
         usuario_id = session.get('usuario_id')
@@ -329,7 +330,7 @@ def gestores_titulares_eliminar_vista(titular_id, gestor_id):
         flash(f'Error al eliminar el titular: {str(e)}', 'danger')
         return redirect(url_for('gestores.gestores_titulares', gestor_id=gestor_id))
 
-def gestores_titulares_titular_vista(gestor_id, titular_id):
+def titulares_titular_vista(gestor_id, titular_id):
     try:
         # Obtener el ID del usuario actual
         usuario_id = session.get('usuario_id')

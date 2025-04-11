@@ -4,13 +4,18 @@ from flask import request, redirect, url_for, render_template, flash, session
 from models.gestores_model import GestoresCollection
 from utils.email_utils import enviar_email
 from utils.token_utils import generar_token_verificacion
+
+from utils.usuario_utils import (
+    crear_usuario,
+    verificar_usuario_existente
+)
 from utils.usuario_rol_utils import (
-    obtener_rol, 
-    crear_rol, 
     obtener_usuario_rol, 
-    crear_usuario_rol,
-    verificar_usuario_existente,
-    crear_usuario
+    crear_usuario_rol
+)
+from utils.rol_utils import (
+    obtener_rol, 
+    crear_rol
 )
 from config import conexion_mongo
 from bson.objectid import ObjectId

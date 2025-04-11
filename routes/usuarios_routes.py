@@ -8,20 +8,20 @@ from core.usuarios import (
 from core._decoradores import login_requerido
 
 # Crear el Blueprint para las rutas de usuarios
-usuarios_bp = Blueprint('usuarios', __name__)
+usuarios_bp = Blueprint('usuarios', __name__, url_prefix='/usuarios')
 
 # Rutas para gestión de usuarios
-@usuarios_bp.route('/usuarios', methods=['GET', 'POST'])
+@usuarios_bp.route('/', methods=['GET', 'POST'])
 @login_requerido
 def usuarios():
     return usuarios_vista()
 
-@usuarios_bp.route('/usuarios/actualizar', methods=['GET', 'POST'])
+@usuarios_bp.route('/actualizar', methods=['GET', 'POST'])
 @login_requerido
 def usuario_actualizar():
     return usuario_actualizar_vista()
 
-@usuarios_bp.route('/usuarios/cambiar-password')
+@usuarios_bp.route('/cambiar-password')
 @login_requerido
 def solicitar_cambio_password():
     return usuario_solicitar_cambio_password() 
