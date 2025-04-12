@@ -16,7 +16,7 @@
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end align-items-center">
                     <span class="my-auto">Ir a usuarios:</span>
                     <div class="btn-group" role="group" aria-label="Navegación entre tipos de usuarios">
-                        <a href="{{ url_for('usuarios_cogestores.gestores_usuarios_cogestores') }}" class="btn btn-outline-primary">Cogestores</a>
+                        <a href="{{ url_for('ug_usuarios_cogestores.usuarios_cogestores') }}" class="btn btn-outline-primary">Cogestores</a>
                     </div>
                     <a href="{{ url_for('logout') }}" class="btn btn-outline-dark">Cerrar sesión</a>
                 </div>
@@ -82,7 +82,7 @@
                 </div>
             </form>
             <!-- Botón crear -->
-            <a href="{{ url_for('gestores.gestores_crear') }}" class="btn btn-success">Crear</a>
+            <a href="{{ url_for('ug_gestores.gestores_crear') }}" class="btn btn-success">Crear</a>
         </div>
 
         <!-- Tabla de gestores -->
