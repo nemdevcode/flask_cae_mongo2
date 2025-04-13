@@ -6,7 +6,7 @@
             <div class="card-body">
                 <h4 class="card-title text-center">Actualizar COGESTOR</h4>
                 <div class="card-body">
-                    <form action="{{ url_for('gestores.gestores_usuarios_cogestores_actualizar', gestor_id=gestor_id|string, cogestor_id=cogestor._id) }}" method="post">
+                    <form action="{{ url_for('ug_usuarios_cogestores.usuarios_cogestores_actualizar', gestor_id=gestor_id|string, cogestor_id=cogestor._id) }}" method="post">
                         <div class="form-floating mb-3">
                             <input type="text" 
                                    class="form-control" 
@@ -45,7 +45,7 @@
                             <label class="btn btn-outline-secondary" for="estado-inactivo{{ cogestor._id }}">Inactivo</label>
                         </div>
                         <div class="d-flex justify-content-end align-items-center gap-2">
-                            <a href="{{ url_for('gestores.gestores_usuarios_cogestores', gestor_id=gestor_id|string) }}" class="btn btn-secondary">Cancelar</a>
+                            <a href="{{ url_for('ug_usuarios_cogestores.usuarios_cogestores', gestor_id=gestor_id|string) }}" class="btn btn-secondary">Cancelar</a>
                             <button type="submit" class="btn btn-primary">Actualizar</button>
                         </div>
                     </form>

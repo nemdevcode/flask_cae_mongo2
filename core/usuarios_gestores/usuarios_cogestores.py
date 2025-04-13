@@ -58,7 +58,7 @@ def usuarios_cogestores_vista():
 
         # Si se solicita vaciar filtros
         if vaciar == '1':
-            return redirect(url_for('usuarios_cogestores.gestores_usuarios_cogestores'))
+            return redirect(url_for('ug_usuarios_cogestores.usuarios_cogestores'))
 
         # Construir la consulta base - buscar cogestores donde el usuario_rol_gestor_id sea el del gestor actual
         query = {'usuario_rol_gestor_id': ObjectId(usuario_rol_id)}
@@ -191,7 +191,7 @@ def usuarios_cogestores_crear_vista():
                 # Crear el cogestor
                 crear_usuario_cogestor(usuario_rol_cogestor_id, usuario_rol_id, alias)
                 flash('Este email ya está registrado, será asignado como cogestor para este gestor', 'success')
-                return redirect(url_for('gestores.gestores_usuarios_cogestores'))
+                return redirect(url_for('ug_usuarios_cogestores.usuarios_cogestores'))
 
             # Si el usuario no existe, crear nuevo usuario y cogestor
             # Generar token de verificación
@@ -229,7 +229,7 @@ def usuarios_cogestores_crear_vista():
             else:
                 flash('Cogestor creado pero hubo un error al enviar el email de activación.', 'warning')
 
-            return redirect(url_for('usuarios_cogestores.gestores_usuarios_cogestores'))
+            return redirect(url_for('ug_usuarios_cogestores.usuarios_cogestores'))
 
     except Exception as e:
         flash(f'Error al crear el cogestor: {str(e)}', 'danger')
@@ -260,7 +260,7 @@ def usuarios_cogestores_actualizar_vista():
         cogestor_id = request.args.get('cogestor_id')
         if not cogestor_id:
             flash('ID de cogestor no proporcionado', 'danger')
-            return redirect(url_for('gestores.gestores_usuarios_cogestores'))
+            return redirect(url_for('ug_usuarios_cogestores.usuarios_cogestores'))
 
         # Verificar que el cogestor pertenece al gestor actual
         cogestor = db.usuarios_cogestores.find_one({
@@ -270,26 +270,26 @@ def usuarios_cogestores_actualizar_vista():
 
         if not cogestor:
             flash('Cogestor no encontrado o no pertenece a este gestor', 'danger')
-            return redirect(url_for('gestores.gestores_usuarios_cogestores'))
+            return redirect(url_for('ug_usuarios_cogestores.usuarios_cogestores'))
 
         # Obtener el usuario_rol del cogestor
         usuario_rol = db.usuarios_roles.find_one({'_id': ObjectId(cogestor['usuario_rol_id'])})
         if not usuario_rol:
             flash('Usuario rol no encontrado', 'danger')
-            return redirect(url_for('gestores.gestores_usuarios_cogestores'))
+            return redirect(url_for('ug_usuarios_cogestores.usuarios_cogestores'))
 
         # Obtener la información del usuario cogestor
         usuario = db.usuarios.find_one({'_id': ObjectId(usuario_rol['usuario_id'])})
         if not usuario:
             flash('Usuario no encontrado', 'danger')
-            return redirect(url_for('gestores.gestores_usuarios_cogestores'))
+            return redirect(url_for('ug_usuarios_cogestores.usuarios_cogestores'))
 
         # Preparar los datos para el template
         cogestor_data = {
             '_id': cogestor['_id'],
             'cogestor_info': {
                 'alias': cogestor['alias_usuario_cogestor'],
-                'estado': cogestor['estado_usuario_cogestor']
+                'estado_usuario_cogestor': cogestor['estado_usuario_cogestor']
             },
             'email': usuario['email']
         }
@@ -326,7 +326,7 @@ def usuarios_cogestores_actualizar_vista():
             )
 
             flash('Cogestor actualizado exitosamente', 'success')
-            return redirect(url_for('gestores.gestores_usuarios_cogestores'))
+            return redirect(url_for('ug_usuarios_cogestores.usuarios_cogestores'))
 
     except Exception as e:
         flash(f'Error al actualizar el cogestor: {str(e)}', 'danger')
@@ -357,7 +357,7 @@ def usuarios_cogestores_eliminar_vista():
         cogestor_id = request.args.get('cogestor_id')
         if not cogestor_id:
             flash('ID de cogestor no proporcionado', 'danger')
-            return redirect(url_for('gestores.gestores_usuarios_cogestores'))
+            return redirect(url_for('ug_usuarios_cogestores.usuarios_cogestores'))
 
         # Verificar que el cogestor pertenece al gestor actual
         cogestor = db.usuarios_cogestores.find_one({
@@ -367,19 +367,19 @@ def usuarios_cogestores_eliminar_vista():
 
         if not cogestor:
             flash('Cogestor no encontrado o no pertenece a este gestor', 'danger')
-            return redirect(url_for('gestores.gestores_usuarios_cogestores'))
+            return redirect(url_for('ug_usuarios_cogestores.usuarios_cogestores'))
 
         # Obtener el usuario_rol del cogestor
         usuario_rol = db.usuarios_roles.find_one({'_id': ObjectId(cogestor['usuario_rol_id'])})
         if not usuario_rol:
             flash('Usuario rol no encontrado', 'danger')
-            return redirect(url_for('gestores.gestores_usuarios_cogestores'))
+            return redirect(url_for('ug_usuarios_cogestores.usuarios_cogestores'))
 
         # Obtener la información del usuario cogestor
         usuario = db.usuarios.find_one({'_id': ObjectId(usuario_rol['usuario_id'])})
         if not usuario:
             flash('Usuario no encontrado', 'danger')
-            return redirect(url_for('gestores.gestores_usuarios_cogestores'))
+            return redirect(url_for('ug_usuarios_cogestores.usuarios_cogestores'))
 
         # Eliminar el cogestor
         db.usuarios_cogestores.delete_one({'_id': ObjectId(cogestor_id)})
@@ -395,11 +395,11 @@ def usuarios_cogestores_eliminar_vista():
             db.usuarios_roles.delete_one({'_id': ObjectId(usuario_rol['_id'])})
 
         flash('Cogestor eliminado exitosamente', 'success')
-        return redirect(url_for('gestores.gestores_usuarios_cogestores'))
+        return redirect(url_for('ug_usuarios_cogestores.usuarios_cogestores'))
 
     except Exception as e:
         flash(f'Error al eliminar el cogestor: {str(e)}', 'danger')
-        return redirect(url_for('gestores.gestores_usuarios_cogestores'))
+        return redirect(url_for('ug_usuarios_cogestores.usuarios_cogestores'))
 
 # def usuarios_cogestores_vista():
 #     try:
