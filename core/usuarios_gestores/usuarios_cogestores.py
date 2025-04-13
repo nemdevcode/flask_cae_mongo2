@@ -6,11 +6,13 @@ from utils.token_utils import generar_token_verificacion
 from utils.email_utils import enviar_email
 from utils.usuario_utils import (
     crear_usuario,
-    verificar_usuario_existente
+    verificar_usuario_existente, 
+    obtener_usuario_autenticado
 )
 from utils.rol_utils import (
     crear_rol,
-    obtener_rol
+    obtener_rol,
+    verificar_rol_gestor
 )
 from utils.usuario_rol_utils import (
     crear_usuario_rol,
@@ -25,30 +27,18 @@ db = conexion_mongo()
 
 def usuarios_cogestores_vista():
     try:
-        # Obtener el ID del usuario actual
-        usuario_id = session.get('usuario_id')
-        
-        if not usuario_id:
-            flash('No hay usuario autenticado', 'danger')
-            return redirect(url_for('login'))
+        # Obtener usuario autenticado y verificar permisos
+        usuario, respuesta_redireccion = obtener_usuario_autenticado()
+        if respuesta_redireccion:
+            return respuesta_redireccion
 
-        # Obtener el rol de gestor
-        existe_rol, rol_gestor_id = obtener_rol('gestor')
-        
-        if not existe_rol:
-            flash('Rol de gestor no encontrado', 'danger')
-            return redirect(url_for('usuarios.usuarios'))
-
-        # Verificar si el usuario tiene el rol de gestor
-        tiene_rol, usuario_rol_id = obtener_usuario_rol(usuario_id, rol_gestor_id)
-        
+        # Verificar rol de gestor
+        tiene_rol, usuario_rol_id = verificar_rol_gestor(usuario['_id'])
         if not tiene_rol:
             flash('No tienes permisos para acceder a esta página', 'danger')
             return redirect(url_for('usuarios.usuarios'))
 
-        # Obtener la información del usuario
-        usuario = db.usuarios.find_one({'_id': ObjectId(usuario_id)})
-        
+        # Obtener el nombre del gestor
         nombre_gestor = usuario.get('nombre_usuario', 'Gestor')
 
         # Obtener parámetros de filtrado
@@ -59,53 +49,61 @@ def usuarios_cogestores_vista():
         # Si se solicita vaciar filtros
         if vaciar == '1':
             return redirect(url_for('ug_usuarios_cogestores.usuarios_cogestores'))
-
-        # Construir la consulta base - buscar cogestores donde el usuario_rol_gestor_id sea el del gestor actual
-        query = {'usuario_rol_gestor_id': ObjectId(usuario_rol_id)}
+        
+        # Obtener todos los cogestores relacionados con el usuario_rol_id
+        cogestores_relacionados = {'usuario_rol_gestor_id': ObjectId(usuario_rol_id)}
         
         # Aplicar filtros si existen
         if filtrar_estado != 'todos':
-            query['estado_usuario_cogestor'] = filtrar_estado
+            cogestores_relacionados['estado_usuario_cogestor'] = filtrar_estado
 
-        # Obtener los cogestores asociados al gestor
-        cogestores = []
-        usuarios_cogestores = list(db.usuarios_cogestores.find(query))
-        
-        for uc in usuarios_cogestores:
-            # Obtener el usuario_rol del cogestor usando usuario_rol_id
-            usuario_rol = db.usuarios_roles.find_one({'_id': ObjectId(uc['usuario_rol_id'])})
-            
-            if usuario_rol:
-                # Obtener la información del usuario cogestor
-                usuario_cogestor = db.usuarios.find_one({'_id': ObjectId(usuario_rol['usuario_id'])})
-                
-                if usuario_cogestor:
-                    # Si hay filtro por nombre, verificar si coincide
-                    if filtrar_cogestor:
-                        if (filtrar_cogestor.lower() not in uc['alias_usuario_cogestor'].lower() and
-                            filtrar_cogestor.lower() not in usuario_cogestor['email'].lower()):
-                            continue
+        # Obtener los cogestores del gestor actual
+        cogestores = list(db.usuarios_cogestores.find(cogestores_relacionados))
 
-                    cogestor = {
-                        '_id': uc['_id'],
-                        'cogestor_info': {
-                            'alias': uc['alias_usuario_cogestor'],
-                            'nombre_usuario': usuario_cogestor['nombre_usuario'],
-                            'telefono_usuario': usuario_cogestor['telefono_usuario'],
-                            'estado_usuario_cogestor': uc['estado_usuario_cogestor']
-                        },
-                        'email': usuario_cogestor['email']
-                    }
-                    cogestores.append(cogestor)
+        # Obtener información adicional de cada cogestor
+        cogestores_info = []
+        for cogestor in cogestores:
+            # Obtener el usuario_rol del cogestor
+            usuario_rol = db.usuarios_roles.find_one({'_id': ObjectId(cogestor['usuario_rol_id'])})
+            if not usuario_rol:
+                continue
 
-        return render_template('usuarios_gestores/usuarios_cogestores/listar.html', 
-                             cogestores=cogestores,
+            # Obtener la información del usuario cogestor
+            usuario = db.usuarios.find_one({'_id': ObjectId(usuario_rol['usuario_id'])})
+            if not usuario:
+                continue
+
+            # Obtener el rol del cogestor
+            rol = db.roles.find_one({'_id': ObjectId(usuario_rol['rol_id'])})
+            if not rol:
+                continue
+
+            # Si hay filtro por nombre, verificar si coincide
+            if filtrar_cogestor:
+                if (filtrar_cogestor.lower() not in cogestor['alias_usuario_cogestor'].lower() and
+                    filtrar_cogestor.lower() not in usuario['email'].lower() and
+                    filtrar_cogestor.lower() not in usuario['nombre_usuario'].lower()):
+                    continue
+
+            # Preparar los datos para el template manteniendo la estructura original
+            cogestor_data = {
+                '_id': cogestor['_id'],
+                'cogestor_info': {
+                    'alias': cogestor['alias_usuario_cogestor'],
+                    'estado_usuario_cogestor': cogestor['estado_usuario_cogestor']
+                },
+                'email': usuario['email']
+            }
+            cogestores_info.append(cogestor_data)
+
+        return render_template('usuarios_gestores/usuarios_cogestores/listar.html',
                              nombre_gestor=nombre_gestor,
+                             cogestores=cogestores_info,
                              filtrar_cogestor=filtrar_cogestor,
                              filtrar_estado=filtrar_estado)
 
     except Exception as e:
-        flash(f'Error al listar los cogestores: {str(e)}', 'danger')
+        flash(f'Error al obtener la lista de cogestores: {str(e)}', 'danger')
         return redirect(url_for('usuarios.usuarios'))
 
 def crear_usuario_cogestor(usuario_rol_id, usuario_rol_gestor_id, alias):
@@ -385,10 +383,10 @@ def usuarios_cogestores_eliminar_vista():
         db.usuarios_cogestores.delete_one({'_id': ObjectId(cogestor_id)})
 
         # Verificar si el usuario tiene otros roles
-        otros_roles = db.usuarios_roles.find({
+        otros_roles = db.usuarios_roles.count_documents({
             'usuario_id': ObjectId(usuario_rol['usuario_id']),
             '_id': {'$ne': ObjectId(usuario_rol['_id'])}
-        }).count()
+        })
 
         # Si no tiene otros roles, eliminar el usuario_rol
         if otros_roles == 0:

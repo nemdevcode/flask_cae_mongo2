@@ -20,7 +20,7 @@ def gestores_crear():
 def gestores_actualizar(gestor_id):
     return gestores_actualizar_vista(gestor_id)
 
-@ug_gestores_bp.route('/eliminar/<gestor_id>', methods=['GET'])
+@ug_gestores_bp.route('/eliminar/<gestor_id>', methods=['GET', 'POST'])
 @login_requerido
 def gestores_eliminar(gestor_id):
     return gestores_eliminar_vista(gestor_id)

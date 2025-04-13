@@ -1,6 +1,7 @@
 from datetime import datetime
 from models.roles_model import RolesCollection
 from config import conexion_mongo
+from utils.usuario_rol_utils import obtener_usuario_rol
 
 db = conexion_mongo()
 
@@ -37,3 +38,17 @@ def crear_rol(nombre_rol):
     )
     resultado_rol = db.roles.insert_one(rol.__dict__)
     return resultado_rol.inserted_id
+
+def verificar_rol_gestor(usuario_id):
+    """
+    Verifica si el usuario tiene el rol de gestor.
+    Retorna una tupla con (tiene_rol, usuario_rol_id)
+    """
+    # Obtener el rol de gestor
+    existe_rol, rol_gestor_id = obtener_rol('gestor')
+    if not existe_rol:
+        return False, None
+
+    # Verificar si el usuario tiene el rol de gestor
+    tiene_rol, usuario_rol_id = obtener_usuario_rol(usuario_id, rol_gestor_id)
+    return tiene_rol, usuario_rol_id
