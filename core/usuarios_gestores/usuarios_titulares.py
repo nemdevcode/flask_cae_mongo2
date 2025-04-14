@@ -3,64 +3,62 @@ from bson import ObjectId
 from datetime import datetime
 from utils.usuario_utils import (
     crear_usuario,
-    verificar_usuario_existente
+    verificar_usuario_existente,
+    obtener_usuario_autenticado
 )
 from utils.rol_utils import (
     obtener_rol, 
-    crear_rol
+    crear_rol,
+    verificar_rol_gestor
 )
 from utils.usuario_rol_utils import (
     obtener_usuario_rol, 
     crear_usuario_rol
 )
+from utils.gestor_utils import obtener_gestor_por_usuario
 from utils.token_utils import generar_token_verificacion
 from utils.email_utils import enviar_email
 from config import conexion_mongo
 
 db = conexion_mongo()
 
-def usuarios_titulares_vista(titular_id):
+def usuarios_titulares_vista(gestor_id, titular_id):
+    '''
+    Vista para listar los usuarios titulares del titular seleccionado
+    '''
     try:
-        # Obtener el ID del usuario actual
-        usuario_id = session.get('usuario_id')
-        if not usuario_id:
-            flash('No hay usuario autenticado', 'danger')
-            return redirect(url_for('login'))
+        # Obtener usuario autenticado y verificar permisos
+        usuario, respuesta_redireccion = obtener_usuario_autenticado()
+        if respuesta_redireccion:
+            return respuesta_redireccion
 
-        # Obtener el rol de gestor
-        existe_rol, rol_gestor_id = obtener_rol('gestor')
-        if not existe_rol:
-            flash('Rol de gestor no encontrado', 'danger')
-            return redirect(url_for('login'))
-
-        # Verificar si el usuario tiene el rol de gestor
-        tiene_rol, usuario_rol_id = obtener_usuario_rol(usuario_id, rol_gestor_id)
+        # Verificar rol de gestor
+        tiene_rol, usuario_rol_id = verificar_rol_gestor(usuario['_id'])
         if not tiene_rol:
             flash('No tienes permisos para acceder a esta página', 'danger')
-            return redirect(url_for('login'))
+            return redirect(url_for('usuarios.usuarios'))
 
         # Obtener el gestor asociado al usuario_rol_id
-        gestor = db.gestores.find_one({'usuario_rol_id': ObjectId(usuario_rol_id)})
+        gestor = obtener_gestor_por_usuario(gestor_id, usuario_rol_id)
         if not gestor:
-            flash('Gestor no encontrado', 'danger')
-            return redirect(url_for('login'))
+            flash('Gestor no encontrado o no tienes permisos para acceder', 'danger')
+            return redirect(url_for('usuarios_gestores.usuarios_gestores_gestor', gestor_id=gestor_id))
 
-        # Obtener la información del usuario
-        usuario = db.usuarios.find_one({'_id': ObjectId(usuario_id)})
-        if not usuario:
-            flash('Usuario no encontrado', 'danger')
-            return redirect(url_for('login'))
+        nombre_gestor = gestor.get('nombre_gestor', 'Gestor')
 
-        nombre_gestor = usuario.get('nombre_usuario', 'Gestor')
-        gestor_id = str(gestor['_id'])
+        # Obtener la información del titular
+        titular = db.titulares.find_one({'_id': ObjectId(titular_id)})
+        if not titular:
+            flash('Titular no encontrado', 'danger')
+            return redirect(url_for('gestores.gestores_titulares', gestor_id=gestor_id))
 
         # Obtener los usuarios titulares asociados al titular_id
         usuarios_titulares = []
         usuarios_titulares_cursor = db.usuarios_titulares.find({'titular_id': ObjectId(titular_id)})
         
         for ut in usuarios_titulares_cursor:
-            # Obtener el usuario_rol del titular usando usuario_rol_titular_id
-            usuario_rol = db.usuarios_roles.find_one({'_id': ObjectId(ut['usuario_rol_titular_id'])})
+            # Obtener el usuario_rol del titular usando la función obtener_usuario_rol
+            usuario_rol = obtener_usuario_rol(ut['usuario_rol_titular_id'])
             
             if usuario_rol:
                 # Obtener la información del usuario titular
@@ -77,27 +75,23 @@ def usuarios_titulares_vista(titular_id):
                         'nombre_usuario': usuario_titular.get('nombre_usuario', '')
                     }
                     usuarios_titulares.append(titular_info)
-        
-        # Obtener la información del titular
-        titular = db.titulares.find_one({'_id': ObjectId(titular_id)})
-        if not titular:
-            flash('Titular no encontrado', 'danger')
-            return redirect(url_for('gestores.gestores_titulares', gestor_id=gestor_id))
 
-        return render_template(
-            'usuarios_gestores/usuarios_titulares/listar.html',
-            usuarios_titulares=usuarios_titulares,
-            titular_id=titular_id,
-            gestor_id=gestor_id,
-            nombre_gestor=nombre_gestor,
-            titular=titular
-        )
+        return render_template('usuarios_gestores/usuarios_titulares/listar.html',
+                               usuarios_titulares=usuarios_titulares,
+                               titular_id=titular_id,
+                               gestor_id=gestor_id,
+                               nombre_gestor=nombre_gestor,
+                               titular=titular
+                            )
 
     except Exception as e:
         flash(f'Error al listar los usuarios titulares: {str(e)}', 'danger')
-        return redirect(url_for('login'))
+        return redirect(url_for('ug_titulares.titulares_titular', gestor_id=gestor_id, titular_id=titular_id))
 
 def usuarios_titulares_crear_vista(gestor_id, titular_id):
+    '''
+    Vista para crear un nuevo usuario titular del titular seleccionado
+    '''
     try:
         # Obtener el ID del usuario actual
         usuario_id = session.get('usuario_id')
@@ -199,7 +193,7 @@ def usuarios_titulares_crear_vista(gestor_id, titular_id):
                 }
                 db.usuarios_titulares.insert_one(titular_data)
                 flash('Este email ya está registrado, será asignado como usuario titular para este titular', 'success')
-                return redirect(url_for('gestores.gestores_usuarios_titulares', gestor_id=gestor_id, titular_id=titular_id))
+                return redirect(url_for('ug_usuarios_titulares.usuarios_titulares', gestor_id=gestor_id, titular_id=titular_id))
 
             # Si el usuario no existe, crear nuevo usuario y usuario titular
             # Generar token de verificación
@@ -247,7 +241,7 @@ def usuarios_titulares_crear_vista(gestor_id, titular_id):
             else:
                 flash('Usuario titular creado pero hubo un error al enviar el email de activación.', 'warning')
 
-            return redirect(url_for('gestores.gestores_usuarios_titulares', gestor_id=gestor_id, titular_id=titular_id))
+            return redirect(url_for('ug_usuarios_titulares.usuarios_titulares', gestor_id=gestor_id, titular_id=titular_id))
 
     except Exception as e:
         flash(f'Error al crear el usuario titular: {str(e)}', 'danger')
@@ -257,7 +251,10 @@ def usuarios_titulares_crear_vista(gestor_id, titular_id):
                              titular=titular,
                              gestor_id=gestor_id)
 
-def usuarios_titulares_actualizar_vista(titular_id):
+def usuarios_titulares_actualizar_vista(gestor_id, titular_id):
+    '''
+    Vista para actualizar un usuario titular del titular seleccionado
+    '''
     try:
         # Obtener el ID del usuario actual
         usuario_id = session.get('usuario_id')
@@ -352,8 +349,10 @@ def usuarios_titulares_actualizar_vista(titular_id):
         flash(f'Error al actualizar el usuario titular: {str(e)}', 'danger')
         return redirect(url_for('gestores.gestores_titulares'))
 
-def usuarios_titulares_eliminar_vista(titular_id):
-    
+def usuarios_titulares_eliminar_vista(gestor_id, titular_id):
+    '''
+    Vista para eliminar un usuario titular del titular seleccionado
+    '''
     try:
         # Obtener el ID del gestor actual
         gestor_id = session.get('usuario_id')
@@ -365,7 +364,7 @@ def usuarios_titulares_eliminar_vista(titular_id):
         titular_id = request.args.get('titular_id')
         if not titular_id:
             flash('ID de titular no proporcionado', 'danger')
-            return redirect(url_for('gestores.gestores_usuarios_titulares'))
+            return redirect(url_for('ug_usuarios_titulares.usuarios_titulares', gestor_id=gestor_id, titular_id=titular_id))
 
         # Verificar que el titular pertenece al gestor actual
         titular = db.usuarios_titulares.find_one({
@@ -375,19 +374,13 @@ def usuarios_titulares_eliminar_vista(titular_id):
 
         if not titular:
             flash('Titular no encontrado o no pertenece a este gestor', 'danger')
-            return redirect(url_for('gestores.gestores_usuarios_titulares'))
+            return redirect(url_for('ug_usuarios_titulares.usuarios_titulares', gestor_id=gestor_id, titular_id=titular_id))
 
         # Eliminar el titular
         db.usuarios_titulares.delete_one({'_id': ObjectId(titular_id)})
         flash('Titular eliminado exitosamente', 'success')
-        return redirect(url_for('gestores.gestores_usuarios_titulares'))
+        return redirect(url_for('ug_usuarios_titulares.usuarios_titulares', gestor_id=gestor_id, titular_id=titular_id))
 
     except Exception as e:
         flash(f'Error al eliminar el titular: {str(e)}', 'danger')
-        return redirect(url_for('gestores.gestores_usuarios_titulares'))
-
-def usuarios_titulares_vista():
-    return render_template('usuarios_titulares.html')
-
-def usuarios_titulares_gestor_vista():
-    return render_template('usuarios_titulares_gestor.html')
+        return redirect(url_for('ug_usuarios_titulares.usuarios_titulares', gestor_id=gestor_id, titular_id=titular_id))

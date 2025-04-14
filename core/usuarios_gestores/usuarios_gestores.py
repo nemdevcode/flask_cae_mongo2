@@ -72,32 +72,19 @@ def usuarios_gestores_eliminar_vista():
     pass
 
 def usuarios_gestores_gestor_vista(gestor_id):
+    '''
+    Vista del gestor seleccionado relacionados con el gestor autenticado.
+    '''
     try:
-        # Obtener el ID del usuario actual
-        usuario_id = session.get('usuario_id')
+        # Obtener usuario autenticado y verificar permisos
+        usuario, respuesta_redireccion = obtener_usuario_autenticado()
+        if respuesta_redireccion:
+            return respuesta_redireccion
         
-        if not usuario_id:
-            flash('No hay usuario autenticado', 'danger')
-            return redirect(url_for('login'))
-
-        # Obtener el rol de gestor
-        existe_rol, rol_gestor_id = obtener_rol('gestor')
-        
-        if not existe_rol:
-            flash('Rol de gestor no encontrado', 'danger')
-            return redirect(url_for('usuarios.usuarios'))
-
-        # Verificar si el usuario tiene el rol de gestor
-        tiene_rol, usuario_rol_id = obtener_usuario_rol(usuario_id, rol_gestor_id)
-        
+        # Verificar rol de gestor
+        tiene_rol, usuario_rol_id = verificar_rol_gestor(usuario['_id'])
         if not tiene_rol:
             flash('No tienes permisos para acceder a esta página', 'danger')
-            return redirect(url_for('usuarios.usuarios'))
-
-        # Obtener la información del usuario y gestor
-        usuario = db.usuarios.find_one({'_id': ObjectId(usuario_id)})
-        if not usuario:
-            flash('Usuario no encontrado', 'danger')
             return redirect(url_for('usuarios.usuarios'))
 
         # Verificar que el gestor existe y pertenece al usuario actual
@@ -110,10 +97,10 @@ def usuarios_gestores_gestor_vista(gestor_id):
             flash('Gestor no encontrado o no tienes permisos para acceder', 'danger')
             return redirect(url_for('usuarios_gestores.usuarios_gestores'))
 
-        return render_template('usuarios_gestores/index.html',
-                             nombre_usuario=usuario.get('nombre_usuario'),
-                             nombre_gestor=gestor.get('nombre_gestor'),
-                             gestor_id=gestor_id)
+        return render_template('usuarios_gestores/index.html', 
+                               nombre_usuario=usuario.get('nombre_usuario'),
+                               nombre_gestor=gestor.get('nombre_gestor'),
+                               gestor_id=gestor_id)
 
     except Exception as e:
         flash(f'Error al cargar la vista del gestor: {str(e)}', 'danger')

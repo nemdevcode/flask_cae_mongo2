@@ -6,7 +6,7 @@
             <div class="card-body">
                 <h4 class="card-title text-center">Crear nuevo TITULAR</h4>
                 <div class="card-body">
-                    <form method="POST" action="{{ url_for('gestores.gestores_titulares_crear', gestor_id=gestor_id|string) }}">
+                    <form method="POST" action="{{ url_for('ug_titulares.titulares_crear', gestor_id=gestor_id|string) }}">
                         <div class="form-floating mb-3">
                             <input type="text" class="form-control" id="nombre_titular" name="nombre_titular" 
                                    value="{{ form_data.nombre_titular if form_data else '' }}" required>
@@ -50,7 +50,8 @@
                         </div>
 
                         <div class="d-flex justify-content-end align-items-center gap-2">
-                            <a href="{{ url_for('gestores.gestores_titulares', gestor_id=gestor_id|string) }}" class="btn btn-secondary">Cancelar</a>
+                            <a href="{{ url_for('ug_titulares.titulares', gestor_id=gestor_id|string) }}" class="btn btn-secondary">
+                                Cancelar</a>
                             <button type="submit" class="btn btn-success">Crear</button>
                         </div>
                     </form>

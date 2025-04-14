@@ -7,7 +7,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
-                <a class="navbar-brand" href="#">CAE Accesible. Panel de gestión para el titular: {{ titular.nombre_titular }}</a>
+                <a class="navbar-brand">CAE Accesible</a>
                 <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="/usuarios">Inicio</a>
@@ -16,16 +16,26 @@
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end align-items-center">
                     <span class="my-auto">Volver a:</span>
                     <div class="btn-group" role="group" aria-label="Navegación entre tipos de usuarios">
-                        <a href="{{ url_for('gestores.gestores_titulares', gestor_id=gestor_id|string) }}" class="btn btn-outline-primary">Titulares</a>
+                        <a href="{{ url_for('ug_titulares.titulares', gestor_id=gestor_id|string) }}" class="btn btn-outline-primary">
+                            Titulares</a>
                     </div>
                     <div class="btn-group" role="group" aria-label="Navegación entre elementos de usuario">
-                        <a href="{{ url_for('gestores.gestores_usuarios_titulares', gestor_id=gestor_id|string, titular_id=titular._id|string) }}" class="btn btn-secondary">Usuarios</a>
-                        <a href="{{ url_for('gestores.gestores_centros', gestor_id=gestor_id|string, titular_id=titular._id|string) }}" class="btn btn-secondary">Centros</a>
-                        <a href="{{ url_for('gestores.gestores_contratas', gestor_id=gestor_id|string, titular_id=titular._id|string) }}" class="btn btn-secondary">Contratas</a>
+                        <a href="{{ url_for('ug_usuarios_titulares.usuarios_titulares', gestor_id=gestor_id|string, titular_id=titular._id|string) }}" class="btn btn-secondary">
+                            Usuarios</a>
+                        <a href="{{ url_for('ug_centros.centros', gestor_id=gestor_id|string, titular_id=titular._id|string) }}" class="btn btn-secondary">
+                            Centros</a>
+                        <a href="{{ url_for('ug_contratas.contratas', gestor_id=gestor_id|string, titular_id=titular._id|string) }}" class="btn btn-secondary">
+                            Contratas</a>
                     </div>
                     <a href="{{ url_for('logout') }}" class="btn btn-outline-dark">Cerrar sesión</a>
                 </div>
             </div>
         </div>
     </nav>
+{% endblock %}
+
+{% block main %}
+    <div class="container mt-5">
+        <h3 class="text-center">Vista de estado del TITULAR: {{ titular.nombre_titular }}</h3>
+    </div>
 {% endblock %}

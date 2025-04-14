@@ -16,7 +16,8 @@
             </ul>
             <div class="d-grid gap-2 d-md-flex justify-content-md-end align-items-center">
                 <span class="my-auto">Volver a:</span>
-                <a href="{{ url_for('gestores.gestores_titulares', gestor_id=gestor_id|string) }}" class="btn btn-outline-primary">Titulares</a>
+                <a href="{{ url_for('ug_titulares.titulares_titular', gestor_id=gestor_id|string, titular_id=titular_id) }}" class="btn btn-outline-primary">
+                    Titular</a>
                 <a href="{{ url_for('logout') }}" class="btn btn-outline-dark">Cerrar sesión</a>
             </div>
                 
@@ -29,7 +30,7 @@
         <h3 class="text-center">Listado de USUARIOS TITULARES del titular: {{ titular.nombre_titular }}</h3>
         <div class="d-flex justify-content-between align-items-center mt-5">
             <!-- Formulario para filtrar usuarios titulares -->
-            <form action="{{ url_for('gestores.gestores_usuarios_titulares', gestor_id=gestor_id|string, titular_id=titular_id) }}" method="post" id="filtroForm" class="flex-grow-1 me-3">
+            <form action="{{ url_for('ug_usuarios_titulares.usuarios_titulares', gestor_id=gestor_id|string, titular_id=titular_id) }}" method="post" id="filtroForm" class="flex-grow-1 me-3">
                 <div class="d-flex gap-3 align-items-center">
                     <!-- Input para filtrar usuario titular por nombre -->
                     <div class="form-floating" style="flex: 2;">
@@ -76,12 +77,12 @@
                     </div>
                     <!-- Boton para limpiar filtro -->
                     <div style="flex: 1;">
-                        <a href="{{ url_for('gestores.gestores_usuarios_titulares', gestor_id=gestor_id|string, titular_id=titular_id, vaciar=1) }}" class="btn btn-secondary">Limpiar filtros</a>
+                        <a href="{{ url_for('ug_usuarios_titulares.usuarios_titulares', gestor_id=gestor_id|string, titular_id=titular_id, vaciar=1) }}" class="btn btn-secondary">Limpiar filtros</a>
                     </div>
                 </div>
             </form>
             <!-- Botón crear -->
-            <a href="{{ url_for('gestores.gestores_usuarios_titulares_crear', gestor_id=gestor_id|string, titular_id=titular_id) }}" class="btn btn-success">Crear</a>
+            <a href="{{ url_for('ug_usuarios_titulares.usuarios_titulares_crear', gestor_id=gestor_id|string, titular_id=titular_id) }}" class="btn btn-success">Crear</a>
         </div>
 
         <!-- Tabla de usuarios titulares -->
@@ -111,7 +112,7 @@
                                     {% endif %}
                                 </td>
                                 <td class="text-center">
-                                    <a href="{{ url_for('gestores.gestores_usuarios_titulares_actualizar', gestor_id=gestor_id|string, titular_id=usuario_titular._id) }}" 
+                                    <a href="{{ url_for('ug_usuarios_titulares.usuarios_titulares_actualizar', gestor_id=gestor_id|string, titular_id=usuario_titular._id) }}" 
                                        class="btn btn-primary btn-sm">Editar</a>
                                     <button type="button" 
                                             class="btn btn-danger btn-sm" 
@@ -136,7 +137,7 @@
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                            <a href="{{ url_for('gestores.gestores_usuarios_titulares_eliminar', gestor_id=gestor_id|string, titular_id=usuario_titular._id) }}" 
+                                            <a href="{{ url_for('ug_usuarios_titulares.usuarios_titulares_eliminar', gestor_id=gestor_id|string, titular_id=usuario_titular._id) }}" 
                                                class="btn btn-danger">Eliminar</a>
                                         </div>
                                     </div>

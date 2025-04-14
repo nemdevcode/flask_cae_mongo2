@@ -18,24 +18,24 @@ Rutas para gestión de usuarios titulares, funciones:
     - usuarios_titulares_eliminar_vista()
 '''
 
-@ug_usuarios_titulares_bp.route('/<titular_id>', methods=['GET', 'POST'])
+@ug_usuarios_titulares_bp.route('/<gestor_id>/<titular_id>', methods=['GET', 'POST'])
 @login_requerido
-def usuarios_titulares(titular_id):
-    return usuarios_titulares_vista(titular_id)
+def usuarios_titulares(gestor_id, titular_id):
+    return usuarios_titulares_vista(gestor_id, titular_id)
 
 @ug_usuarios_titulares_bp.route('/crear/<gestor_id>/<titular_id>', methods=['GET', 'POST'])
 @login_requerido
 def usuarios_titulares_crear(gestor_id, titular_id):
     return usuarios_titulares_crear_vista(gestor_id, titular_id)
 
-@ug_usuarios_titulares_bp.route('/actualizar/<titular_id>', methods=['GET', 'POST'])
+@ug_usuarios_titulares_bp.route('/actualizar/<gestor_id>/<titular_id>', methods=['GET', 'POST'])
 @login_requerido
-def usuarios_titulares_actualizar(titular_id):
-    return usuarios_titulares_actualizar_vista(titular_id)
+def usuarios_titulares_actualizar(gestor_id, titular_id):
+    return usuarios_titulares_actualizar_vista(gestor_id, titular_id)
 
-@ug_usuarios_titulares_bp.route('/eliminar/<titular_id>', methods=['GET', 'POST'])
+@ug_usuarios_titulares_bp.route('/eliminar/<gestor_id>/<titular_id>', methods=['GET', 'POST'])
 @login_requerido
-def usuarios_titulares_eliminar(titular_id):
-    return usuarios_titulares_eliminar_vista(titular_id)
+def usuarios_titulares_eliminar(gestor_id, titular_id):
+    return usuarios_titulares_eliminar_vista(gestor_id, titular_id)
 
 

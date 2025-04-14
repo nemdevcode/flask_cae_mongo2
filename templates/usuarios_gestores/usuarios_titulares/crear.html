@@ -6,7 +6,7 @@
             <div class="card-body">
                 <h4 class="card-title text-center">Crear nuevo USUARIO TITULAR</h4>
                 <div class="card-body">
-                    <form action="{{ url_for('gestores.gestores_usuarios_titulares_crear', gestor_id=gestor_id|string, titular_id=titular._id) }}" method="post">
+                    <form action="{{ url_for('ug_usuarios_titulares.usuarios_titulares_crear', gestor_id=gestor_id|string, titular_id=titular._id) }}" method="post">
                         <input type="hidden" name="titular_id" value="{{ titular._id|string }}">
                         <input type="hidden" name="gestor_id" value="{{ gestor_id|string }}">
                         <div class="form-floating mb-3">
@@ -28,7 +28,7 @@
                             <label for="email">Email:</label>
                         </div>
                         <div class="d-flex justify-content-end align-items-center gap-2">
-                            <a href="{{ url_for('gestores.gestores_titulares_titular', gestor_id=gestor_id|string, titular_id=titular._id|string) }}" class="btn btn-secondary">
+                            <a href="{{ url_for('ug_usuarios_titulares.usuarios_titulares', gestor_id=gestor_id|string, titular_id=titular._id|string) }}" class="btn btn-secondary">
                             Cancelar</a>
                             <button type="submit" class="btn btn-primary">Crear</button>
                         </div>

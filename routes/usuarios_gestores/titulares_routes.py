@@ -30,15 +30,15 @@ def titulares(gestor_id):
 def titulares_crear(gestor_id):
     return titulares_crear_vista(gestor_id)
 
-@ug_titulares_bp.route('/actualizar/<titular_id>/<gestor_id>', methods=['GET', 'POST'])
+@ug_titulares_bp.route('/actualizar/<gestor_id>/<titular_id>', methods=['GET', 'POST'])
 @login_requerido
-def titulares_actualizar(titular_id, gestor_id):
-    return titulares_actualizar_vista(titular_id, gestor_id)
+def titulares_actualizar(gestor_id, titular_id):
+    return titulares_actualizar_vista(gestor_id, titular_id)
 
 @ug_titulares_bp.route('/eliminar/<gestor_id>/<titular_id>', methods=['POST'])
 @login_requerido
 def titulares_eliminar(gestor_id, titular_id):
-    return titulares_eliminar_vista(titular_id, gestor_id)
+    return titulares_eliminar_vista(gestor_id, titular_id)
 
 '''
 Rutas para gestión de elementos de cada titular, funciones:
