@@ -28,14 +28,14 @@ def usuarios_titulares(gestor_id, titular_id):
 def usuarios_titulares_crear(gestor_id, titular_id):
     return usuarios_titulares_crear_vista(gestor_id, titular_id)
 
-@ug_usuarios_titulares_bp.route('/actualizar/<gestor_id>/<titular_id>', methods=['GET', 'POST'])
+@ug_usuarios_titulares_bp.route('/actualizar/<gestor_id>/<titular_id>/<usuario_titular_id>', methods=['GET', 'POST'])
 @login_requerido
-def usuarios_titulares_actualizar(gestor_id, titular_id):
-    return usuarios_titulares_actualizar_vista(gestor_id, titular_id)
+def usuarios_titulares_actualizar(gestor_id, titular_id, usuario_titular_id):
+    return usuarios_titulares_actualizar_vista(gestor_id, titular_id, usuario_titular_id)
 
-@ug_usuarios_titulares_bp.route('/eliminar/<gestor_id>/<titular_id>', methods=['GET', 'POST'])
+@ug_usuarios_titulares_bp.route('/eliminar/<gestor_id>/<titular_id>/<usuario_titular_id>', methods=['GET', 'POST'])
 @login_requerido
-def usuarios_titulares_eliminar(gestor_id, titular_id):
-    return usuarios_titulares_eliminar_vista(gestor_id, titular_id)
+def usuarios_titulares_eliminar(gestor_id, titular_id, usuario_titular_id):
+    return usuarios_titulares_eliminar_vista(gestor_id, titular_id, usuario_titular_id)
 
 

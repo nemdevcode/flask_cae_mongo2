@@ -112,14 +112,14 @@
                                     {% endif %}
                                 </td>
                                 <td class="text-center">
-                                    <a href="{{ url_for('ug_usuarios_titulares.usuarios_titulares_actualizar', gestor_id=gestor_id|string, titular_id=usuario_titular._id) }}" 
-                                       class="btn btn-primary btn-sm">Editar</a>
+                                    <a href="{{ url_for('ug_usuarios_titulares.usuarios_titulares_actualizar', gestor_id=gestor_id, titular_id=titular_id, usuario_titular_id=usuario_titular._id) }}" 
+                                       class="btn btn-primary btn-sm">
+                                       Editar</a>
                                     <button type="button" 
-                                            class="btn btn-danger btn-sm" 
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#confirmarEliminar{{ usuario_titular._id }}">
-                                        Eliminar
-                                    </button>
+                                        class="btn btn-danger btn-sm" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#confirmarEliminar{{ usuario_titular._id }}">
+                                        Eliminar</button>
                                 </td>
                             </tr>
                             <!-- Modal de confirmación para eliminar usuario titular-->
@@ -137,7 +137,7 @@
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                            <a href="{{ url_for('ug_usuarios_titulares.usuarios_titulares_eliminar', gestor_id=gestor_id|string, titular_id=usuario_titular._id) }}" 
+                                            <a href="{{ url_for('ug_usuarios_titulares.usuarios_titulares_eliminar', gestor_id=gestor_id, titular_id=titular_id, usuario_titular_id=usuario_titular._id) }}" 
                                                class="btn btn-danger">Eliminar</a>
                                         </div>
                                     </div>
