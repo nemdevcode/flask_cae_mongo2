@@ -24,7 +24,7 @@ from config import conexion_mongo
 
 db = conexion_mongo()
 
-def verificar_y_obtener(gestor_id, titular_id):
+def verificaciones_consultas(gestor_id, titular_id):
     '''
     Función auxiliar para verificar permisos de gestor y obtener información necesaria
     Retorna:
@@ -62,7 +62,7 @@ def usuarios_titulares_vista(gestor_id, titular_id):
     '''
     try:
         # Verificar permisos y obtener información
-        permisos_ok, resultado = verificar_y_obtener(gestor_id, titular_id)
+        permisos_ok, resultado = verificaciones_consultas(gestor_id, titular_id)
         if not permisos_ok:
             return resultado
 
@@ -117,7 +117,7 @@ def usuarios_titulares_crear_vista(gestor_id, titular_id):
     '''
     try:
         # Verificar permisos y obtener información
-        permisos_ok, resultado = verificar_y_obtener(gestor_id, titular_id)
+        permisos_ok, resultado = verificaciones_consultas(gestor_id, titular_id)
         if not permisos_ok:
             return resultado
 
@@ -224,7 +224,7 @@ def usuarios_titulares_actualizar_vista(gestor_id, titular_id, usuario_titular_i
     '''
     try:
         # Verificar permisos y obtener información
-        permisos_ok, resultado = verificar_y_obtener(gestor_id, titular_id)
+        permisos_ok, resultado = verificaciones_consultas(gestor_id, titular_id)
         if not permisos_ok:
             return resultado
 
@@ -295,7 +295,7 @@ def usuarios_titulares_eliminar_vista(gestor_id, titular_id, usuario_titular_id)
     '''
     try:
         # Verificar permisos y obtener información
-        permisos_ok, resultado = verificar_y_obtener(gestor_id, titular_id)
+        permisos_ok, resultado = verificaciones_consultas(gestor_id, titular_id)
         if not permisos_ok:
             return resultado
 
