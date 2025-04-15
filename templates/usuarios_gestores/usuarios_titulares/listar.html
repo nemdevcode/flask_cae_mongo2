@@ -38,7 +38,7 @@
                             class="form-control" 
                             id="filtrar_titular" 
                             name="filtrar_titular"
-                            value="{{ filtrar_titular }}"
+                            value="{{ request.form.get('filtrar_titular', '') }}"
                             oninput="this.form.submit()"
                             autocomplete="off"
                             autofocus

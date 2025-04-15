@@ -69,9 +69,29 @@ def usuarios_titulares_vista(gestor_id, titular_id):
         usuario, usuario_rol_id, gestor, titular = resultado
         nombre_gestor = gestor.get('nombre_gestor', 'Gestor')
 
+        # Obtener parámetros de filtrado
+        filtrar_titular = request.form.get('filtrar_titular', '')
+        filtrar_estado = request.form.get('filtrar_estado', 'todos')
+        vaciar = request.args.get('vaciar', '0')
+
+        # Si se solicita vaciar filtros
+        if vaciar == '1':
+            return redirect(url_for('ug_usuarios_titulares.usuarios_titulares', gestor_id=gestor_id, titular_id=titular_id))
+        
+        # Construir la consulta base - buscar usuarios titulares donde el titular_id sea el del titular actual
+        query = {'titular_id': ObjectId(titular_id)}
+        
+        # Aplicar filtros si existen
+        if filtrar_titular:
+            query['alias_usuario_titular'] = {'$regex': filtrar_titular, '$options': 'i'}
+
+        if filtrar_estado != 'todos':
+            query['estado_usuario_titular'] = filtrar_estado
+        
+
         # Obtener los usuarios titulares asociados al titular_id
         usuarios_titulares = []
-        usuarios_titulares_cursor = db.usuarios_titulares.find({'titular_id': ObjectId(titular_id)})
+        usuarios_titulares_cursor = db.usuarios_titulares.find(query)
         
         # Obtener el rol de titular
         existe_rol, rol_titular_id = obtener_rol('titular')

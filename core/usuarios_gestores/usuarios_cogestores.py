@@ -25,20 +25,34 @@ from models.cogestores_model import UsuariosCogestoresCollection
 
 db = conexion_mongo()
 
+def verificaciones_consultas():
+    '''
+    Función auxiliar para verificar permisos de gestor y obtener información necesaria
+    Retorna:
+        - (False, respuesta_redireccion) si hay algún error
+        - (True, (usuario, usuario_rol_id)) si todo está correcto
+    '''
+    # Obtener usuario autenticado y verificar permisos
+    usuario, respuesta_redireccion = obtener_usuario_autenticado()
+    if respuesta_redireccion:
+        return False, respuesta_redireccion
+
+    # Verificar rol de gestor
+    tiene_rol, usuario_rol_id = verificar_rol_gestor(usuario['_id'])
+    if not tiene_rol:
+        flash('No tienes permisos para acceder a esta página', 'danger')
+        return False, redirect(url_for('usuarios.usuarios'))
+
+    return True, (usuario, usuario_rol_id)
+
 def usuarios_cogestores_vista():
     try:
-        # Obtener usuario autenticado y verificar permisos
-        usuario, respuesta_redireccion = obtener_usuario_autenticado()
-        if respuesta_redireccion:
-            return respuesta_redireccion
+        # Verificar permisos y obtener información
+        permisos_ok, resultado = verificaciones_consultas()
+        if not permisos_ok:
+            return resultado
 
-        # Verificar rol de gestor
-        tiene_rol, usuario_rol_id = verificar_rol_gestor(usuario['_id'])
-        if not tiene_rol:
-            flash('No tienes permisos para acceder a esta página', 'danger')
-            return redirect(url_for('usuarios.usuarios'))
-
-        # Obtener el nombre del gestor
+        usuario, usuario_rol_id = resultado
         nombre_gestor = usuario.get('nombre_usuario', 'Gestor')
 
         # Obtener parámetros de filtrado
@@ -124,26 +138,12 @@ def crear_usuario_cogestor(usuario_rol_id, usuario_rol_gestor_id, alias):
 
 def usuarios_cogestores_crear_vista():
     try:
-        # Obtener el ID del usuario actual
-        usuario_id = session.get('usuario_id')
-        
-        if not usuario_id:
-            flash('No hay usuario autenticado', 'danger')
-            return redirect(url_for('login'))
+        # Verificar permisos y obtener información
+        permisos_ok, resultado = verificaciones_consultas()
+        if not permisos_ok:
+            return resultado
 
-        # Obtener el rol de gestor
-        existe_rol, rol_gestor_id = obtener_rol('gestor')
-        
-        if not existe_rol:
-            flash('Rol de gestor no encontrado', 'danger')
-            return redirect(url_for('usuarios.usuarios'))
-
-        # Verificar si el usuario tiene el rol de gestor
-        tiene_rol, usuario_rol_id = obtener_usuario_rol(usuario_id, rol_gestor_id)
-        
-        if not tiene_rol:
-            flash('No tienes permisos para acceder a esta página', 'danger')
-            return redirect(url_for('usuarios.usuarios'))
+        usuario, usuario_rol_id = resultado
 
         if request.method == 'GET':
             return render_template('usuarios_gestores/usuarios_cogestores/crear.html')
@@ -236,23 +236,12 @@ def usuarios_cogestores_crear_vista():
 
 def usuarios_cogestores_actualizar_vista():
     try:
-        # Obtener el ID del usuario actual
-        usuario_id = session.get('usuario_id')
-        if not usuario_id:
-            flash('No hay usuario autenticado', 'danger')
-            return redirect(url_for('login'))
+        # Verificar permisos y obtener información
+        permisos_ok, resultado = verificaciones_consultas()
+        if not permisos_ok:
+            return resultado
 
-        # Obtener el rol de gestor
-        existe_rol, rol_gestor_id = obtener_rol('gestor')
-        if not existe_rol:
-            flash('Rol de gestor no encontrado', 'danger')
-            return redirect(url_for('usuarios.usuarios'))
-
-        # Verificar si el usuario tiene el rol de gestor
-        tiene_rol, usuario_rol_id = obtener_usuario_rol(usuario_id, rol_gestor_id)
-        if not tiene_rol:
-            flash('No tienes permisos para acceder a esta página', 'danger')
-            return redirect(url_for('usuarios.usuarios'))
+        usuario, usuario_rol_id = resultado
 
         # Obtener el ID del cogestor a actualizar
         cogestor_id = request.args.get('cogestor_id')
@@ -333,23 +322,12 @@ def usuarios_cogestores_actualizar_vista():
 
 def usuarios_cogestores_eliminar_vista():
     try:
-        # Obtener el ID del usuario actual
-        usuario_id = session.get('usuario_id')
-        if not usuario_id:
-            flash('No hay usuario autenticado', 'danger')
-            return redirect(url_for('login'))
+        # Verificar permisos y obtener información
+        permisos_ok, resultado = verificaciones_consultas()
+        if not permisos_ok:
+            return resultado
 
-        # Obtener el rol de gestor
-        existe_rol, rol_gestor_id = obtener_rol('gestor')
-        if not existe_rol:
-            flash('Rol de gestor no encontrado', 'danger')
-            return redirect(url_for('usuarios.usuarios'))
-
-        # Verificar si el usuario tiene el rol de gestor
-        tiene_rol, usuario_rol_id = obtener_usuario_rol(usuario_id, rol_gestor_id)
-        if not tiene_rol:
-            flash('No tienes permisos para acceder a esta página', 'danger')
-            return redirect(url_for('usuarios.usuarios'))
+        usuario, usuario_rol_id = resultado
 
         # Obtener el ID del cogestor a eliminar
         cogestor_id = request.args.get('cogestor_id')
