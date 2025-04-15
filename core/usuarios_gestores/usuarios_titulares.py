@@ -281,10 +281,10 @@ def usuarios_titulares_actualizar_vista(gestor_id, titular_id, usuario_titular_i
 
         if request.method == 'GET':
             return render_template('usuarios_gestores/usuarios_titulares/actualizar.html',
-                                usuario_titular=usuario_titular_info,
-                                titular=titular,
-                                gestor_id=gestor_id,
-                                titular_id=titular_id)
+                                   usuario_titular=usuario_titular_info,
+                                   titular=titular,
+                                   gestor_id=gestor_id,
+                                   titular_id=titular_id)
 
         if request.method == 'POST':
             # Obtener datos del formulario

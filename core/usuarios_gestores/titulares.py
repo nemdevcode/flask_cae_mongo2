@@ -288,8 +288,8 @@ def titulares_eliminar_vista(gestor_id, titular_id):
             return resultado
 
         # Eliminar el titular
-        result = db.titulares.delete_one({'_id': ObjectId(titular_id)})
-        if result.deleted_count > 0:
+        delete = db.titulares.delete_one({'_id': ObjectId(titular_id)})
+        if delete.deleted_count > 0:
             flash('Titular eliminado exitosamente', 'success')
         else:
             flash('No se pudo eliminar el titular', 'danger')
