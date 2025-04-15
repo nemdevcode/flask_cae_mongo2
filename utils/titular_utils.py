@@ -26,3 +26,53 @@ def obtener_titular_por_id(titular_id):
     
     return titular
 
+def obtener_titulares_activos(gestor_id):
+    '''
+    Obtiene los titulares activos para un gestor específico
+    '''
+    titulares = list(db.usuarios.aggregate([
+        {
+            "$match": {
+                "_id": {"$in": [ObjectId(rel['usuario_id']) for rel in db.usuarios_titulares.find({"gestor_id": ObjectId(gestor_id), "estado": "activo"})]}
+            }
+        },
+        {
+            "$lookup": {
+                "from": "usuarios_titulares",
+                "localField": "_id",
+                "foreignField": "usuario_id",
+                "as": "titular_info"
+            }
+        },
+        {
+            "$unwind": {
+                "path": "$titular_info",
+                "preserveNullAndEmptyArrays": True
+            }
+        },
+        {
+            "$match": {
+                "titular_info.gestor_id": ObjectId(gestor_id),
+                "titular_info.estado": "activo"
+            }
+        },
+        {
+            "$project": {
+                "_id": 1,
+                "nombre": "$nombre_usuario",
+                "alias": "$titular_info.alias"
+            }
+        },
+        {
+            "$sort": {
+                "alias": 1
+            }
+        }
+    ]))
+    
+    # Convertir ObjectId a string para cada titular
+    for titular in titulares:
+        titular['_id'] = str(titular['_id'])
+    
+    return titulares
+

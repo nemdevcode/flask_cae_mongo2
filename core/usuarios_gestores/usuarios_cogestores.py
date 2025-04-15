@@ -106,7 +106,8 @@ def usuarios_cogestores_vista():
                     'alias': cogestor['alias_usuario_cogestor'],
                     'estado_usuario_cogestor': cogestor['estado_usuario_cogestor']
                 },
-                'email': usuario['email']
+                'email': usuario['email'],
+                'nombre_usuario': usuario['nombre_usuario']
             }
             cogestores_info.append(cogestor_data)
 
@@ -376,97 +377,3 @@ def usuarios_cogestores_eliminar_vista():
     except Exception as e:
         flash(f'Error al eliminar el cogestor: {str(e)}', 'danger')
         return redirect(url_for('ug_usuarios_cogestores.usuarios_cogestores'))
-
-# def usuarios_cogestores_vista():
-#     try:
-#         # Obtener el ID del usuario actual
-#         usuario_id = session.get('usuario_id')
-#         if not usuario_id:
-#             flash('No hay usuario autenticado', 'danger')
-#             return redirect(url_for('login'))
-
-#         # Obtener el rol de cogestor
-#         existe_rol, rol_cogestor_id = obtener_rol('cogestor')
-#         if not existe_rol:
-#             flash('Rol de cogestor no encontrado', 'danger')
-#             return redirect(url_for('usuarios.usuarios'))
-
-#         # Verificar si el usuario tiene el rol de cogestor
-#         tiene_rol, usuario_rol_id = obtener_usuario_rol(usuario_id, rol_cogestor_id)
-#         if not tiene_rol:
-#             flash('No tienes permisos para acceder a esta página', 'danger')
-#             return redirect(url_for('usuarios.usuarios'))
-
-#         # Obtener la información del usuario
-#         usuario = db.usuarios.find_one({'_id': ObjectId(usuario_id)})
-#         if not usuario:
-#             flash('Usuario no encontrado', 'danger')
-#             return redirect(url_for('usuarios.usuarios'))
-
-#         nombre_cogestor = usuario.get('nombre_usuario', 'Cogestor')
-
-#         # Obtener parámetros de filtrado
-#         filtrar_gestor = request.form.get('filtrar_gestor', '')
-#         filtrar_estado = request.form.get('filtrar_estado', 'todos')
-#         vaciar = request.args.get('vaciar', '0')
-
-#         # Si se solicita vaciar filtros
-#         if vaciar == '1':
-#             return redirect(url_for('cogestores.usuarios_cogestores'))
-
-#         # Construir la consulta base - buscar gestores donde el usuario_rol_id sea el del cogestor actual
-#         query = {'usuario_rol_id': ObjectId(usuario_rol_id)}
-        
-#         # Aplicar filtros si existen
-#         if filtrar_estado != 'todos':
-#             query['estado_usuario_cogestor'] = filtrar_estado
-
-#         # Obtener los gestores asociados al cogestor
-#         gestores = []
-#         usuarios_cogestores = list(db.usuarios_cogestores.find(query))
-        
-#         for uc in usuarios_cogestores:
-#             # Obtener el usuario_rol del gestor
-#             usuario_rol_gestor = db.usuarios_roles.find_one({'_id': ObjectId(uc['usuario_rol_gestor_id'])})
-#             if not usuario_rol_gestor:
-#                 continue
-
-#             # Obtener la información del usuario gestor
-#             usuario_gestor = db.usuarios.find_one({'_id': ObjectId(usuario_rol_gestor['usuario_id'])})
-#             if not usuario_gestor:
-#                 continue
-
-#             # Si hay filtro por nombre, verificar si coincide
-#             if filtrar_gestor:
-#                 if (filtrar_gestor.lower() not in uc['alias_usuario_cogestor'].lower() and
-#                     filtrar_gestor.lower() not in usuario_gestor['email'].lower() and
-#                     filtrar_gestor.lower() not in usuario_gestor['nombre_usuario'].lower() and
-#                     filtrar_gestor.lower() not in usuario_gestor['telefono_usuario'].lower()):
-#                     continue
-
-#             gestor = {
-#                 '_id': uc['_id'],
-#                 'gestor_info': {
-#                     'alias': uc['alias_usuario_cogestor'],
-#                     'nombre_usuario': usuario_gestor['nombre_usuario'],
-#                     'telefono_usuario': usuario_gestor['telefono_usuario'],
-#                     'estado': uc['estado_usuario_cogestor']
-#                 },
-#                 'email': usuario_gestor['email']
-#             }
-#             gestores.append(gestor)
-
-#         return render_template('usuarios/usuarios_cogestores.html', 
-#                              gestores=gestores,
-#                              nombre_cogestor=nombre_cogestor,
-#                              filtrar_gestor=filtrar_gestor,
-#                              filtrar_estado=filtrar_estado)
-
-#     except Exception as e:
-#         flash(f'Error al listar los gestores: {str(e)}', 'danger')
-#         return redirect(url_for('usuarios.usuarios'))
-
-# def usuarios_cogestores_gestor_vista():
-#     return render_template('cogestores/cogestores_gestor.html')
-
-

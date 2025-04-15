@@ -1,70 +1,13 @@
 from flask import render_template, session, request, redirect, url_for, flash, jsonify
 from bson.objectid import ObjectId
-
 from datetime import datetime
 
+
+from utils.titular_utils import obtener_titulares_activos
+from utils.centros_utils import obtener_centros
 from config import conexion_mongo
 
 db = conexion_mongo()
-
-def obtener_titulares_activos(gestor_id):
-
-    """Obtiene los titulares activos para un gestor específico"""
-    titulares = list(db.usuarios.aggregate([
-        {
-            "$match": {
-                "_id": {"$in": [ObjectId(rel['usuario_id']) for rel in db.usuarios_titulares.find({"gestor_id": ObjectId(gestor_id), "estado": "activo"})]}
-            }
-        },
-        {
-            "$lookup": {
-                "from": "usuarios_titulares",
-                "localField": "_id",
-                "foreignField": "usuario_id",
-                "as": "titular_info"
-            }
-        },
-        {
-            "$unwind": {
-                "path": "$titular_info",
-                "preserveNullAndEmptyArrays": True
-            }
-        },
-        {
-            "$match": {
-                "titular_info.gestor_id": ObjectId(gestor_id),
-                "titular_info.estado": "activo"
-            }
-        },
-        {
-            "$project": {
-                "_id": 1,
-                "nombre": "$nombre_usuario",
-                "alias": "$titular_info.alias"
-            }
-        },
-        {
-            "$sort": {
-                "alias": 1
-            }
-        }
-    ]))
-    
-    # Convertir ObjectId a string para cada titular
-    for titular in titulares:
-        titular['_id'] = str(titular['_id'])
-    
-    return titulares
-
-def obtener_centros(titular_id):
-    
-    """Obtiene los centros activos para un titular específico"""
-    centros = list(db.centros.find({"titular_id": ObjectId(titular_id)}))
-    # Convertir ObjectId a string para cada centro
-    for centro in centros:
-        centro['_id'] = str(centro['_id'])
-        centro['titular_id'] = str(centro['titular_id'])
-    return centros
 
 def centros_vista():
     
