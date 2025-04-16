@@ -5,6 +5,7 @@ from extensions import init_extensions
 from dotenv import load_dotenv, find_dotenv
 from config import configurar_email
 
+
 def crear_app():
     # Forzar recarga del archivo .env, tomaba contraseñas antiguas
     dotenv_path = find_dotenv()

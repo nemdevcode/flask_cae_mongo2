@@ -1,4 +1,5 @@
-from flask import render_template, session, redirect, url_for, flash, request
+import os
+from flask import render_template, session, redirect, url_for, flash, request, send_from_directory
 
 from routes.usuarios_routes import usuarios_bp
 from routes.usuarios_gestores.usuarios_gestores_routes import usuarios_gestores_bp
@@ -30,6 +31,11 @@ def rutas(app):
     app.register_blueprint(ug_usuarios_titulares_bp)
 
     # Rutas comunes
+
+    @app.route('/favicon.ico')
+    def favicon():
+        return send_from_directory(os.path.join(app.root_path, 'static'),
+                                   'favicon.ico', mimetype='image/vnd.microsoft.icon')
     @app.route('/')
     def index():
         return render_template('index.html')
