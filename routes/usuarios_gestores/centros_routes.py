@@ -4,7 +4,8 @@ from core.usuarios_gestores.centros import (
     centros_vista,
     centros_crear_vista,
     centros_actualizar_vista,
-    centros_eliminar_vista
+    centros_eliminar_vista,
+    centros_centro_vista
 )
 
 from core._decoradores import login_requerido
@@ -38,3 +39,13 @@ def centros_actualizar(gestor_id, titular_id, centro_id):
 @login_requerido
 def centros_eliminar(gestor_id, titular_id, centro_id):
     return centros_eliminar_vista(gestor_id, titular_id, centro_id)
+
+'''
+Rutas para gestión de elementos de cada centro, funciones:
+    - centros_centro_vista()
+'''
+
+@ug_centros_bp.route('/centro/<gestor_id>/<titular_id>/<centro_id>', methods=['GET', 'POST'])
+@login_requerido
+def centros_centro(gestor_id, titular_id, centro_id):
+    return centros_centro_vista(gestor_id, titular_id, centro_id)

@@ -125,8 +125,11 @@
                                     {% endif %}
                                 </td>
                                 <td class="text-center">
-                                    <a href="{{ url_for('ug_centros.centros_actualizar', gestor_id=gestor_id, titular_id=titular._id, centro_id=centro._id) }}" 
+                                    <a href="{{ url_for('ug_centros.centros_centro', gestor_id=gestor_id|string, titular_id=titular._id|string, centro_id=centro._id|string) }}" 
                                         class="btn btn-primary btn-sm">
+                                        Ir</a>
+                                    <a href="{{ url_for('ug_centros.centros_actualizar', gestor_id=gestor_id, titular_id=titular._id, centro_id=centro._id) }}" 
+                                        class="btn btn-warning btn-sm">
                                         Editar</a>
                                     <button type="button" 
                                         class="btn btn-danger btn-sm" 

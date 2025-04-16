@@ -6,5 +6,6 @@ __pycache__/
 .venv3132work/
 .venv3132pc/
 .venv3132portatil/
+.venv/
 
 .env

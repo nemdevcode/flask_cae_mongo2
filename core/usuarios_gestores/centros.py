@@ -375,3 +375,28 @@ def centros_eliminar_vista(gestor_id, titular_id, centro_id):
     except Exception as e:
         flash(f'Error al eliminar el centro: {str(e)}', 'danger')
         return redirect(url_for('ug_centros.centros', gestor_id=gestor_id, titular_id=titular_id))
+    
+def centros_centro_vista(gestor_id, titular_id, centro_id):
+    try:
+        # Verificar permisos y obtener información
+        permisos_ok, resultado = verificaciones_consultas(gestor_id, titular_id)
+        if not permisos_ok:
+            return resultado
+        
+        # Verificar que el centro pertenece al titular actual
+        centro = db.centros.find_one({
+            '_id': ObjectId(centro_id),
+            'titular_id': ObjectId(titular_id)
+        })
+        if not centro:
+            flash('Centro no encontrado o no pertenece a este titular', 'danger')
+            return redirect(url_for('ug_centros.centros', gestor_id=gestor_id, titular_id=titular_id))
+        
+        return render_template('usuarios_gestores/centros/index.html',
+                               centro=centro,
+                               gestor_id=gestor_id,
+                               titular_id=titular_id)
+    except Exception as e:
+        flash(f'Error al cargar el centro: {str(e)}', 'danger')
+        return redirect(url_for('ug_centros.centros', gestor_id=gestor_id, titular_id=titular_id))
+    
