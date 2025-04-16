@@ -15,7 +15,7 @@
                 </ul>
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end align-items-center">
                     <span class="my-auto">Volver a:</span>
-                    <a href="{{ url_for('ug_titulares.titulares_titular', gestor_id=gestor_id, titular_id=titular_id) }}" class="btn btn-outline-primary">
+                    <a href="{{ url_for('ug_titulares.titulares_titular', gestor_id=gestor_id, titular_id=titular._id) }}" class="btn btn-outline-primary">
                         Titular</a>
                     <a href="{{ url_for('logout') }}" class="btn btn-outline-dark">
                         Cerrar sesión</a>
@@ -28,63 +28,62 @@
 {% block main %}
     <!-- Listado de centros por titular -->
     <div class="container mt-5">
-        <h3 class="text-center">Listado de Centros del Titular: {{ titular.alias }} - {{ titular.nombre }}</h3>
-        <div class="d-flex justify-content-between align-items-center mb-5">
+        <h3 class="text-center">Listado de centros del titular: {{ titular.nombre_titular }}</h3>
+        <div class="d-flex justify-content-between align-items-center mt-5">
             <!-- Formulario para filtrar centros -->
-            <form action="{{ url_for('ug_centros.centros', gestor_id=gestor_id, titular_id=titular_id) }}" method="post" class="flex-grow-1 me-3">
+            <form action="{{ url_for('ug_centros.centros', gestor_id=gestor_id, titular_id=titular._id) }}" method="post" class="flex-grow-1 me-3">
                 <div class="d-flex gap-3 align-items-center">
                     <!-- Input para filtrar centro -->
                     <div class="form-floating" style="flex: 2; min-height: 80px;">
                         <input type="text" 
                                 class="form-control" 
-                                id="filtrar_centro_{{ titular._id }}"
-                                name="filtrar_centro_{{ titular._id }}"
-                                value="{{ request.form.get('filtrar_centro_' + titular._id|string, '') }}"
+                                id="filtrar_centro"
+                                name="filtrar_centro"
+                                value="{{ request.form.get('filtrar_centro', '') }}"
                                 oninput="this.form.submit()"
                                 autocomplete="off"
                                 autofocus
                                 onfocus="this.setSelectionRange(this.value.length, this.value.length)"
                                 style="height: 80px;">
-                        <label for="filtrar_centro_{{ titular._id }}" style="white-space: normal; line-height: 1.2; height: auto; padding-top: 0.5rem; transform-origin: 0 0;">Escriba el nombre, domicilio, código postal, población o provincia para filtrar...</label>
+                        <label for="filtrar_centro" style="white-space: normal; line-height: 1.2; height: auto; padding-top: 0.5rem; transform-origin: 0 0;">Escriba el nombre, domicilio, código postal, población o provincia para filtrar...</label>
                     </div>
                     
                     <!-- Filtro por estado -->
                     <div class="btn-group" role="group" aria-label="Filtrar por estado" style="flex: 2;">
                         <input type="radio" 
                                 class="btn-check" 
-                                name="filtrar_estado_{{ titular._id }}" 
-                                id="todos_{{ titular._id }}" 
+                                name="filtrar_estado" 
+                                id="todos" 
                                 value="todos" 
-                                {% if not request.form.get('filtrar_estado_' + titular._id|string) or request.form.get('filtrar_estado_' + titular._id|string) == 'todos' %}checked{% endif %}
+                                {% if not request.form.get('filtrar_estado') or request.form.get('filtrar_estado') == 'todos' %}checked{% endif %}
                                 onchange="this.form.submit()">
-                        <label class="btn btn-outline-primary" for="todos_{{ titular._id }}">
+                        <label class="btn btn-outline-primary" for="todos">
                             Todos</label>
                         
                         <input type="radio" 
                                 class="btn-check" 
-                                name="filtrar_estado_{{ titular._id }}" 
-                                id="activos_{{ titular._id }}" 
+                                name="filtrar_estado" 
+                                id="activos" 
                                 value="activo"
-                                {% if request.form.get('filtrar_estado_' + titular._id|string) == 'activo' %}checked{% endif %}
-                            
+                                {% if request.form.get('filtrar_estado') == 'activo' %}checked{% endif %}
                                 onchange="this.form.submit()">
-                        <label class="btn btn-outline-success" for="activos_{{ titular._id }}">
+                        <label class="btn btn-outline-success" for="activos">
                             Activos</label>
                         
                         <input type="radio" 
                                 class="btn-check" 
-                                name="filtrar_estado_{{ titular._id }}" 
-                                id="inactivos_{{ titular._id }}" 
+                                name="filtrar_estado" 
+                                id="inactivos" 
                                 value="inactivo"
-                                {% if request.form.get('filtrar_estado_' + titular._id|string) == 'inactivo' %}checked{% endif %}
+                                {% if request.form.get('filtrar_estado') == 'inactivo' %}checked{% endif %}
                                 onchange="this.form.submit()">
-                        <label class="btn btn-outline-secondary" for="inactivos_{{ titular._id }}">
+                        <label class="btn btn-outline-secondary" for="inactivos">
                             Inactivos</label>
                     </div>
                     
                     <!-- Botón para limpiar filtro -->
                     <div style="flex: 1;">
-                        <a href="{{ url_for('ug_centros.centros', gestor_id=gestor_id, titular_id=titular_id) }}" class="btn btn-secondary">
+                        <a href="{{ url_for('ug_centros.centros', gestor_id=gestor_id, titular_id=titular._id) }}" class="btn btn-secondary">
                             Limpiar filtros</a>
                     </div>
                 </div>
@@ -103,6 +102,7 @@
                         <th>Código Postal</th>
                         <th>Población</th>
                         <th>Provincia</th>
+                        <th>Teléfono</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
@@ -116,15 +116,16 @@
                                 <td>{{ centro.codigo_postal }}</td>
                                 <td>{{ centro.poblacion }}</td>
                                 <td>{{ centro.provincia }}</td>
+                                <td>{{ centro.telefono_centro }}</td>
                                 <td class="text-center">
-                                    {% if centro.estado == 'activo' %}
+                                    {% if centro.estado_centro == 'activo' %}
                                         <span class="badge bg-success">Activo</span>
                                     {% else %}
                                         <span class="badge bg-secondary">Inactivo</span>
                                     {% endif %}
                                 </td>
-                                <td>
-                                    <a href="{{ url_for('ug_centros.centros_actualizar', gestor_id=gestor_id, titular_id=titular_id, centro_id=centro._id) }}" 
+                                <td class="text-center">
+                                    <a href="{{ url_for('ug_centros.centros_actualizar', gestor_id=gestor_id, titular_id=titular._id, centro_id=centro._id) }}" 
                                         class="btn btn-primary btn-sm">
                                         Editar</a>
                                     <button type="button" 
@@ -150,7 +151,7 @@
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                            <a href="{{ url_for('ug_centros.centros_eliminar', gestor_id=gestor_id, titular_id=titular_id, centro_id=centro._id) }}" class="btn btn-danger">
+                                            <a href="{{ url_for('ug_centros.centros_eliminar', gestor_id=gestor_id|string, titular_id=titular._id|string, centro_id=centro._id|string) }}" class="btn btn-danger">
                                                 Eliminar</a>
                                         </div>
                                     </div>
