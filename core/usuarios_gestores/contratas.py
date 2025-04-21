@@ -213,7 +213,7 @@ def contratas_crear_vista(gestor_id, titular_id):
                                      gestor=gestor,
                                      titular=titular,
                                      nombre_gestor=nombre_gestor,
-                                     form_data=datos_formulario
+                                     datos_formulario=datos_formulario
                                      )
 
     except Exception as e:
