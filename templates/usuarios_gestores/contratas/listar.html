@@ -104,49 +104,51 @@
                         <th>Población</th>
                         <th>Provincia</th>
                         <th>Teléfono</th>
+                        <th>Email</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% if contratas %}
-                        {% for contratata in contratas %}
+                        {% for contrata in contratas %}
                             <tr>
-                                <td>{{ contratata.nombre_contrata }}</td>
-                                <td>{{ contratata.cif_dni }}</td>
-                                <td>{{ contratata.domicilio_contrata }}</td>
-                                <td>{{ contratata.codigo_postal_contrata }}</td>
-                                <td>{{ contratata.poblacion_contrata }}</td>
-                                <td>{{ contratata.provincia_contrata }}</td>
-                                <td>{{ contratata.telefono_contrata }}</td>
+                                <td>{{ contrata.nombre_contrata }}</td>
+                                <td>{{ contrata.cif_dni }}</td>
+                                <td>{{ contrata.domicilio }}</td>
+                                <td>{{ contrata.codigo_postal }}</td>
+                                <td>{{ contrata.poblacion }}</td>
+                                <td>{{ contrata.provincia }}</td>
+                                <td>{{ contrata.telefono_contrata }}</td>
+                                <td>{{ contrata.email_contrata }}</td>
                                 <td class="text-center">
-                                    {% if contratata.estado_contrata == 'activo' %}
+                                    {% if contrata.estado_contrata == 'activo' %}
                                         <span class="badge bg-success">Activo</span>
                                     {% else %}
                                         <span class="badge bg-secondary">Inactivo</span>
                                     {% endif %}
                                 </td>
                                 <td class="text-center">
-                                    <a href="{{ url_for('ug_contratas.contratas_contrata', gestor_id=gestor_id|string, titular_id=titular._id|string, contratata_id=contratata._id|string) }}" 
+                                    <a href="{{ url_for('ug_contratas.contratas_contrata', gestor_id=gestor_id|string, titular_id=titular._id|string, contrata_id=contrata._id|string) }}" 
                                         class="btn btn-primary btn-sm">
                                         Ir</a>
-                                    <a href="{{ url_for('ug_contratas.contratas_actualizar', gestor_id=gestor_id, titular_id=titular._id, contratata_id=contratata._id) }}" 
+                                    <a href="{{ url_for('ug_contratas.contratas_actualizar', gestor_id=gestor_id, titular_id=titular._id, contrata_id=contrata._id) }}" 
                                         class="btn btn-warning btn-sm">
                                         Editar</a>
                                     <button type="button" 
                                         class="btn btn-danger btn-sm" 
                                         data-bs-toggle="modal" 
-                                        data-bs-target="#confirmarEliminar{{ contratata._id }}">
+                                        data-bs-target="#confirmarEliminar{{ contrata._id }}">
                                         Eliminar
                                     </button>
                                 </td>
                             </tr>
                             <!-- Modal de confirmación de eliminación -->
-                            <div class="modal fade" id="confirmarEliminar{{ contratata._id }}" tabindex="-1" aria-labelledby="confirmarEliminarLabel{{ contratata._id }}" aria-hidden="true">
+                            <div class="modal fade" id="confirmarEliminar{{ contrata._id }}" tabindex="-1" aria-labelledby="confirmarEliminarLabel{{ contrata._id }}" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content bg-dark text-white">
                                         <div class="modal-header">
-                                            <h5 class="modal-title text-danger text-center w-100" id="confirmarEliminarLabel{{ centro._id }}">Confirmar eliminación</h5>
+                                            <h5 class="modal-title text-danger text-center w-100" id="confirmarEliminarLabel{{ contrata._id }}">Confirmar eliminación</h5>
                                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
@@ -156,7 +158,7 @@
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                            <a href="{{ url_for('ug_contratas.contratas_eliminar', gestor_id=gestor_id|string, titular_id=titular._id|string, contratata_id=contratata._id|string) }}" class="btn btn-danger">
+                                            <a href="{{ url_for('ug_contratas.contratas_eliminar', gestor_id=gestor_id|string, titular_id=titular._id|string, contrata_id=contrata._id|string) }}" class="btn btn-danger">
                                                 Eliminar</a>
                                         </div>
                                     </div>
@@ -165,7 +167,7 @@
                         {% endfor %}
                     {% else %}
                         <tr>
-                            <td colspan="9" class="text-center">No hay contratas para mostrar</td>
+                            <td colspan="10" class="text-center">No hay contratas para mostrar</td>
                         </tr>
                     {% endif %}
                 </tbody>

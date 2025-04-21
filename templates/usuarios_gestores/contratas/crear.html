@@ -77,6 +77,8 @@
                                    name="email_contrata" 
                                    value="{{ datos_formulario.email_contrata if datos_formulario else '' }}"
                                    required>
+                            <label for="email_contrata">Email notificaciones:</label>
+                        </div>
                         <div class="d-flex justify-content-end align-items-center gap-2">
                             <a href="{{ url_for('ug_contratas.contratas', gestor_id=gestor_id, titular_id=titular_id) }}" class="btn btn-secondary">
                                 Cancelar</a>

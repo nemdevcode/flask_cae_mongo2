@@ -77,22 +77,24 @@ def contratas_vista(gestor_id, titular_id):
             if filtrar_contrata:
                 if (filtrar_contrata.lower() not in contrata['nombre_contrata'].lower() and
                     filtrar_contrata.lower() not in contrata['cif_dni'].lower() and
-                    filtrar_contrata.lower() not in contrata['domicilio_contrata'].lower() and
-                    filtrar_contrata.lower() not in contrata['codigo_postal_contrata'].lower() and
-                    filtrar_contrata.lower() not in contrata['poblacion_contrata'].lower() and
-                    filtrar_contrata.lower() not in contrata['provincia_contrata'].lower() and
-                    filtrar_contrata.lower() not in contrata.get('telefono_contrata', '').lower()):
+                    filtrar_contrata.lower() not in contrata['domicilio'].lower() and
+                    filtrar_contrata.lower() not in contrata['codigo_postal'].lower() and
+                    filtrar_contrata.lower() not in contrata['poblacion'].lower() and
+                    filtrar_contrata.lower() not in contrata['provincia'].lower() and
+                    filtrar_contrata.lower() not in contrata.get('telefono_contrata', '').lower() and
+                    filtrar_contrata.lower() not in contrata.get('email_contrata', '').lower()):
                     continue
 
             contratas.append({
                 '_id': str(contrata['_id']),
                 'nombre_contrata': contrata['nombre_contrata'],
                 'cif_dni': contrata['cif_dni'],
-                'domicilio_contrata': contrata['domicilio_contrata'],
-                'codigo_postal_contrata': contrata['codigo_postal_contrata'],
-                'poblacion_contrata': contrata['poblacion_contrata'],
-                'provincia_contrata': contrata['provincia_contrata'],
+                'domicilio': contrata['domicilio'],
+                'codigo_postal': contrata['codigo_postal'],
+                'poblacion': contrata['poblacion'],
+                'provincia': contrata['provincia'],
                 'telefono_contrata': contrata.get('telefono_contrata', ''),
+                'email_contrata': contrata.get('email_contrata', ''),
                 'estado_contrata': contrata.get('estado_contrata', contrata.get('estado', 'activo'))
             })
 
