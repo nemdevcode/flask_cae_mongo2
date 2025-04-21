@@ -109,8 +109,116 @@ def contratas_vista(gestor_id, titular_id):
         flash(f'Error al cargar las contratas: {str(e)}', 'danger')
         return redirect(url_for('ug_titulares.titulares_titular', gestor_id=gestor_id, titular_id=titular_id))
 
+def crear_contrata(gestor_id, titular_id, datos_formulario):
+    """
+    Crea una nueva contratata en la base de datos.
+    
+    Args:
+        gestor_id (str): ID del gestor
+        titular_id (str): ID del titular
+        datos_formulario (dict): Datos del formulario
+    
+    Returns:
+        tuple: (bool, dict) 
+            - bool: True si se creó exitosamente, False si hubo error
+            - dict: Datos del formulario o mensaje de error
+    """
+    try:
+        # Obtener datos del formulario
+        nombre_contrata = datos_formulario.get('nombre_contrata', '').strip().upper()
+        cif_dni = datos_formulario.get('cif_dni', '').strip().upper()
+        domicilio = datos_formulario.get('domicilio', '').strip()
+        codigo_postal = datos_formulario.get('codigo_postal', '').strip()
+        poblacion = datos_formulario.get('poblacion', '').strip().upper()
+        provincia = datos_formulario.get('provincia', '').strip().upper()
+        telefono_contrata = datos_formulario.get('telefono_contrata', '').strip()
+        email_contrata = datos_formulario.get('email_contrata', '').strip().lower()
+        
+        # Verificar si ya existe una contratata con el mismo cif_dni para este titular
+        contrata_existente = db.contratas.find_one({
+            'titular_id': ObjectId(titular_id),
+            'cif_dni': cif_dni
+        })
+        if contrata_existente:
+            flash('Ya existe una contratata con este cif/dni para este titular', 'warning')
+            return False, datos_formulario
+            
+        # Crear la contratata
+        contrata = {
+            'titular_id': ObjectId(titular_id),
+            'nombre_contrata': nombre_contrata,
+            'cif_dni': cif_dni,
+            'domicilio': domicilio,
+            'codigo_postal': codigo_postal,
+            'poblacion': poblacion,
+            'provincia': provincia,
+            'telefono_contrata': telefono_contrata,
+            'email_contrata': email_contrata,
+            'estado_contrata': 'activo',
+            'fecha_activacion': datetime.now(),
+            'fecha_modificacion': datetime.now()
+        }
+
+        # Insertar la contratata
+        insert = db.contratas.insert_one(contrata)
+        if insert.inserted_id:
+            flash('Contratata creada correctamente', 'success')
+            return True, None
+        else:
+            flash('Error al crear la contratata', 'danger')
+            return False, datos_formulario
+
+    except Exception as e:
+        flash(f'Error al crear la contratata: {str(e)}', 'danger')
+        return False, datos_formulario
+
 def contratas_crear_vista(gestor_id, titular_id):
-    return render_template('usuarios_gestores/contratas/crear.html')
+
+    try:
+        # Verificar permisos y obtener información
+        permisos_ok, resultado = verificaciones_consultas(gestor_id, titular_id)
+        if not permisos_ok:
+            return resultado
+
+        usuario, usuario_rol_id, gestor, titular = resultado
+        nombre_gestor = gestor.get('nombre_gestor', 'Gestor')
+        
+        # Convertir los ObjectId a string para el template
+        gestor_id = str(gestor_id)
+        titular_id = str(titular_id)
+        titular['_id'] = str(titular['_id'])
+
+        if request.method == 'GET':
+            return render_template('usuarios_gestores/contratas/crear.html',
+                                 gestor_id=gestor_id,
+                                 titular_id=titular_id,
+                                 usuario=usuario,
+                                 usuario_rol_id=usuario_rol_id,
+                                 gestor=gestor,
+                                 titular=titular,
+                                 nombre_gestor=nombre_gestor
+                                 )
+
+        if request.method == 'POST':
+            # Procesar el formulario con la función crear_centro
+            creado, datos_formulario = crear_contrata(gestor_id, titular_id, request.form)
+            if creado:
+                return redirect(url_for('ug_contratas.contratas', gestor_id=gestor_id, titular_id=titular_id))
+            else:
+                return render_template('usuarios_gestores/contratas/crear.html',
+                                     gestor_id=gestor_id,
+                                     titular_id=titular_id,
+                                     usuario=usuario,
+                                     usuario_rol_id=usuario_rol_id,
+                                     gestor=gestor,
+                                     titular=titular,
+                                     nombre_gestor=nombre_gestor,
+                                     form_data=datos_formulario
+                                     )
+
+    except Exception as e:
+        flash(f'Error al crear la contratata: {str(e)}', 'danger')
+        return redirect(url_for('ug_contratas.contratas', gestor_id=gestor_id, titular_id=titular_id))
 
 def contratas_actualizar_vista(contratata_id, datos_formulario):
     return render_template('usuarios_gestores/contratas/actualizar.html')
