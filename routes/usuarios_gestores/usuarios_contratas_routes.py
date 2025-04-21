@@ -18,25 +18,25 @@ Rutas para gestión de usuarios contratas, funciones:
     - usuarios_contratas_eliminar_vista()
 '''
 
-@ug_usuarios_contratas_bp.route('/', methods=['GET', 'POST'])
+@ug_usuarios_contratas_bp.route('/<gestor_id>/<titular_id>/<contrata_id>', methods=['GET', 'POST'])
 @login_requerido
-def usuarios_contratas():
-    return usuarios_contratas_vista()
+def usuarios_contratas(gestor_id, titular_id, contrata_id):
+    return usuarios_contratas_vista(gestor_id, titular_id, contrata_id)
 
-@ug_usuarios_contratas_bp.route('/crear', methods=['GET', 'POST'])
+@ug_usuarios_contratas_bp.route('/crear/<gestor_id>/<titular_id>/<contrata_id>', methods=['GET', 'POST'])
 @login_requerido
-def usuarios_contratas_crear():
-    return usuarios_contratas_crear_vista()
+def usuarios_contratas_crear(gestor_id, titular_id, contrata_id):
+    return usuarios_contratas_crear_vista(gestor_id, titular_id, contrata_id)
 
-@ug_usuarios_contratas_bp.route('/actualizar', methods=['GET', 'POST'])
+@ug_usuarios_contratas_bp.route('/actualizar/<gestor_id>/<titular_id>/<contrata_id>/<usuario_contrata_id>', methods=['GET', 'POST'])
 @login_requerido
-def usuarios_contratas_actualizar():
-    return usuarios_contratas_actualizar_vista()
+def usuarios_contratas_actualizar(gestor_id, titular_id, contrata_id, usuario_contrata_id):
+    return usuarios_contratas_actualizar_vista(gestor_id, titular_id, contrata_id, usuario_contrata_id)
 
-@ug_usuarios_contratas_bp.route('/eliminar', methods=['GET', 'POST'])
+@ug_usuarios_contratas_bp.route('/eliminar/<gestor_id>/<titular_id>/<contrata_id>/<usuario_contrata_id>', methods=['GET', 'POST'])
 @login_requerido
-def usuarios_contratas_eliminar():
-    return usuarios_contratas_eliminar_vista()
+def usuarios_contratas_eliminar(gestor_id, titular_id, contrata_id, usuario_contrata_id):
+    return usuarios_contratas_eliminar_vista(gestor_id, titular_id, contrata_id, usuario_contrata_id)
 
 
 

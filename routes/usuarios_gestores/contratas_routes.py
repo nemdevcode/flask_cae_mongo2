@@ -30,13 +30,13 @@ def contratas_crear(gestor_id, titular_id):
 
 @ug_contratas_bp.route('/actualizar/<gestor_id>/<titular_id>/<contrata_id>', methods=['GET', 'POST'])
 @login_requerido
-def contratas_actualizar(gestor_id, titular_id, contratata_id):
-    return contratas_actualizar_vista(gestor_id, titular_id, contratata_id)
+def contratas_actualizar(gestor_id, titular_id, contrata_id):
+    return contratas_actualizar_vista(gestor_id, titular_id, contrata_id)
 
 @ug_contratas_bp.route('/eliminar/<gestor_id>/<titular_id>/<contrata_id>', methods=['GET', 'POST'])
 @login_requerido
-def contratas_eliminar(gestor_id, titular_id, contratata_id):
-    return contratas_eliminar_vista(gestor_id, titular_id, contratata_id)
+def contratas_eliminar(gestor_id, titular_id, contrata_id):
+    return contratas_eliminar_vista(gestor_id, titular_id, contrata_id)
 
 '''
 Rutas para gestión de elementos de cada contratas, funciones:
@@ -45,5 +45,5 @@ Rutas para gestión de elementos de cada contratas, funciones:
 
 @ug_contratas_bp.route('/contrata/<gestor_id>/<titular_id>/<contrata_id>', methods=['GET', 'POST'])
 @login_requerido
-def contratas_contrata(gestor_id, titular_id, contratata_id):
-    return contratas_contrata_vista(gestor_id, titular_id, contratata_id)
+def contratas_contrata(gestor_id, titular_id, contrata_id):
+    return contratas_contrata_vista(gestor_id, titular_id, contrata_id)

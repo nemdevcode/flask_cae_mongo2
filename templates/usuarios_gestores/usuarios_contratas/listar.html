@@ -1,0 +1,156 @@
+{% extends "_base.html" %}
+
+{% block header %}
+
+    <nav class="navbar navbar-expand-lg" style="background-color: #e3f2fd;">
+        <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+            <a class="navbar-brand">CAE Accesible</a>
+            <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/usuarios">Inicio</a>
+                </li>
+            </ul>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end align-items-center">
+                <span class="my-auto">Volver a:</span>
+                <a href="{{ url_for('ug_contratas.contratas_contrata', gestor_id=gestor_id|string, titular_id=titular_id|string, contrata_id=contrata_id|string) }}" class="btn btn-outline-primary">
+                    Contrata</a>
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-dark">Cerrar sesión</a>
+            </div>
+                
+        </div>
+    </nav>
+{% endblock %}
+
+{% block main %}
+    <div class="container mt-5">
+        <h3 class="text-center">Listado de USUARIOS de la CONTRATA: {{ contrata.nombre_contrata }}</h3>
+        <div class="d-flex justify-content-between align-items-center mt-5">
+            <!-- Formulario para filtrar usuarios contratas -->
+            <form action="{{ url_for('ug_usuarios_contratas.usuarios_contratas', gestor_id=gestor_id|string, titular_id=titular_id|string, contrata_id=contrata_id|string) }}" method="post" id="filtroForm" class="flex-grow-1 me-3">
+                <div class="d-flex gap-3 align-items-center">
+                    <!-- Input para filtrar usuario contratas por nombre -->
+                    <div class="form-floating" style="flex: 2;">
+                        <input type="text" 
+                            class="form-control" 
+                            id="filtrar_contrata" 
+                            name="filtrar_contrata"
+                            value="{{ request.form.get('filtrar_contrata', '') }}"
+                            oninput="this.form.submit()"
+                            autocomplete="off"
+                            autofocus
+                            onfocus="this.setSelectionRange(this.value.length, this.value.length)">
+                        <label for="filtrar_contrata">Escriba el alias o email para filtrar</label>
+                    </div>
+                    
+                    <!-- Filtro por estado -->
+                    <div class="btn-group" role="group" aria-label="Filtrar por estado" style="flex: 2;">
+                        <input type="radio" 
+                        class="btn-check" 
+                        name="filtrar_estado" 
+                        id="todos" 
+                                value="todos" 
+                                {% if not filtrar_estado or filtrar_estado == 'todos' %}checked{% endif %}
+                                onchange="this.form.submit()">
+                                <label class="btn btn-outline-primary" for="todos">Todos</label>
+        
+                        <input type="radio" 
+                                class="btn-check" 
+                                name="filtrar_estado" 
+                                id="activos" 
+                                value="activo"
+                                {% if filtrar_estado == 'activo' %}checked{% endif %}
+                                onchange="this.form.submit()">
+                        <label class="btn btn-outline-success" for="activos">Activos</label>
+        
+                        <input type="radio" 
+                            class="btn-check" 
+                            name="filtrar_estado" 
+                            id="inactivos" 
+                            value="inactivo"
+                            {% if filtrar_estado == 'inactivo' %}checked{% endif %}
+                            onchange="this.form.submit()">
+                        <label class="btn btn-outline-secondary" for="inactivos">Inactivos</label>
+                    </div>
+                    <!-- Boton para limpiar filtro -->
+                    <div style="flex: 1;">
+                        <a href="{{ url_for('ug_usuarios_contratas.usuarios_contratas', gestor_id=gestor_id|string, titular_id=titular_id|string, contrata_id=contrata_id|string, vaciar=1) }}" class="btn btn-secondary">Limpiar filtros</a>
+                    </div>
+                </div>
+            </form>
+            <!-- Botón crear -->
+            <a href="{{ url_for('ug_usuarios_contratas.usuarios_contratas_crear', gestor_id=gestor_id|string, titular_id=titular_id|string, contrata_id=contrata_id|string) }}" class="btn btn-success">Crear</a>
+        </div>
+
+        <!-- Tabla de usuarios contratas -->
+        <div class="table-responsive mt-5">
+            <table class="table table-striped">
+                <thead class="text-center">
+                    <tr>
+                        <th>Alias</th>
+                        <th>Email</th>
+                        <th>Nombre</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if usuarios_contratas %}
+                        {% for usuario_contrata in usuarios_contratas %}
+                            <tr>
+                                <td>{{ usuario_contrata.contrata_info.alias }}</td>
+                                <td>{{ usuario_contrata.email }}</td>
+                                <td>{{ usuario_contrata.nombre_usuario }}</td>
+                                <td class="text-center">
+                                    {% if usuario_contrata.contrata_info.estado_usuario_contrata == 'activo' %}
+                                        <span class="badge bg-success">Activo</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactivo</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <a href="{{ url_for('ug_usuarios_contratas.usuarios_contratas_actualizar', gestor_id=gestor_id|string, titular_id=titular_id|string, contrata_id=contrata_id|string, usuario_contrata_id=usuario_contrata._id) }}" 
+                                       class="btn btn-primary btn-sm">
+                                       Editar</a>
+                                    <button type="button" 
+                                        class="btn btn-danger btn-sm" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#confirmarEliminar{{ usuario_contrata._id }}">
+                                        Eliminar</button>
+                                </td>
+                            </tr>
+                            <!-- Modal de confirmación para eliminar usuario contratas-->
+                            <div class="modal fade" id="confirmarEliminar{{ usuario_contrata._id }}" tabindex="-1" aria-labelledby="confirmarEliminarLabel{{ usuario_contrata._id }}" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content bg-dark text-white">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title text-danger text-center w-100" id="confirmarEliminarLabel{{ usuario_titular._id }}">Confirmar eliminación</h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            ¿Está seguro que desea eliminar al usuario contratas "{{ usuario_contrata.contrata_info.alias }}"?
+                                            <br>
+                                            <strong>Email:</strong> {{ usuario_contrata.email }}
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                            <a href="{{ url_for('ug_usuarios_contratas.usuarios_contratas_eliminar', gestor_id=gestor_id|string, titular_id=titular_id|string, contrata_id=contrata_id|string, usuario_contrata_id=usuario_contrata._id) }}" 
+                                               class="btn btn-danger">Eliminar</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center">No hay usuarios titulares registrados</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

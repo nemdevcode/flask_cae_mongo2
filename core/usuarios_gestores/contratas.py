@@ -113,7 +113,7 @@ def contratas_vista(gestor_id, titular_id):
 
 def crear_contrata(gestor_id, titular_id, datos_formulario):
     """
-    Crea una nueva contratata en la base de datos.
+    Crea una nueva contrata en la base de datos.
     
     Args:
         gestor_id (str): ID del gestor
@@ -136,16 +136,16 @@ def crear_contrata(gestor_id, titular_id, datos_formulario):
         telefono_contrata = datos_formulario.get('telefono_contrata', '').strip()
         email_contrata = datos_formulario.get('email_contrata', '').strip().lower()
         
-        # Verificar si ya existe una contratata con el mismo cif_dni para este titular
+        # Verificar si ya existe una contrata con el mismo cif_dni para este titular
         contrata_existente = db.contratas.find_one({
             'titular_id': ObjectId(titular_id),
             'cif_dni': cif_dni
         })
         if contrata_existente:
-            flash('Ya existe una contratata con este cif/dni para este titular', 'warning')
+            flash('Ya existe una contrata con este cif/dni para este titular', 'danger')
             return False, datos_formulario
             
-        # Crear la contratata
+        # Crear la contrata
         contrata = {
             'titular_id': ObjectId(titular_id),
             'nombre_contrata': nombre_contrata,
@@ -161,17 +161,17 @@ def crear_contrata(gestor_id, titular_id, datos_formulario):
             'fecha_modificacion': datetime.now()
         }
 
-        # Insertar la contratata
+        # Insertar la contrata
         insert = db.contratas.insert_one(contrata)
         if insert.inserted_id:
-            flash('Contratata creada correctamente', 'success')
+            flash('contrata creada correctamente', 'success')
             return True, None
         else:
-            flash('Error al crear la contratata', 'danger')
+            flash('Error al crear la contrata', 'danger')
             return False, datos_formulario
 
     except Exception as e:
-        flash(f'Error al crear la contratata: {str(e)}', 'danger')
+        flash(f'Error al crear la contrata: {str(e)}', 'danger')
         return False, datos_formulario
 
 def contratas_crear_vista(gestor_id, titular_id):
@@ -219,15 +219,217 @@ def contratas_crear_vista(gestor_id, titular_id):
                                      )
 
     except Exception as e:
-        flash(f'Error al crear la contratata: {str(e)}', 'danger')
+        flash(f'Error al crear la contrata: {str(e)}', 'danger')
         return redirect(url_for('ug_contratas.contratas', gestor_id=gestor_id, titular_id=titular_id))
 
-def contratas_actualizar_vista(contratata_id, datos_formulario):
-    return render_template('usuarios_gestores/contratas/actualizar.html')
+def actualizar_contrata(titular_id, contrata_id, datos_formulario):
+    """
+    Actualiza una contrata existente en la base de datos.
+    
+    Args:
+        titular_id (str): ID del titular
+        contrata_id (str): ID de la contrata a actualizar
+        datos_formulario (dict): Datos del formulario
+    
+    Returns:
+        tuple: (bool, dict) 
+            - bool: True si se actualizó exitosamente, False si hubo error
+            - dict: Datos del formulario o mensaje de error
+    """
+    try:
+        # Obtener la contrata actual para comparar que no exista otra con el mismo cif/dni
+        contrata_actual = db.contratas.find_one({'_id': ObjectId(contrata_id)})
+        if not contrata_actual:
+            flash('Contrata no encontrada', 'danger')
+            return False, datos_formulario
 
-def contratas_eliminar_vista(gestor_id, titular_id, contratata_id):
-    return render_template('usuarios_gestores/contratas/eliminar.html')
+        # Obtener datos del formulario
+        nombre_contrata = datos_formulario.get('nombre_contrata', '').strip().upper()
+        cif_dni = datos_formulario.get('cif_dni', '').strip().upper()
+        domicilio = datos_formulario.get('domicilio', '').strip()
+        codigo_postal = datos_formulario.get('codigo_postal', '').strip()
+        poblacion = datos_formulario.get('poblacion', '').strip().upper()
+        provincia = datos_formulario.get('provincia', '').strip().upper()
+        telefono_contrata = datos_formulario.get('telefono_contrata', '').strip()
+        email_contrata = datos_formulario.get('email_contrata', '').strip().lower()
+        estado_contrata = datos_formulario.get('estado_contrata', '')
 
-def contratas_contrata_vista(contratata_id):
+        # Verificar si el CIF/DNI ha cambiado
+        if cif_dni != contrata_actual.get('cif_dni', ''):
+            # Solo verificar duplicados si el CIF/DNI ha cambiado
+            # Buscar si existe otra contrata con este CIF/DNI (excluyendo la actual)
+            contrata_existente = db.contratas.find_one({
+                'titular_id': ObjectId(titular_id),
+                'cif_dni': cif_dni,
+                '_id': {'$ne': ObjectId(contrata_id)}  # Excluir la contrata actual
+            })
+            if contrata_existente:
+                flash('Ya existe otra contrata con este cif/dni para este titular', 'danger')
+                return False, datos_formulario
+        
+        # Actualizar la contrata
+        resultado = db.contratas.update_one(
+            {'_id': ObjectId(contrata_id)},
+            {
+                '$set': {
+                    'nombre_contrata': nombre_contrata,
+                    'cif_dni': cif_dni,
+                    'domicilio': domicilio,
+                    'codigo_postal': codigo_postal,
+                    'poblacion': poblacion,
+                    'provincia': provincia,
+                    'telefono_contrata': telefono_contrata,
+                    'email_contrata': email_contrata,
+                    'estado_contrata': estado_contrata,
+                    'fecha_modificacion': datetime.now()
+                }
+            }
+        )
+        
+        if resultado.modified_count > 0:
+            flash('Contrata actualizada correctamente', 'success')
+            return True, None
+        else:
+            flash('No se realizaron cambios en la contrata', 'info')
+            return True, None
+
+    except Exception as e:
+        flash(f'Error al actualizar la contrata: {str(e)}', 'danger')
+        return False, datos_formulario
+
+def contratas_actualizar_vista(gestor_id, titular_id, contrata_id):
+    try:
+        # Verificar permisos y obtener información
+        permisos_ok, resultado = verificaciones_consultas(gestor_id, titular_id)
+        if not permisos_ok:
+            return resultado
+
+        usuario, usuario_rol_id, gestor, titular = resultado
+        nombre_gestor = gestor.get('nombre_gestor', 'Gestor')
+        
+        # Convertir IDs a string para el template
+        titular['_id'] = str(titular['_id'])
+        
+        # Obtener la contrata
+        contrata = db.contratas.find_one({'_id': ObjectId(contrata_id)})
+        if not contrata:
+            flash('Contrata no encontrada', 'danger')
+            return redirect(url_for('ug_contratas.contratas', gestor_id=gestor_id, titular_id=titular_id))
+            
+        # Convertir IDs a string para el template
+        contrata['_id'] = str(contrata['_id'])
+        contrata['titular_id'] = str(contrata['titular_id'])
+
+        if request.method == 'GET':
+            return render_template('usuarios_gestores/contratas/actualizar.html',
+                                 gestor_id=gestor_id,
+                                 titular_id=titular_id,
+                                 usuario=usuario,
+                                 usuario_rol_id=usuario_rol_id,
+                                 gestor=gestor,
+                                 titular=titular,
+                                 nombre_gestor=nombre_gestor,
+                                 contrata=contrata
+                                 )
+
+        if request.method == 'POST':
+            # Procesar el formulario con la función actualizar_centro
+            actualizado, datos_formulario = actualizar_contrata(titular_id, contrata_id, request.form)
+            if actualizado:
+                return redirect(url_for('ug_contratas.contratas', gestor_id=gestor_id, titular_id=titular_id))
+            else:
+                return render_template('usuarios_gestores/contratas/actualizar.html',
+                                     gestor_id=gestor_id,
+                                     titular_id=titular_id,
+                                     usuario=usuario,
+                                     usuario_rol_id=usuario_rol_id,
+                                     gestor=gestor,
+                                     titular=titular,
+                                     nombre_gestor=nombre_gestor,
+                                     contrata=contrata,
+                                     datos_formulario=datos_formulario
+                                     )
+
+    except Exception as e:
+        flash(f'Error al actualizar la contrata: {str(e)}', 'danger')
+        return redirect(url_for('ug_contratas.contratas', gestor_id=gestor_id, titular_id=titular_id))
+
+def eliminar_contrata(contrata_id):
+    """
+    Elimina una contrata de la base de datos.
+    
+    Args:
+        contrata_id (str): ID de la contrata a eliminar
+    
+    Returns:
+        bool: True si se eliminó exitosamente, False si hubo error
+    """
+    try:
+        # Verificar si el centro existe
+        contrata = db.contratas.find_one({'_id': ObjectId(contrata_id)})
+        if not contrata:
+            flash('Contrata no encontrada', 'danger')
+            return False
+            
+        # Eliminar la contrata
+        delete = db.contratas.delete_one({'_id': ObjectId(contrata_id)})
+        if delete.deleted_count > 0:
+            flash('Contrata eliminada correctamente', 'success')
+            return True
+        else:
+            flash('Error al eliminar la contrata', 'danger')
+            return False
+
+    except Exception as e:
+        flash(f'Error al eliminar la contrata: {str(e)}', 'danger')
+        return False
+
+def contratas_eliminar_vista(gestor_id, titular_id, contrata_id):
+    try:
+        # Verificar permisos y obtener información
+        permisos_ok, resultado = verificaciones_consultas(gestor_id, titular_id)
+        if not permisos_ok:
+            return resultado
+            
+        # Ejecutar la eliminación
+        eliminado = eliminar_contrata(contrata_id)
+        if eliminado:
+            return redirect(url_for('ug_contratas.contratas', gestor_id=gestor_id, titular_id=titular_id))
+        else:
+            return redirect(url_for('ug_contratas.contratas', gestor_id=gestor_id, titular_id=titular_id))
+
+    except Exception as e:
+        flash(f'Error al eliminar la contrata: {str(e)}', 'danger')
+        return redirect(url_for('ug_contratas.contratas', gestor_id=gestor_id, titular_id=titular_id))
+
+def contratas_contrata_vista(gestor_id, titular_id, contrata_id):
+    try:
+        # Verificar permisos y obtener información
+        permisos_ok, resultado = verificaciones_consultas(gestor_id, titular_id)
+        if not permisos_ok:
+            return resultado
+        
+        # Verificar que la contratata pertenece al titular actual
+        contrata = db.contratas.find_one({
+            '_id': ObjectId(contrata_id),
+            'titular_id': ObjectId(titular_id)
+        })
+        if not contrata:
+            flash('Contrata no encontrada o no pertenece a este titular', 'danger')
+            return redirect(url_for('ug_contratas.contratas', gestor_id=gestor_id, titular_id=titular_id))
+        
+        return render_template('usuarios_gestores/contratas/index.html',
+                               contrata=contrata,
+                               gestor_id=gestor_id,
+                               titular_id=titular_id)
+    except Exception as e:
+        flash(f'Error al cargar la contratata: {str(e)}', 'danger')
+        return redirect(url_for('ug_contratas.contratas', gestor_id=gestor_id, titular_id=titular_id))
+    
+    
+
+
+        
+    
     return render_template('usuarios_gestores/contratas/contrata.html')
 
