@@ -132,7 +132,8 @@ def usuarios_contratas_vista(gestor_id, titular_id, contrata_id):
                                contrata=contrata,
                                gestor_id=gestor_id,
                                nombre_gestor=nombre_gestor,
-                               titular=titular
+                               titular=titular,
+                               titular_id=titular_id
                             )
 
     except Exception as e:

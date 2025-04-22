@@ -37,17 +37,3 @@ def usuarios_contratas_actualizar(gestor_id, titular_id, contrata_id, usuario_co
 @login_requerido
 def usuarios_contratas_eliminar(gestor_id, titular_id, contrata_id, usuario_contrata_id):
     return usuarios_contratas_eliminar_vista(gestor_id, titular_id, contrata_id, usuario_contrata_id)
-
-
-
-
-
-
-
-
-
-
-
-
-
-

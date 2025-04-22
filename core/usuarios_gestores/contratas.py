@@ -418,10 +418,20 @@ def contratas_contrata_vista(gestor_id, titular_id, contrata_id):
             flash('Contrata no encontrada o no pertenece a este titular', 'danger')
             return redirect(url_for('ug_contratas.contratas', gestor_id=gestor_id, titular_id=titular_id))
         
+        # Convertir IDs a string para el template
+        contrata['_id'] = str(contrata['_id'])
+        contrata['titular_id'] = str(contrata['titular_id'])
+        
+        # Asegurar que los IDs de los parámetros estén en formato string
+        gestor_id = str(gestor_id)
+        titular_id = str(titular_id)
+        contrata_id = str(contrata_id)
+        
         return render_template('usuarios_gestores/contratas/index.html',
                                contrata=contrata,
                                gestor_id=gestor_id,
-                               titular_id=titular_id)
+                               titular_id=titular_id,
+                               contrata_id=contrata['_id'])
     except Exception as e:
         flash(f'Error al cargar la contratata: {str(e)}', 'danger')
         return redirect(url_for('ug_contratas.contratas', gestor_id=gestor_id, titular_id=titular_id))
