@@ -27,14 +27,14 @@ class ContratasCollection:
 
 class UsuariosContratasCollection:
     def __init__(self,
-                 usuario_rol_id,
+                 usuario_rol_contrata_id,
                  contrata_id,
                  alias_usuario_contrata,
                  fecha_activacion,
                  fecha_modificacion,
                  fecha_inactivacion,
                  estado_usuario_contrata):
-        self.usuario_rol_id = usuario_rol_id
+        self.usuario_rol_contrata_id = usuario_rol_contrata_id
         self.contrata_id = contrata_id
         self.alias_usuario_contrata = alias_usuario_contrata
         self.fecha_activacion = fecha_activacion
