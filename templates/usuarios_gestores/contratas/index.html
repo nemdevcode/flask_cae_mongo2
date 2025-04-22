@@ -20,7 +20,7 @@
                             Contratas</a>
                     </div>
                     <div class="btn-group" role="group" aria-label="Navegación entre elementos de usuario">
-                        <a href="{{ url_for('ug_usuarios_contratas.usuarios_contratas', gestor_id=gestor_id|string, titular_id=titular_id|string, contrata_id=contrata_id|string) }}" class="btn btn-secondary">
+                        <a href="{{ url_for('ug_usuarios_contratas.usuarios_contratas', gestor_id=gestor_id|string, titular_id=titular_id|string, contrata_id=contrata._id|string) }}" class="btn btn-secondary">
                             Usuarios</a>
                     </div>
                     <a href="{{ url_for('logout') }}" class="btn btn-outline-dark">Cerrar sesión</a>

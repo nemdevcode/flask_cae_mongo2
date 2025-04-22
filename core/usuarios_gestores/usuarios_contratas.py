@@ -71,7 +71,7 @@ def usuarios_contratas_vista(gestor_id, titular_id, contrata_id):
         if not permisos_ok:
             return resultado
 
-        usuario, usuario_rol_id, gestor, titular = resultado
+        usuario, usuario_rol_id, gestor, titular, contrata = resultado
         nombre_gestor = gestor.get('nombre_gestor', 'Gestor')
 
         # Obtener parámetros de filtrado
@@ -127,6 +127,7 @@ def usuarios_contratas_vista(gestor_id, titular_id, contrata_id):
         return render_template('usuarios_gestores/usuarios_contratas/listar.html',
                                usuarios_contratas=usuarios_contratas,
                                contrata_id=contrata_id,
+                               contrata=contrata,
                                gestor_id=gestor_id,
                                nombre_gestor=nombre_gestor,
                                titular=titular
