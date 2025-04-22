@@ -425,11 +425,4 @@ def contratas_contrata_vista(gestor_id, titular_id, contrata_id):
     except Exception as e:
         flash(f'Error al cargar la contratata: {str(e)}', 'danger')
         return redirect(url_for('ug_contratas.contratas', gestor_id=gestor_id, titular_id=titular_id))
-    
-    
-
-
-        
-    
-    return render_template('usuarios_gestores/contratas/contrata.html')
 

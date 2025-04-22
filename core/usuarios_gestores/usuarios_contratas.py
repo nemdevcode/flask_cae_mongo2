@@ -64,7 +64,9 @@ def verificaciones_consultas(gestor_id, titular_id, contrata_id):
     return True, (usuario, usuario_rol_id, gestor, titular, contrata)
 
 def usuarios_contratas_vista(gestor_id, titular_id, contrata_id):
-    print(gestor_id, titular_id, contrata_id)
+    '''
+    Vista para listar los usuarios contratatas de la contratata seleccionada
+    '''
     try:
         # Verificar permisos y obtener información
         permisos_ok, resultado = verificaciones_consultas(gestor_id, titular_id, contrata_id)
@@ -81,7 +83,7 @@ def usuarios_contratas_vista(gestor_id, titular_id, contrata_id):
 
         # Si se solicita vaciar filtros
         if vaciar == '1':
-            return redirect(url_for('ug_usuarios_titulares.usuarios_titulares', gestor_id=gestor_id, titular_id=titular_id))
+            return redirect(url_for('ug_usuarios_contratas.usuarios_contratas', gestor_id=gestor_id, titular_id=titular_id, contrata_id=contrata_id))
         
         # Construir la consulta base - buscar usuarios contratas donde el titular_id sea el del titular actual
         query = {'titular_id': ObjectId(titular_id)}
@@ -138,7 +140,115 @@ def usuarios_contratas_vista(gestor_id, titular_id, contrata_id):
         return redirect(url_for('ug_contratas.contratas_contrata', gestor_id=gestor_id, titular_id=titular_id, contrata_id=contrata_id))
 
 def usuarios_contratas_crear_vista(gestor_id, titular_id, contrata_id):
-    return render_template('usuarios_gestores/usuarios_contratas/crear.html', gestor_id=gestor_id, titular_id=titular_id, contrata_id=contrata_id)
+    '''
+    Vista para crear un nuevo usuario contratata de la contratata seleccionada
+    '''
+    try:
+        # Verificar permisos y obtener información
+        permisos_ok, resultado = verificaciones_consultas(gestor_id, titular_id, contrata_id)
+        if not permisos_ok:
+            return resultado
+
+        usuario, usuario_rol_id, gestor, titular, contrata = resultado
+        nombre_gestor = gestor.get('nombre_gestor', 'Gestor')
+
+        if request.method == 'GET':
+            return render_template('usuarios_gestores/usuarios_contratas/crear.html',
+                                    nombre_gestor=nombre_gestor,
+                                    titular=titular,
+                                    contrata=contrata,
+                                    gestor_id=gestor_id)
+        
+        if request.method == 'POST':
+            # Obtener datos del formulario
+            email = request.form.get('email', '').strip().lower()
+            alias = request.form.get('alias', '').strip().upper()
+
+            # Verificar si el usuario existe
+            existe_usuario, usuario_contrata_id = verificar_usuario_existente(email)
+
+            if existe_usuario:
+                # Obtener rol de contrata
+                existe_rol, rol_contrata_id = obtener_rol('contrata')
+                
+                if not existe_rol:
+                    rol_contrata_id = crear_rol('contrata')
+                
+                # Verificar si el usuario ya tiene el rol de titular
+                tiene_rol_contrata, usuario_rol_contrata_id = obtener_usuario_rol(usuario_contrata_id, rol_contrata_id)
+
+                if tiene_rol_contrata:
+                    # Verificar si ya es usuario titular para esta contrata específica
+                    contratata_existente = db.usuarios_contratas.find_one({
+                        'usuario_rol_contrata_id': usuario_rol_contrata_id,
+                        'contrata_id': ObjectId(contrata_id)
+                    })
+                    
+                    if contratata_existente:
+                        flash('Este email ya está registrado como usuario-contrata para esta contrata', 'danger')
+                        return render_template('usuarios_gestores/usuarios_contratas/crear.html',
+                                            datos_formulario=request.form,
+                                            nombre_gestor=nombre_gestor,
+                                            titular=titular,
+                                            contrata=contrata,
+                                            gestor_id=gestor_id)
+                else:
+                    # Si no tiene el rol de contrata, crearlo
+                    usuario_rol_contrata_id = crear_usuario_rol(usuario_contrata_id, rol_contrata_id)
+                
+                # Crear el usuario contrata
+                crear_usuario_contrata(usuario_rol_contrata_id, contrata_id, alias)
+                flash('Este email ya está registrado, será asignado como usuario-contrata para esta contrata', 'success')
+                return redirect(url_for('ug_usuarios_contratas.usuarios_contratas', gestor_id=gestor_id, titular_id=titular_id, contrata_id=contrata_id))
+
+            # Si el usuario no existe, crear nuevo usuario y usuario titular
+            # Generar token de verificación
+            token = generar_token_verificacion(email)
+            
+            # Crear diccionario con los datos del nuevo usuario
+            datos_usuario = {
+                'token_verificacion': token,
+                'verificado': False,
+                'estado_usuario': 'pendiente'
+            }
+            
+            # Crear el nuevo usuario
+            nuevo_usuario_id = crear_usuario(email, datos_usuario)
+            
+            # Obtener rol de contrata y crear usuario_rol
+            existe_rol, rol_contrata_id = obtener_rol('contrata')
+            if not existe_rol:
+                rol_contrata_id = crear_rol('contrata')
+            
+            usuario_rol_contrata_id = crear_usuario_rol(nuevo_usuario_id, rol_contrata_id)
+            
+            # Crear el usuario contrata
+            crear_usuario_contrata(usuario_rol_contrata_id, contrata_id, alias)
+
+            # Enviar email de verificación solo para usuarios nuevos
+            link_verificacion = url_for('verificar_email', token=token, email=email, _external=True)
+            cuerpo_email = render_template('emails/registro_contrata.html',
+                                           alias=alias,
+                                           link_verificacion=link_verificacion,
+                                           contrata=contrata
+                                           )
+
+            if enviar_email(email, "Activación de cuenta - CAE Accesible", cuerpo_email):
+                flash('Usuario contrata creado correctamente. Se ha enviado un email de activación.', 'success')
+            else:
+                flash('Usuario contrata creado pero hubo un error al enviar el email de activación.', 'warning')
+
+            return redirect(url_for('ug_usuarios_contratas.usuarios_contratas', gestor_id=gestor_id, titular_id=titular_id, contrata_id=contrata_id))
+
+    except Exception as e:
+        flash(f'Error al crear el usuario contrata: {str(e)}', 'danger')
+        return render_template('usuarios_gestores/usuarios_contratas/crear.html',
+                             datos_formulario=request.form,
+                             nombre_gestor=nombre_gestor,
+                             titular=titular,
+                             contrata=contrata,
+                             gestor_id=gestor_id)
+
 
 def usuarios_contratas_actualizar_vista(gestor_id, titular_id, contrata_id, usuario_contrata_id):
     return render_template('usuarios_gestores/usuarios_contratas/actualizar.html', gestor_id=gestor_id, titular_id=titular_id, contrata_id=contrata_id, usuario_contrata_id=usuario_contrata_id)

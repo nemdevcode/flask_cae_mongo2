@@ -30,7 +30,7 @@
         <h3 class="text-center">Listado de USUARIOS de la CONTRATA: {{ contrata.nombre_contrata }}</h3>
         <div class="d-flex justify-content-between align-items-center mt-5">
             <!-- Formulario para filtrar usuarios contratas -->
-            <form action="{{ url_for('ug_usuarios_contratas.usuarios_contratas', gestor_id=gestor_id|string, titular_id=titular_id|string, contrata_id=contrata_id|string) }}" method="post" id="filtroForm" class="flex-grow-1 me-3">
+            <form action="{{ url_for('ug_usuarios_contratas.usuarios_contratas', gestor_id=gestor_id|string, titular_id=titular_id|string, contrata_id=contrata._id|string) }}" method="post" id="filtroForm" class="flex-grow-1 me-3">
                 <div class="d-flex gap-3 align-items-center">
                     <!-- Input para filtrar usuario contratas por nombre -->
                     <div class="form-floating" style="flex: 2;">
@@ -77,12 +77,13 @@
                     </div>
                     <!-- Boton para limpiar filtro -->
                     <div style="flex: 1;">
-                        <a href="{{ url_for('ug_usuarios_contratas.usuarios_contratas', gestor_id=gestor_id|string, titular_id=titular_id|string, contrata_id=contrata_id|string, vaciar=1) }}" class="btn btn-secondary">Limpiar filtros</a>
+                        <a href="{{ url_for('ug_usuarios_contratas.usuarios_contratas', gestor_id=gestor_id|string, titular_id=titular_id|string, contrata_id=contrata._id|string, vaciar=1) }}" class="btn btn-secondary">Limpiar filtros</a>
                     </div>
                 </div>
             </form>
             <!-- Botón crear -->
-            <a href="{{ url_for('ug_usuarios_contratas.usuarios_contratas_crear', gestor_id=gestor_id|string, titular_id=titular_id|string, contrata_id=contrata_id|string) }}" class="btn btn-success">Crear</a>
+            <a href="{{ url_for('ug_usuarios_contratas.usuarios_contratas_crear', gestor_id=gestor_id|string, titular_id=titular_id|string, contrata_id=contrata._id|string) }}" class="btn btn-success">
+                Crear</a>
         </div>
 
         <!-- Tabla de usuarios contratas -->
@@ -112,7 +113,7 @@
                                     {% endif %}
                                 </td>
                                 <td class="text-center">
-                                    <a href="{{ url_for('ug_usuarios_contratas.usuarios_contratas_actualizar', gestor_id=gestor_id|string, titular_id=titular_id|string, contrata_id=contrata_id|string, usuario_contrata_id=usuario_contrata._id) }}" 
+                                    <a href="{{ url_for('ug_usuarios_contratas.usuarios_contratas_actualizar', gestor_id=gestor_id|string, titular_id=titular_id|string, contrata_id=contrata._id|string, usuario_contrata_id=usuario_contrata._id) }}" 
                                        class="btn btn-primary btn-sm">
                                        Editar</a>
                                     <button type="button" 
@@ -127,7 +128,7 @@
                                 <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content bg-dark text-white">
                                         <div class="modal-header">
-                                            <h5 class="modal-title text-danger text-center w-100" id="confirmarEliminarLabel{{ usuario_titular._id }}">Confirmar eliminación</h5>
+                                            <h5 class="modal-title text-danger text-center w-100" id="confirmarEliminarLabel{{ usuario_contrata._id }}">Confirmar eliminación</h5>
                                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
@@ -137,7 +138,7 @@
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                            <a href="{{ url_for('ug_usuarios_contratas.usuarios_contratas_eliminar', gestor_id=gestor_id|string, titular_id=titular_id|string, contrata_id=contrata_id|string, usuario_contrata_id=usuario_contrata._id) }}" 
+                                            <a href="{{ url_for('ug_usuarios_contratas.usuarios_contratas_eliminar', gestor_id=gestor_id|string, titular_id=titular_id|string, contrata_id=contrata._id|string, usuario_contrata_id=usuario_contrata._id) }}" 
                                                class="btn btn-danger">Eliminar</a>
                                         </div>
                                     </div>
