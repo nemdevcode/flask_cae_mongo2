@@ -124,7 +124,8 @@ def usuarios_titulares_vista(gestor_id, titular_id):
                                titular_id=titular_id,
                                gestor_id=gestor_id,
                                nombre_gestor=nombre_gestor,
-                               titular=titular
+                               titular=titular,
+                               filtrar_estado=filtrar_estado
                             )
 
     except Exception as e:

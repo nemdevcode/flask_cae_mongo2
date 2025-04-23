@@ -49,22 +49,22 @@
                     <!-- Filtro por estado -->
                     <div class="btn-group" role="group" aria-label="Filtrar por estado" style="flex: 2;">
                         <input type="radio" 
-                        class="btn-check" 
-                        name="filtrar_estado" 
-                        id="todos" 
-                                value="todos" 
-                                {% if not filtrar_estado or filtrar_estado == 'todos' %}checked{% endif %}
-                                onchange="this.form.submit()">
-                                <label class="btn btn-outline-primary" for="todos">Todos</label>
+                            class="btn-check" 
+                            name="filtrar_estado" 
+                            id="todos" 
+                            value="todos" 
+                            {% if not filtrar_estado or filtrar_estado == 'todos' %}checked{% endif %}
+                            onchange="this.form.submit()">
+                            <label class="btn btn-outline-primary" for="todos">Todos</label>
         
                         <input type="radio" 
-                                class="btn-check" 
-                                name="filtrar_estado" 
-                                id="activos" 
-                                value="activo"
-                                {% if filtrar_estado == 'activo' %}checked{% endif %}
-                                onchange="this.form.submit()">
-                        <label class="btn btn-outline-success" for="activos">Activos</label>
+                            class="btn-check" 
+                            name="filtrar_estado" 
+                            id="activos" 
+                            value="activo"
+                            {% if filtrar_estado == 'activo' %}checked{% endif %}
+                            onchange="this.form.submit()">
+                            <label class="btn btn-outline-success" for="activos">Activos</label>
         
                         <input type="radio" 
                             class="btn-check" 
@@ -73,7 +73,7 @@
                             value="inactivo"
                             {% if filtrar_estado == 'inactivo' %}checked{% endif %}
                             onchange="this.form.submit()">
-                        <label class="btn btn-outline-secondary" for="inactivos">Inactivos</label>
+                            <label class="btn btn-outline-secondary" for="inactivos">Inactivos</label>
                     </div>
                     <!-- Boton para limpiar filtro -->
                     <div style="flex: 1;">

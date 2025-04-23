@@ -85,8 +85,8 @@ def usuarios_contratas_vista(gestor_id, titular_id, contrata_id):
         if vaciar == '1':
             return redirect(url_for('ug_usuarios_contratas.usuarios_contratas', gestor_id=gestor_id, titular_id=titular_id, contrata_id=contrata_id))
         
-        # Construir la consulta base - buscar usuarios contratas donde el titular_id sea el del titular actual
-        query = {'titular_id': ObjectId(titular_id)}
+        # Construir la consulta base - buscar usuarios contratas donde el contrata_id sea el de la contratata actual
+        query = {'contrata_id': ObjectId(contrata_id)}
         
         # Aplicar filtros si existen
         if filtrar_contrata:
@@ -133,7 +133,8 @@ def usuarios_contratas_vista(gestor_id, titular_id, contrata_id):
                                gestor_id=gestor_id,
                                nombre_gestor=nombre_gestor,
                                titular=titular,
-                               titular_id=titular_id
+                               titular_id=titular_id,
+                               filtrar_estado=filtrar_estado
                             )
 
     except Exception as e:

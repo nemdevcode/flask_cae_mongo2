@@ -8,7 +8,7 @@ def generar_token_verificacion(email):
     serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
     return serializer.dumps(email, salt=current_app.config['SECURITY_PASSWORD_SALT'])
 
-def verificar_token(token, expiration=3600):
+def verificar_token(token, expiration=259200):
     """
     Verifica un token de verificación
     """
