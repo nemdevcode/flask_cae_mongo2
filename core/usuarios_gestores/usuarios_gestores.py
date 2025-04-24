@@ -98,9 +98,10 @@ def usuarios_gestores_gestor_vista(gestor_id):
             return redirect(url_for('usuarios_gestores.usuarios_gestores'))
 
         return render_template('usuarios_gestores/index.html', 
+                               gestor_id=gestor_id,
                                nombre_usuario=usuario.get('nombre_usuario'),
-                               nombre_gestor=gestor.get('nombre_gestor'),
-                               gestor_id=gestor_id)
+                               nombre_gestor=gestor.get('nombre_gestor')
+                               )
 
     except Exception as e:
         flash(f'Error al cargar la vista del gestor: {str(e)}', 'danger')

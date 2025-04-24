@@ -157,7 +157,8 @@ def usuarios_cogestores_crear_vista():
             if not email or not alias:
                 flash('El email y el alias son obligatorios', 'danger')
                 return render_template('usuarios_gestores/usuarios_cogestores/crear.html',
-                                    form_data=request.form)
+                                       form_data=request.form
+                                       )
 
             # Verificar si el usuario existe
             existe_usuario, usuario_cogestor_id = verificar_usuario_existente(email)
@@ -182,7 +183,8 @@ def usuarios_cogestores_crear_vista():
                     if cogestor_existente:
                         flash('Este email ya está registrado como cogestor para este gestor', 'danger')
                         return render_template('usuarios_gestores/usuarios_cogestores/crear.html',
-                                            form_data=request.form)
+                                               form_data=request.form
+                                               )
                 else:
                     # Si no tiene el rol de cogestor, crearlo
                     usuario_rol_cogestor_id = crear_usuario_rol(usuario_cogestor_id, rol_cogestor_id)
@@ -216,12 +218,15 @@ def usuarios_cogestores_crear_vista():
             crear_usuario_cogestor(usuario_rol_cogestor_id, usuario_rol_id, alias)
 
             # Enviar email de verificación solo para usuarios nuevos
-            link_verificacion = url_for('verificar_email', token=token, email=email, _external=True)
-            cuerpo_email = render_template(
-                    'emails/registro_cogestor.html',
-                    alias=alias,
-                    link_verificacion=link_verificacion
-                )
+            link_verificacion = url_for('verificar_email', 
+                                        token=token, 
+                                        email=email, 
+                                        _external=True
+                                        )
+            cuerpo_email = render_template('emails/registro_cogestor.html',
+                                           alias=alias,
+                                           link_verificacion=link_verificacion
+                                           )
 
             if enviar_email(email, "Activación de cuenta - CAE Accesible", cuerpo_email):
                 flash('Cogestor creado correctamente. Se ha enviado un email de activación.', 'success')
@@ -233,7 +238,8 @@ def usuarios_cogestores_crear_vista():
     except Exception as e:
         flash(f'Error al crear el cogestor: {str(e)}', 'danger')
         return render_template('usuarios_gestores/usuarios_cogestores/crear.html',
-                            form_data=request.form)
+                               form_data=request.form
+                               )
 
 def usuarios_cogestores_actualizar_vista():
     try:
@@ -283,8 +289,9 @@ def usuarios_cogestores_actualizar_vista():
         }
 
         if request.method == 'GET':
-            return render_template('usuarios_gestores/usuarios_cogestores/actualizar.html', 
-                                cogestor=cogestor_data)
+            return render_template('usuarios_gestores/usuarios_cogestores/actualizar.html',
+                                   cogestor=cogestor_data
+                                   )
 
         if request.method == 'POST':
             # Obtener datos del formulario
@@ -299,7 +306,8 @@ def usuarios_cogestores_actualizar_vista():
             }):
                 flash('El alias ya está en uso para este gestor', 'danger')
                 return render_template('usuarios_gestores/usuarios_cogestores/actualizar.html',
-                                    cogestor=cogestor_data)
+                                       cogestor=cogestor_data
+                                       )
 
             # Actualizar el cogestor
             db.usuarios_cogestores.update_one(
@@ -319,7 +327,8 @@ def usuarios_cogestores_actualizar_vista():
     except Exception as e:
         flash(f'Error al actualizar el cogestor: {str(e)}', 'danger')
         return render_template('usuarios_gestores/usuarios_cogestores/actualizar.html',
-                             cogestor=cogestor_data if 'cogestor_data' in locals() else None)
+                               cogestor=cogestor_data if 'cogestor_data' in locals() else None
+                               )
 
 def usuarios_cogestores_eliminar_vista():
     try:

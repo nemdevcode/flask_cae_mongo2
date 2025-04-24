@@ -113,22 +113,27 @@
                                     {% endif %}
                                 </td>
                                 <td class="text-center">
-                                    <a href="{{ url_for('ug_usuarios_contratas.usuarios_contratas_actualizar', gestor_id=gestor_id|string, titular_id=titular_id|string, contrata_id=contrata._id|string, usuario_contrata_id=usuario_contrata._id) }}" 
+                                    <a href="{{ url_for(
+                                        'ug_usuarios_contratas.usuarios_contratas_actualizar', 
+                                        gestor_id=gestor_id|string, 
+                                        titular_id=titular_id|string, 
+                                        contrata_id=contrata._id|string, 
+                                        usuario_contrata_id=usuario_contrata_ids[usuario_contrata._id|string]) }}" 
                                        class="btn btn-primary btn-sm">
                                        Editar</a>
                                     <button type="button" 
                                         class="btn btn-danger btn-sm" 
                                         data-bs-toggle="modal" 
-                                        data-bs-target="#confirmarEliminar{{ usuario_contrata._id }}">
+                                        data-bs-target="#confirmarEliminar{{ usuario_contrata_ids[usuario_contrata._id|string] }}">
                                         Eliminar</button>
                                 </td>
                             </tr>
                             <!-- Modal de confirmación para eliminar usuario contratas-->
-                            <div class="modal fade" id="confirmarEliminar{{ usuario_contrata._id }}" tabindex="-1" aria-labelledby="confirmarEliminarLabel{{ usuario_contrata._id }}" aria-hidden="true">
+                            <div class="modal fade" id="confirmarEliminar{{ usuario_contrata_ids[usuario_contrata._id|string] }}" tabindex="-1" aria-labelledby="confirmarEliminarLabel{{ usuario_contrata_ids[usuario_contrata._id|string] }}" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content bg-dark text-white">
                                         <div class="modal-header">
-                                            <h5 class="modal-title text-danger text-center w-100" id="confirmarEliminarLabel{{ usuario_contrata._id }}">Confirmar eliminación</h5>
+                                            <h5 class="modal-title text-danger text-center w-100" id="confirmarEliminarLabel{{ usuario_contrata_ids[usuario_contrata._id|string] }}">Confirmar eliminación</h5>
                                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
@@ -138,7 +143,12 @@
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                            <a href="{{ url_for('ug_usuarios_contratas.usuarios_contratas_eliminar', gestor_id=gestor_id|string, titular_id=titular_id|string, contrata_id=contrata._id|string, usuario_contrata_id=usuario_contrata._id) }}" 
+                                            <a href="{{ url_for(
+                                                                'ug_usuarios_contratas.usuarios_contratas_eliminar', 
+                                                                gestor_id=gestor_id|string, 
+                                                                titular_id=titular_id|string, 
+                                                                contrata_id=contrata._id|string, 
+                                                                usuario_contrata_id=usuario_contrata_ids[usuario_contrata._id|string]) }}" 
                                                class="btn btn-danger">Eliminar</a>
                                         </div>
                                     </div>
