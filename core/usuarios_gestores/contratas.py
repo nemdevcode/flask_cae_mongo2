@@ -32,13 +32,17 @@ def verificaciones_consultas(gestor_id, titular_id):
     gestor = obtener_gestor_por_usuario(gestor_id, usuario_rol_id)
     if not gestor:
         flash('Gestor no encontrado o no tienes permisos para acceder', 'danger')
-        return False, redirect(url_for('usuarios_gestores.usuarios_gestores_gestor', gestor_id=gestor_id))
+        return False, redirect(url_for('usuarios_gestores.usuarios_gestores_gestor', 
+                                       gestor_id=gestor_id
+                                       ))
 
     # Obtener la información del titular
     titular = db.titulares.find_one({'_id': ObjectId(titular_id)})
     if not titular:
         flash('Titular no encontrado o no pertenece a este gestor', 'danger')
-        return False, redirect(url_for('ug_titulares.titulares', gestor_id=gestor_id))
+        return False, redirect(url_for('ug_titulares.titulares', 
+                                       gestor_id=gestor_id
+                                       ))
     
     return True, (usuario, usuario_rol_id, gestor, titular)
 
@@ -59,7 +63,10 @@ def contratas_vista(gestor_id, titular_id):
         
         # Si se solicita vaciar filtros
         if vaciar == '1':
-            return redirect(url_for('ug_contratas.contratas', gestor_id=gestor_id, titular_id=titular_id))
+            return redirect(url_for('ug_contratas.contratas', 
+                                    gestor_id=gestor_id, 
+                                    titular_id=titular_id
+                                    ))
         
         # Construir la consulta base - buscar contratas donde el titular_id sea el del titular actual
         consulta_filtros = {'titular_id': ObjectId(titular_id)}
@@ -99,17 +106,20 @@ def contratas_vista(gestor_id, titular_id):
             })
 
         return render_template('usuarios_gestores/contratas/listar.html',
-                               contratas=contratas,
-                               titular=titular,
+                               gestor_id=gestor_id,
                                nombre_gestor=nombre_gestor,
+                               titular=titular,
+                               contratas=contratas,
                                filtrar_contrata=filtrar_contrata,
-                               filtrar_estado=filtrar_estado,
-                               gestor_id=gestor_id
+                               filtrar_estado=filtrar_estado
                                )
                              
     except Exception as e:
         flash(f'Error al cargar las contratas: {str(e)}', 'danger')
-        return redirect(url_for('ug_titulares.titulares_titular', gestor_id=gestor_id, titular_id=titular_id))
+        return redirect(url_for('ug_titulares.titulares_titular', 
+                                gestor_id=gestor_id, 
+                                titular_id=titular_id
+                                ))
 
 def crear_contrata(gestor_id, titular_id, datos_formulario):
     """
@@ -197,15 +207,18 @@ def contratas_crear_vista(gestor_id, titular_id):
                                  usuario=usuario,
                                  usuario_rol_id=usuario_rol_id,
                                  gestor=gestor,
-                                 titular=titular,
-                                 nombre_gestor=nombre_gestor
+                                 nombre_gestor=nombre_gestor,
+                                 titular=titular
                                  )
 
         if request.method == 'POST':
             # Procesar el formulario con la función crear_centro
             creado, datos_formulario = crear_contrata(gestor_id, titular_id, request.form)
             if creado:
-                return redirect(url_for('ug_contratas.contratas', gestor_id=gestor_id, titular_id=titular_id))
+                return redirect(url_for('ug_contratas.contratas', 
+                                        gestor_id=gestor_id, 
+                                        titular_id=titular_id
+                                        ))
             else:
                 return render_template('usuarios_gestores/contratas/crear.html',
                                      gestor_id=gestor_id,
@@ -213,8 +226,8 @@ def contratas_crear_vista(gestor_id, titular_id):
                                      usuario=usuario,
                                      usuario_rol_id=usuario_rol_id,
                                      gestor=gestor,
-                                     titular=titular,
                                      nombre_gestor=nombre_gestor,
+                                     titular=titular,
                                      datos_formulario=datos_formulario
                                      )
 
@@ -314,7 +327,10 @@ def contratas_actualizar_vista(gestor_id, titular_id, contrata_id):
         contrata = db.contratas.find_one({'_id': ObjectId(contrata_id)})
         if not contrata:
             flash('Contrata no encontrada', 'danger')
-            return redirect(url_for('ug_contratas.contratas', gestor_id=gestor_id, titular_id=titular_id))
+            return redirect(url_for('ug_contratas.contratas', 
+                                    gestor_id=gestor_id, 
+                                    titular_id=titular_id
+                                    ))
             
         # Convertir IDs a string para el template
         contrata['_id'] = str(contrata['_id'])
@@ -327,8 +343,8 @@ def contratas_actualizar_vista(gestor_id, titular_id, contrata_id):
                                  usuario=usuario,
                                  usuario_rol_id=usuario_rol_id,
                                  gestor=gestor,
-                                 titular=titular,
                                  nombre_gestor=nombre_gestor,
+                                 titular=titular,
                                  contrata=contrata
                                  )
 
@@ -336,7 +352,10 @@ def contratas_actualizar_vista(gestor_id, titular_id, contrata_id):
             # Procesar el formulario con la función actualizar_centro
             actualizado, datos_formulario = actualizar_contrata(titular_id, contrata_id, request.form)
             if actualizado:
-                return redirect(url_for('ug_contratas.contratas', gestor_id=gestor_id, titular_id=titular_id))
+                return redirect(url_for('ug_contratas.contratas', 
+                                        gestor_id=gestor_id, 
+                                        titular_id=titular_id
+                                        ))
             else:
                 return render_template('usuarios_gestores/contratas/actualizar.html',
                                      gestor_id=gestor_id,
@@ -344,15 +363,18 @@ def contratas_actualizar_vista(gestor_id, titular_id, contrata_id):
                                      usuario=usuario,
                                      usuario_rol_id=usuario_rol_id,
                                      gestor=gestor,
-                                     titular=titular,
                                      nombre_gestor=nombre_gestor,
+                                     titular=titular,
                                      contrata=contrata,
                                      datos_formulario=datos_formulario
                                      )
 
     except Exception as e:
         flash(f'Error al actualizar la contrata: {str(e)}', 'danger')
-        return redirect(url_for('ug_contratas.contratas', gestor_id=gestor_id, titular_id=titular_id))
+        return redirect(url_for('ug_contratas.contratas', 
+                                gestor_id=gestor_id, 
+                                titular_id=titular_id
+                                ))
 
 def eliminar_contrata(contrata_id):
     """
@@ -394,13 +416,22 @@ def contratas_eliminar_vista(gestor_id, titular_id, contrata_id):
         # Ejecutar la eliminación
         eliminado = eliminar_contrata(contrata_id)
         if eliminado:
-            return redirect(url_for('ug_contratas.contratas', gestor_id=gestor_id, titular_id=titular_id))
+            return redirect(url_for('ug_contratas.contratas', 
+                                    gestor_id=gestor_id, 
+                                    titular_id=titular_id
+                                    ))
         else:
-            return redirect(url_for('ug_contratas.contratas', gestor_id=gestor_id, titular_id=titular_id))
+            return redirect(url_for('ug_contratas.contratas', 
+                                    gestor_id=gestor_id, 
+                                    titular_id=titular_id
+                                    ))
 
     except Exception as e:
         flash(f'Error al eliminar la contrata: {str(e)}', 'danger')
-        return redirect(url_for('ug_contratas.contratas', gestor_id=gestor_id, titular_id=titular_id))
+        return redirect(url_for('ug_contratas.contratas', 
+                                gestor_id=gestor_id, 
+                                titular_id=titular_id
+                                ))
 
 def contratas_contrata_vista(gestor_id, titular_id, contrata_id):
     try:
@@ -416,7 +447,10 @@ def contratas_contrata_vista(gestor_id, titular_id, contrata_id):
         })
         if not contrata:
             flash('Contrata no encontrada o no pertenece a este titular', 'danger')
-            return redirect(url_for('ug_contratas.contratas', gestor_id=gestor_id, titular_id=titular_id))
+            return redirect(url_for('ug_contratas.contratas', 
+                                    gestor_id=gestor_id, 
+                                    titular_id=titular_id
+                                    ))
         
         # Convertir IDs a string para el template
         contrata['_id'] = str(contrata['_id'])
@@ -428,11 +462,14 @@ def contratas_contrata_vista(gestor_id, titular_id, contrata_id):
         contrata_id = str(contrata_id)
         
         return render_template('usuarios_gestores/contratas/index.html',
-                               contrata=contrata,
                                gestor_id=gestor_id,
                                titular_id=titular_id,
+                               contrata=contrata,
                                contrata_id=contrata['_id'])
     except Exception as e:
         flash(f'Error al cargar la contratata: {str(e)}', 'danger')
-        return redirect(url_for('ug_contratas.contratas', gestor_id=gestor_id, titular_id=titular_id))
+        return redirect(url_for('ug_contratas.contratas', 
+                                gestor_id=gestor_id, 
+                                titular_id=titular_id
+                                ))
 

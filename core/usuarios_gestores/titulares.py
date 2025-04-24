@@ -36,7 +36,9 @@ def verificaciones_consultas(gestor_id, titular_id=None):
     gestor = obtener_gestor_por_usuario(gestor_id, usuario_rol_id)
     if not gestor:
         flash('Gestor no encontrado o no tienes permisos para acceder', 'danger')
-        return False, redirect(url_for('usuarios_gestores.usuarios_gestores_gestor', gestor_id=gestor_id))
+        return False, redirect(url_for('usuarios_gestores.usuarios_gestores_gestor', 
+                                       gestor_id=gestor_id
+                                       ))
 
     # Si se proporciona un titular_id, verificar que pertenece al gestor
     if titular_id:
@@ -46,7 +48,9 @@ def verificaciones_consultas(gestor_id, titular_id=None):
         })
         if not titular:
             flash('Titular no encontrado o no pertenece a este gestor', 'danger')
-            return False, redirect(url_for('ug_titulares.titulares', gestor_id=gestor_id))
+            return False, redirect(url_for('ug_titulares.titulares', 
+                                           gestor_id=gestor_id
+                                           ))
 
     return True, (usuario, usuario_rol_id, gestor)
 
@@ -70,7 +74,9 @@ def titulares_vista(gestor_id):
 
         # Si se solicita vaciar filtros
         if vaciar == '1':
-            return redirect(url_for('ug_titulares.titulares', gestor_id=gestor_id))
+            return redirect(url_for('ug_titulares.titulares', 
+                                    gestor_id=gestor_id
+                                    ))
 
         # Construir la consulta base - buscar titulares donde el gestor_id sea el del gestor actual
         consulta_filtros = {'gestor_id': ObjectId(gestor_id)}
@@ -104,15 +110,18 @@ def titulares_vista(gestor_id):
             })
 
         return render_template('usuarios_gestores/titulares/listar.html', 
-                                titulares=titulares,
+                                gestor_id=gestor_id,
                                 nombre_gestor=nombre_gestor,
+                                titulares=titulares,
                                 filtrar_titular=filtrar_titular,
-                                filtrar_estado=filtrar_estado,
-                                gestor_id=gestor_id)
+                                filtrar_estado=filtrar_estado
+                                )
 
     except Exception as e:
         flash(f'Error al listar los titulares: {str(e)}', 'danger')
-        return redirect(url_for('usuarios_gestores.usuarios_gestores_gestor', gestor_id=gestor_id))
+        return redirect(url_for('usuarios_gestores.usuarios_gestores_gestor', 
+                                gestor_id=gestor_id
+                                ))
 
 def crear_titular(gestor_id, form_data):
     """
@@ -179,19 +188,25 @@ def titulares_crear_vista(gestor_id):
         if request.method == 'POST':
             creado, datos_formulario = crear_titular(gestor_id, request.form)
             if creado:
-                return redirect(url_for('ug_titulares.titulares', gestor_id=gestor_id))
+                return redirect(url_for('ug_titulares.titulares', 
+                                        gestor_id=gestor_id
+                                        ))
             else:
                 return render_template('usuarios_gestores/titulares/crear.html',
-                                       datos_formulario=datos_formulario,
-                                       gestor_id=gestor_id)
+                                       gestor_id=gestor_id,
+                                       datos_formulario=datos_formulario
+                                       )
 
         # Si es una petición GET, mostrar el formulario vacío
         return render_template('usuarios_gestores/titulares/crear.html',
-                               gestor_id=gestor_id)
+                               gestor_id=gestor_id
+                               )
 
     except Exception as e:
         flash(f'Error al acceder a la página: {str(e)}', 'danger')
-        return redirect(url_for('ug_titulares.titulares', gestor_id=gestor_id))
+        return redirect(url_for('ug_titulares.titulares', 
+                                gestor_id=gestor_id
+                                ))
 
 def actualizar_titular(titular_id, form_data):
     """
@@ -262,20 +277,26 @@ def titulares_actualizar_vista(gestor_id, titular_id):
         if request.method == 'POST':
             actualizar = actualizar_titular(titular_id, request.form)
             if actualizar:
-                return redirect(url_for('ug_titulares.titulares', gestor_id=gestor_id))
+                return redirect(url_for('ug_titulares.titulares', 
+                                        gestor_id=gestor_id
+                                        ))
             else:
                 return render_template('usuarios_gestores/titulares/actualizar.html',
-                                       titular=titular,
-                                       gestor_id=gestor_id)
+                                       gestor_id=gestor_id,
+                                       titular=titular
+                                       )
 
         # Si es una petición GET, mostrar el formulario con los datos del titular
         return render_template('usuarios_gestores/titulares/actualizar.html',
-                               titular=titular,
-                               gestor_id=gestor_id)
+                               gestor_id=gestor_id,
+                               titular=titular
+                               )
 
     except Exception as e:
         flash(f'Error al acceder a la página: {str(e)}', 'danger')
-        return redirect(url_for('ug_titulares.titulares', gestor_id=gestor_id))
+        return redirect(url_for('ug_titulares.titulares', 
+                                gestor_id=gestor_id
+                                ))
 
 def titulares_eliminar_vista(gestor_id, titular_id):
     '''
@@ -294,11 +315,15 @@ def titulares_eliminar_vista(gestor_id, titular_id):
         else:
             flash('No se pudo eliminar el titular', 'danger')
 
-        return redirect(url_for('ug_titulares.titulares', gestor_id=gestor_id))
+        return redirect(url_for('ug_titulares.titulares', 
+                                gestor_id=gestor_id
+                                ))
 
     except Exception as e:
         flash(f'Error al eliminar el titular: {str(e)}', 'danger')
-        return redirect(url_for('ug_titulares.titulares', gestor_id=gestor_id))
+        return redirect(url_for('ug_titulares.titulares', 
+                                gestor_id=gestor_id
+                                ))
 
 def titulares_titular_vista(gestor_id, titular_id):
     '''
@@ -316,17 +341,22 @@ def titulares_titular_vista(gestor_id, titular_id):
         })
         if not titular:
             flash('Titular no encontrado o no pertenece a este gestor', 'danger')
-            return redirect(url_for('usuarios_gestores.usuarios_gestores_gestor', gestor_id=gestor_id))
+            return redirect(url_for('usuarios_gestores.usuarios_gestores_gestor', 
+                                    gestor_id=gestor_id
+                                    ))
 
         # Obtener los usuarios titulares asociados al titular
         usuarios_titulares = list(db.usuarios_titulares.find({'titular_id': ObjectId(titular_id)}))
 
         return render_template('usuarios_gestores/titulares/index.html',
-                               titular=titular,
-                               titular_id=titular_id,
                                gestor_id=gestor_id,
-                               usuarios_titulares=usuarios_titulares)
+                               titular_id=titular_id,
+                               titular=titular,
+                               usuarios_titulares=usuarios_titulares
+                               )
 
     except Exception as e:
         flash(f'Error al acceder a la página: {str(e)}', 'danger')
-        return redirect(url_for('ug_titulares.titulares', gestor_id=gestor_id))
+        return redirect(url_for('ug_titulares.titulares', 
+                                gestor_id=gestor_id
+                                ))

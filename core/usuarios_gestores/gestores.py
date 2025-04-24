@@ -65,7 +65,8 @@ def gestores_crear_vista():
                 flash('Error al crear el gestor', 'danger')
 
         return render_template('usuarios_gestores/gestores/crear.html',
-                             usuario_rol_id=usuario_rol_id)
+                               usuario_rol_id=usuario_rol_id
+                               )
 
     except Exception as e:
         flash(f'Error al crear el gestor: {str(e)}', 'danger')
@@ -133,7 +134,8 @@ def gestores_actualizar_vista(gestor_id):
         # Convertir ObjectId a string para el template
         gestor['_id'] = str(gestor['_id'])
         return render_template('usuarios_gestores/gestores/actualizar.html',
-                               gestor=gestor)
+                               gestor=gestor
+                               )
 
     except Exception as e:
         flash(f'Error al actualizar el gestor: {str(e)}', 'danger')

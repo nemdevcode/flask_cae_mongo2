@@ -15,7 +15,8 @@ def usuarios_centros_vista(gestor_id, titular_id, centro_id):
     return render_template('usuarios_gestores/usuarios_centros/listar.html', 
                            gestor_id=gestor_id,
                            titular_id=titular_id,
-                           centro_id=centro_id)
+                           centro_id=centro_id
+                           )
 
 def usuarios_centros_crear_vista():
     return render_template('usuarios_gestores/usuarios_centros/crear.html')

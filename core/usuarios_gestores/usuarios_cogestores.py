@@ -112,10 +112,11 @@ def usuarios_cogestores_vista():
             cogestores_info.append(cogestor_data)
 
         return render_template('usuarios_gestores/usuarios_cogestores/listar.html',
-                             nombre_gestor=nombre_gestor,
-                             cogestores=cogestores_info,
-                             filtrar_cogestor=filtrar_cogestor,
-                             filtrar_estado=filtrar_estado)
+                               nombre_gestor=nombre_gestor,
+                               cogestores=cogestores_info,
+                               filtrar_cogestor=filtrar_cogestor,
+                               filtrar_estado=filtrar_estado
+                               )
 
     except Exception as e:
         flash(f'Error al obtener la lista de cogestores: {str(e)}', 'danger')
