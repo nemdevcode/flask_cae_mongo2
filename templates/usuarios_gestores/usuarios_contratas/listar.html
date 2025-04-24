@@ -16,8 +16,13 @@
             </ul>
             <div class="d-grid gap-2 d-md-flex justify-content-md-end align-items-center">
                 <span class="my-auto">Volver a:</span>
-                <a href="{{ url_for('ug_contratas.contratas_contrata', gestor_id=gestor_id|string, titular_id=titular_id|string, contrata_id=contrata._id|string) }}" class="btn btn-outline-primary">
-                    Contrata</a>
+                <a href="{{ url_for(
+                                    'ug_contratas.contratas_contrata', 
+                                    gestor_id=gestor_id|string, 
+                                    titular_id=titular_id|string, 
+                                    contrata_id=contrata._id|string) }}" 
+                                    class="btn btn-outline-primary">
+                                    Contrata</a>
                 <a href="{{ url_for('logout') }}" class="btn btn-outline-dark">Cerrar sesión</a>
             </div>
                 
@@ -30,7 +35,12 @@
         <h3 class="text-center">Listado de USUARIOS de la CONTRATA: {{ contrata.nombre_contrata }}</h3>
         <div class="d-flex justify-content-between align-items-center mt-5">
             <!-- Formulario para filtrar usuarios contratas -->
-            <form action="{{ url_for('ug_usuarios_contratas.usuarios_contratas', gestor_id=gestor_id|string, titular_id=titular_id|string, contrata_id=contrata._id|string) }}" method="post" id="filtroForm" class="flex-grow-1 me-3">
+            <form action="{{ url_for(
+                                    'ug_usuarios_contratas.usuarios_contratas', 
+                                    gestor_id=gestor_id|string, 
+                                    titular_id=titular_id|string, 
+                                    contrata_id=contrata._id|string) }}" 
+                                    method="post" id="filtroForm" class="flex-grow-1 me-3">
                 <div class="d-flex gap-3 align-items-center">
                     <!-- Input para filtrar usuario contratas por nombre -->
                     <div class="form-floating" style="flex: 2;">
@@ -77,13 +87,24 @@
                     </div>
                     <!-- Boton para limpiar filtro -->
                     <div style="flex: 1;">
-                        <a href="{{ url_for('ug_usuarios_contratas.usuarios_contratas', gestor_id=gestor_id|string, titular_id=titular_id|string, contrata_id=contrata._id|string, vaciar=1) }}" class="btn btn-secondary">Limpiar filtros</a>
+                        <a href="{{ url_for(
+                                            'ug_usuarios_contratas.usuarios_contratas', 
+                                            gestor_id=gestor_id|string, 
+                                            titular_id=titular_id|string, 
+                                            contrata_id=contrata._id|string, vaciar=1) }}" 
+                                            class="btn btn-secondary">
+                                            Limpiar filtros</a>
                     </div>
                 </div>
             </form>
             <!-- Botón crear -->
-            <a href="{{ url_for('ug_usuarios_contratas.usuarios_contratas_crear', gestor_id=gestor_id|string, titular_id=titular_id|string, contrata_id=contrata._id|string) }}" class="btn btn-success">
-                Crear</a>
+            <a href="{{ url_for(
+                                'ug_usuarios_contratas.usuarios_contratas_crear', 
+                                gestor_id=gestor_id|string, 
+                                titular_id=titular_id|string, 
+                                contrata_id=contrata._id|string) }}" 
+                                class="btn btn-success">
+                                Crear</a>
         </div>
 
         <!-- Tabla de usuarios contratas -->
@@ -149,7 +170,8 @@
                                                                 titular_id=titular_id|string, 
                                                                 contrata_id=contrata._id|string, 
                                                                 usuario_contrata_id=usuario_contrata_ids[usuario_contrata._id|string]) }}" 
-                                               class="btn btn-danger">Eliminar</a>
+                                                                class="btn btn-danger">
+                                                                Eliminar</a>
                                         </div>
                                     </div>
                                 </div>

@@ -13,3 +13,7 @@ def obtener_centros(titular_id):
         centro['_id'] = str(centro['_id'])
         centro['titular_id'] = str(centro['titular_id'])
     return centros
+
+def obtener_centro_por_id(centro_id):
+    return db.centros.find_one({'_id': ObjectId(centro_id)})
+

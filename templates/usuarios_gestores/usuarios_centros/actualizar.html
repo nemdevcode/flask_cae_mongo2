@@ -15,7 +15,11 @@
                 </ul>
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end align-items-center">
                     <span class="my-auto">Volver a:</span>
-                    <a href="{{ url_for('gestores.gestores_usuarios_centros', expandir_titular=titular._id) }}" class="btn btn-outline-primary">Usuarios Centros</a>
+                    <a href="{{ url_for(
+                                        'gestores.gestores_usuarios_centros', 
+                                        expandir_titular=titular._id) }}" 
+                                        class="btn btn-outline-primary">
+                                        Usuarios Centros</a>
                     <a href="{{ url_for('logout') }}" class="btn btn-outline-dark">Cerrar sesión</a>
                 </div>
             </div>
@@ -28,7 +32,11 @@
         <h3 class="text-center">Actualizar USUARIO CENTRO</h3>
         <div class="row justify-content-center mt-5">
             <div class="col-md-6">
-                <form action="{{ url_for('gestores.gestores_usuarios_centros_actualizar', usuario_id=usuario_centro._id, expandir_titular=titular._id) }}" method="post">
+                <form action="{{ url_for(
+                                        'gestores.gestores_usuarios_centros_actualizar', 
+                                        usuario_id=usuario_centro._id, 
+                                        expandir_titular=titular._id) }}" 
+                                        method="post">
                     <input type="hidden" name="titular_id" value="{{ titular._id }}">
                     <input type="hidden" name="centro_id" value="{{ centro._id }}">
                     
@@ -78,7 +86,11 @@
                     </div>
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
-                        <a href="{{ url_for('gestores.gestores_usuarios_centros', expandir_titular=titular._id) }}" class="btn btn-secondary me-md-2">Cancelar</a>
+                        <a href="{{ url_for(
+                                            'gestores.gestores_usuarios_centros', 
+                                            expandir_titular=titular._id) }}" 
+                                            class="btn btn-secondary me-md-2">
+                                            Cancelar</a>
                         <button type="submit" class="btn btn-primary">Actualizar</button>
                     </div>
                 </form>

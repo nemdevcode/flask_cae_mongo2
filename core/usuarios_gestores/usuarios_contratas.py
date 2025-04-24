@@ -30,7 +30,7 @@ def verificaciones_consultas(gestor_id, titular_id, contrata_id):
     Función auxiliar para verificar permisos de gestor y obtener información necesaria
     Retorna:
         - (False, respuesta_redireccion) si hay algún error
-        - (True, (usuario, usuario_rol_id, gestor, titular)) si todo está correcto
+        - (True, (usuario, usuario_rol_id, gestor, titular, contrata)) si todo está correcto
     '''
     # Obtener usuario autenticado y verificar permisos
     usuario, respuesta_redireccion = obtener_usuario_autenticado()
