@@ -6,16 +6,6 @@
         <div class="card-body">
             <h4 class="card-title text-center">Iniciar sesión</h4>
             <div class="card-body">
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
                 <form action="{{ url_for('login') }}" method="post">
                     <div class="form-floating mb-3">
                         <input type="text" class="form-control" id="email" name="email" required>

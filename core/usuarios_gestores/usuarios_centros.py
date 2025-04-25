@@ -17,7 +17,7 @@ from utils.usuario_centro_utils import crear_usuario_centro
 from utils.centros_utils import obtener_centro_por_id
 from utils.token_utils import generar_token_verificacion
 from utils.email_utils import enviar_email
-from utils.usuario_rol_utils import obtener_usuario_rol
+from utils.usuario_rol_utils import obtener_usuario_rol, crear_usuario_rol
 from config import conexion_mongo
 
 db = conexion_mongo()
@@ -166,12 +166,179 @@ def usuarios_centros_vista(gestor_id, titular_id, centro_id):
                                 centro_id=centro_id
                                 ))
 
-def usuarios_centros_crear_vista():
-    return render_template('usuarios_gestores/usuarios_centros/crear.html')
+def usuarios_centros_crear_vista(gestor_id, titular_id, centro_id):
+    '''
+    Vista para crear un nuevo usuario centro de un centro seleccionado
+    '''
+    try:
+        # Verificar permisos y obtener información
+        permisos_ok, resultado = verificaciones_consultas(gestor_id, titular_id, centro_id)
+        if not permisos_ok:
+            return resultado
 
-def usuarios_centros_actualizar_vista():
+        usuario, usuario_rol_id, gestor, titular, centro = resultado
+        nombre_gestor = gestor.get('nombre_gestor', 'Gestor')
+
+        if request.method == 'GET':
+            return render_template('usuarios_gestores/usuarios_centros/crear.html',
+                                    gestor_id=gestor_id,
+                                    nombre_gestor=nombre_gestor,
+                                    titular=titular,
+                                    centro=centro
+                                    )
+        
+        if request.method == 'POST':
+            # Obtener datos del formulario
+            email = request.form.get('email', '').strip().lower()
+            alias = request.form.get('alias', '').strip().upper()
+
+            # Verificar si el usuario existe
+            existe_usuario, usuario_centro_id = verificar_usuario_existente(email)
+
+            if existe_usuario:
+                # Obtener rol de centro
+                existe_rol, rol_centro_id = obtener_rol('centro')
+                
+                if not existe_rol:
+                    rol_centro_id = crear_rol('centro')
+                
+                # Verificar si el usuario ya tiene el rol de centro
+                tiene_rol_centro, usuario_rol_centro_id = obtener_usuario_rol(usuario_centro_id, rol_centro_id)
+
+                if tiene_rol_centro:
+                    # Verificar si ya es usuario centro para este centro específico
+                    centro_existente = db.usuarios_centros.find_one({
+                        'usuario_rol_centro_id': usuario_rol_centro_id,
+                        'centro_id': ObjectId(centro_id)
+                    })
+                    
+                    if centro_existente:
+                        flash('Este email ya está registrado como usuario-centro para este centro', 'danger')
+                        return render_template('usuarios_gestores/usuarios_centros/crear.html',
+                                                gestor_id=gestor_id,
+                                                nombre_gestor=nombre_gestor,
+                                                titular=titular,
+                                                centro=centro,
+                                                datos_formulario=request.form
+                                                )
+                else:
+                    # Si no tiene el rol de centro, crearlo
+                    usuario_rol_centro_id = crear_usuario_rol(usuario_centro_id, rol_centro_id)
+                
+                # Crear el usuario centro
+                crear_usuario_centro(usuario_rol_centro_id, centro_id, alias)
+                flash('Este email ya está registrado, será asignado como usuario-centro para este centro', 'success')
+                return redirect(url_for('ug_usuarios_centros.usuarios_centros', 
+                                        gestor_id=gestor_id, 
+                                        titular_id=titular_id, 
+                                        centro_id=centro_id
+                                        ))
+
+            # Si el usuario no existe, crear nuevo usuario y usuario titular
+            # Generar token de verificación
+            token = generar_token_verificacion(email)
+            
+            # Crear diccionario con los datos del nuevo usuario
+            datos_usuario = {
+                'token_verificacion': token,
+                'verificado': False,
+                'estado_usuario': 'pendiente'
+            }
+            
+            # Crear el nuevo usuario
+            nuevo_usuario_id = crear_usuario(email, datos_usuario)
+            
+            # Obtener rol de centro y crear usuario_rol
+            existe_rol, rol_centro_id = obtener_rol('centro')
+            if not existe_rol:
+                rol_centro_id = crear_rol('centro')
+            
+            usuario_rol_centro_id = crear_usuario_rol(nuevo_usuario_id, rol_centro_id)
+            
+            # Crear el usuario centro
+            crear_usuario_centro(usuario_rol_centro_id, centro_id, alias)
+
+            # Enviar email de verificación solo para usuarios nuevos
+            link_verificacion = url_for('verificar_email', 
+                                        token=token, 
+                                        email=email, _external=True
+                                        )
+            cuerpo_email = render_template('emails/registro_centro.html',
+                                           alias=alias,
+                                           link_verificacion=link_verificacion,
+                                           centro=centro
+                                           )
+
+            if enviar_email(email, "Activación de cuenta - CAE Accesible", cuerpo_email):
+                flash('Usuario centro creado correctamente. Se ha enviado un email de activación.', 'success')
+            else:
+                flash('Usuario centro creado pero hubo un error al enviar el email de activación.', 'warning')
+
+            return redirect(url_for('ug_usuarios_centros.usuarios_centros', 
+                                    gestor_id=gestor_id, 
+                                    titular_id=titular_id, 
+                                    centro_id=centro_id
+                                    ))
+
+    except Exception as e:
+        flash(f'Error al crear el usuario centro: {str(e)}', 'danger')
+        return render_template('usuarios_gestores/usuarios_centros/crear.html',
+                               gestor_id=gestor_id,
+                               nombre_gestor=nombre_gestor,
+                               titular=titular,
+                               centro=centro,
+                               datos_formulario=request.form
+                               )
+
+def usuarios_centros_actualizar_vista(gestor_id, titular_id, centro_id, usuario_centro_id):
     return render_template('usuarios_gestores/usuarios_centros/actualizar.html')
 
-def usuarios_centros_eliminar_vista():
-    return render_template('usuarios_gestores/usuarios_centros/eliminar.html')
+def usuarios_centros_eliminar_vista(gestor_id, titular_id, centro_id, usuario_centro_id):
+    '''
+    Vista para eliminar un usuario-centro de un centro seleccionado
+    '''
+    try:
+        # Verificar permisos y obtener información
+        permisos_ok, resultado = verificaciones_consultas(gestor_id, titular_id, centro_id)
+        if not permisos_ok:
+            return resultado
+
+        usuario, usuario_rol_id, gestor, titular, centro = resultado
+
+        # Obtener el usuario-centro a eliminar
+        usuario_centro = db.usuarios_centros.find_one({'_id': ObjectId(usuario_centro_id)})
+        if not usuario_centro:
+            flash('Usuario centro no encontrado', 'danger')
+            return redirect(url_for('ug_usuarios_centros.usuarios_centros', 
+                                    gestor_id=gestor_id, 
+                                    titular_id=titular_id, 
+                                    centro_id=centro_id
+                                    ))
+
+        # Eliminar el usuario-centro
+        result = db.usuarios_centros.delete_one({'_id': ObjectId(usuario_centro_id)})
+
+        if result.deleted_count > 0:
+            flash('Usuario-centro eliminado exitosamente', 'success')
+            return redirect(url_for('ug_usuarios_centros.usuarios_centros', 
+                                 gestor_id=gestor_id, 
+                                 titular_id=titular_id, 
+                                 centro_id=centro_id
+                                 ))
+        else:
+            flash('No se pudo eliminar el usuario-centro', 'danger')
+            return redirect(url_for('ug_usuarios_centros.usuarios_centros', 
+                                 gestor_id=gestor_id, 
+                                 titular_id=titular_id, 
+                                 centro_id=centro_id
+                                 ))
+
+    except Exception as e:
+        flash(f'Error al eliminar el usuario-centro: {str(e)}', 'danger')
+        return redirect(url_for('ug_usuarios_centros.usuarios_centros', 
+                                gestor_id=gestor_id, 
+                                titular_id=titular_id, 
+                                centro_id=centro_id
+                                ))
+
                              

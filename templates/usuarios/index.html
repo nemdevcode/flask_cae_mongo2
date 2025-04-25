@@ -24,12 +24,6 @@
 {% endblock %}
 
 {% block main %}
-    {% if mensaje_ok %}
-        <div class="alert alert-success alert-dismissible fade show mt-3 text-center" role="alert">
-            {{ mensaje_ok }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    {% endif %}
     <!-- Listado de Relaciones y Roles -->
     <div class="container mt-5">
         <h3 class="text-center">Listado de ROLES asignados al usuario: {{ usuario_actual.nombre_usuario }}</h3>
@@ -45,11 +39,11 @@
                           {%- if rol.nombre_rol == 'gestor' -%}
                           {{ url_for('usuarios_gestores.usuarios_gestores') }}
                           {%- elif rol.nombre_rol == 'cogestor' -%}
-                          {{ url_for('usuarios_cogestores.usuarios_cogestores') }}
+                          {{ url_for('ug_usuarios_cogestores.usuarios_cogestores') }}
                           {%- elif rol.nombre_rol == 'titular' -%}
-                          {{ url_for('usuarios_titulares.titulares') }}
+                          {{ url_for('ug_usuarios_titulares.titulares') }}
                           {%- elif rol.nombre_rol == 'centro' -%}
-                          {{ url_for('usuarios_centros.usuarios_centros') }}
+                          {{ url_for('ug_usuarios_centros.usuarios_centros') }}
                           {%- endif -%}"
                           class="btn btn-primary">
                         Ir a rol</a>

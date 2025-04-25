@@ -171,7 +171,7 @@ def usuarios_contratas_vista(gestor_id, titular_id, contrata_id):
 
 def usuarios_contratas_crear_vista(gestor_id, titular_id, contrata_id):
     '''
-    Vista para crear un nuevo usuario contratata de la contratata seleccionada
+    Vista para crear un nuevo usuario contrata de la contratata seleccionada
     '''
     try:
         # Verificar permisos y obtener información
@@ -184,10 +184,10 @@ def usuarios_contratas_crear_vista(gestor_id, titular_id, contrata_id):
 
         if request.method == 'GET':
             return render_template('usuarios_gestores/usuarios_contratas/crear.html',
+                                    gestor_id=gestor_id,
                                     nombre_gestor=nombre_gestor,
                                     titular=titular,
-                                    contrata=contrata,
-                                    gestor_id=gestor_id
+                                    contrata=contrata
                                     )
         
         if request.method == 'POST':
@@ -205,17 +205,17 @@ def usuarios_contratas_crear_vista(gestor_id, titular_id, contrata_id):
                 if not existe_rol:
                     rol_contrata_id = crear_rol('contrata')
                 
-                # Verificar si el usuario ya tiene el rol de titular
+                # Verificar si el usuario ya tiene el rol de contrata
                 tiene_rol_contrata, usuario_rol_contrata_id = obtener_usuario_rol(usuario_contrata_id, rol_contrata_id)
 
                 if tiene_rol_contrata:
                     # Verificar si ya es usuario titular para esta contrata específica
-                    contratata_existente = db.usuarios_contratas.find_one({
+                    contrata_existente = db.usuarios_contratas.find_one({
                         'usuario_rol_contrata_id': usuario_rol_contrata_id,
                         'contrata_id': ObjectId(contrata_id)
                     })
                     
-                    if contratata_existente:
+                    if contrata_existente:
                         flash('Este email ya está registrado como usuario-contrata para esta contrata', 'danger')
                         return render_template('usuarios_gestores/usuarios_contratas/crear.html',
                                                 gestor_id=gestor_id,

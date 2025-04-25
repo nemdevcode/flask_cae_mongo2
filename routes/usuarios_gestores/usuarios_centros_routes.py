@@ -29,15 +29,15 @@ def usuarios_centros(gestor_id, titular_id, centro_id):
 def usuarios_centros_crear(gestor_id, titular_id, centro_id):
     return usuarios_centros_crear_vista(gestor_id, titular_id, centro_id)
 
-@ug_usuarios_centros_bp.route('/actualizar/<gestor_id>/<titular_id>/<centro_id>', methods=['GET', 'POST'])
+@ug_usuarios_centros_bp.route('/actualizar/<gestor_id>/<titular_id>/<centro_id>/<usuario_centro_id>', methods=['GET', 'POST'])
 @login_requerido
-def usuarios_centros_actualizar(gestor_id, titular_id, centro_id):
-    return usuarios_centros_actualizar_vista(gestor_id, titular_id, centro_id)
+def usuarios_centros_actualizar(gestor_id, titular_id, centro_id, usuario_centro_id):
+    return usuarios_centros_actualizar_vista(gestor_id, titular_id, centro_id, usuario_centro_id)
 
-@ug_usuarios_centros_bp.route('/eliminar/<gestor_id>/<titular_id>/<centro_id>', methods=['GET', 'POST'])
+@ug_usuarios_centros_bp.route('/eliminar/<gestor_id>/<titular_id>/<centro_id>/<usuario_centro_id>', methods=['GET', 'POST'])
 @login_requerido
-def usuarios_centros_eliminar(gestor_id, titular_id, centro_id):
-    return usuarios_centros_eliminar_vista(gestor_id, titular_id, centro_id)
+def usuarios_centros_eliminar(gestor_id, titular_id, centro_id, usuario_centro_id):
+    return usuarios_centros_eliminar_vista(gestor_id, titular_id, centro_id, usuario_centro_id)
 
 
 
