@@ -27,25 +27,25 @@
 
 {% block main %}
     <div class="container mt-5">
-        <h3 class="text-center">Listado de USUARIOS GESTORES asignados</h3>
-        <div class="d-flex justify-content-between align-items-center mt-5">
-            <!-- Formulario para filtrar usuarios gestores -->
+        <h3 class="text-center">Listado de GESTORES de: usuario_gestor </h3>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <!-- Formulario para filtrar gestores -->
             <form action="{{ url_for(
                                     'usuarios_cogestores.usuarios_cogestores') }}" method="post" 
                                     id="filtroForm" class="flex-grow-1 me-3">
                 <div class="d-flex gap-3 align-items-center">
-                    <!-- Input para filtrar usuario gestor por nombre -->
+                    <!-- Input para filtrar gestor por nombre -->
                     <div class="form-floating" style="flex: 2;">
                         <input type="text" 
                             class="form-control" 
-                            id="filtrar_usuario_gestor" 
-                            name="filtrar_usuario_gestor"
-                            value="{{ filtrar_usuario_gestor }}"
+                            id="filtrar_gestor" 
+                            name="filtrar_gestor"
+                            value="{{ filtrar_gestor }}"
                             oninput="this.form.submit()"
                             autocomplete="off"
                             autofocus
                             onfocus="this.setSelectionRange(this.value.length, this.value.length)">
-                        <label for="filtrar_usuario_gestor">Escriba el nombre, teléfono o email para filtrar</label>
+                        <label for="filtrar_gestor">Escriba el nombre, alias, teléfono o email para filtrar</label>
                     </div>
                     
                     <!-- Filtro por estado -->
@@ -89,11 +89,12 @@
             </form>
         </div>
 
-        <!-- Tabla de usuarios gestores -->
-        <div class="table-responsive mt-5">
+        <!-- Tabla de gestores -->
+        <div class="table-responsive">
             <table class="table table-striped">
                 <thead class="text-center">
                     <tr>
+                        <th>Alias</th>
                         <th>Nombre</th>
                         <th>Teléfono</th>
                         <th>EMail</th>
@@ -102,14 +103,15 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% if usuarios_gestores %}
-                        {% for usuario_gestor in usuarios_gestores %}
+                    {% if gestores %}
+                        {% for gestor in gestores %}
                             <tr>
-                                <td>{{ usuario_gestor.nombre_usuario }}</td>
-                                <td>{{ usuario_gestor.telefono_usuario }}</td>
-                                <td>{{ usuario_gestor.email }}</td>
+                                <td>{{ gestor.gestor_info.alias }}</td>
+                                <td>{{ gestor.gestor_info.nombre_usuario }}</td>
+                                <td>{{ gestor.gestor_info.telefono_usuario }}</td>
+                                <td>{{ gestor.email }}</td>
                                 <td class="text-center">
-                                    {% if usuario_gestor.estado == 'activo' %}
+                                    {% if gestor.gestor_info.estado == 'activo' %}
                                         <span class="badge bg-success">Activo</span>
                                     {% else %}
                                         <span class="badge bg-secondary">Inactivo</span>
@@ -118,7 +120,7 @@
                                 <td class="text-center">
                                     <a href="{{ url_for(
                                                         'ug_usuarios_gestores.usuarios_gestores', 
-                                                        usuario_gestor_id=usuario_gestor._id) }}" 
+                                                        gestor_id=gestor.gestor_info._id) }}" 
                                                         class="btn btn-primary">
                                                         Ir</a>
                                 </td>
@@ -126,7 +128,7 @@
                         {% endfor %}
                     {% else %}
                         <tr>
-                            <td colspan="6" class="text-center">No hay usuarios gestores registrados</td>
+                            <td colspan="6" class="text-center">No hay gestores registrados</td>
                         </tr>
                     {% endif %}
                 </tbody>

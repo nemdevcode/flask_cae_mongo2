@@ -52,3 +52,18 @@ def verificar_rol_gestor(usuario_id):
     # Verificar si el usuario tiene el rol de gestor
     tiene_rol, usuario_rol_id = obtener_usuario_rol(usuario_id, rol_gestor_id)
     return tiene_rol, usuario_rol_id
+
+def verificar_rol_cogestor(usuario_id):
+    """
+    Verifica si el usuario tiene el rol de cogestor.
+    Retorna una tupla con (tiene_rol, usuario_rol_id)
+    """
+    # Obtener el rol de cogestor
+    existe_rol, rol_cogestor_id = obtener_rol('cogestor')
+    if not existe_rol:
+        return False, None
+
+    # Verificar si el usuario tiene el rol de cogestor
+    tiene_rol, usuario_rol_id = obtener_usuario_rol(usuario_id, rol_cogestor_id)
+    return tiene_rol, usuario_rol_id
+
