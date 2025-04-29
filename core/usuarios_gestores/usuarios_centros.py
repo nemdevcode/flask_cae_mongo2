@@ -291,7 +291,98 @@ def usuarios_centros_crear_vista(gestor_id, titular_id, centro_id):
                                )
 
 def usuarios_centros_actualizar_vista(gestor_id, titular_id, centro_id, usuario_centro_id):
-    return render_template('usuarios_gestores/usuarios_centros/actualizar.html')
+    '''
+    Vista para actualizar un usuario-centro de un centro seleccionado
+    '''
+    try:
+        # Verificar permisos y obtener información
+        permisos_ok, resultado = verificaciones_consultas(gestor_id, titular_id, centro_id)
+        if not permisos_ok:
+            return resultado
+
+        usuario, usuario_rol_id, gestor, titular, centro   = resultado
+        nombre_gestor = gestor.get('nombre_gestor', 'Gestor')
+
+        # Obtener el usuario-centro a actualizar
+        usuario_centro = db.usuarios_centros.find_one({'_id': ObjectId(usuario_centro_id)})
+        if not usuario_centro:
+            flash('Usuario-centro no encontrado', 'danger')
+            return redirect(url_for('ug_usuarios_centros.usuarios_centros', 
+                                    gestor_id=gestor_id, 
+                                    titular_id=titular_id, 
+                                    centro_id=centro_id
+                                    ))
+
+        # Obtener el usuario_rol del usuario-centro
+        usuario_rol = db.usuarios_roles.find_one({'_id': usuario_centro['usuario_rol_centro_id']})
+        if not usuario_rol:
+            flash('Usuario rol no encontrado', 'danger')
+            return redirect(url_for('ug_usuarios_centros.usuarios_centros', 
+                                    gestor_id=gestor_id, 
+                                    titular_id=titular_id, 
+                                    centro_id=centro_id
+                                    ))
+
+        # Obtener la información del usuario-centro
+        usuario = db.usuarios.find_one({'_id': ObjectId(usuario_rol['usuario_id'])})
+        if not usuario:
+            flash('Usuario no encontrado', 'danger')
+            return redirect(url_for('ug_usuarios_centros.usuarios_centros', 
+                                    gestor_id=gestor_id, 
+                                    titular_id=titular_id, 
+                                    centro_id=centro_id
+                                    ))
+
+        # Preparar la información del usuario-centro en el formato que espera el template
+        usuario_centro_info = {
+            '_id': usuario_centro['_id'],
+            'centro_info': {
+                'alias': usuario_centro['alias_usuario_centro'],
+                'estado_usuario_centro': usuario_centro['estado_usuario_centro']
+            },
+            'email': usuario['email']
+        }
+
+        if request.method == 'GET':
+            return render_template('usuarios_gestores/usuarios_centros/actualizar.html',
+                                   gestor_id=gestor_id,
+                                   titular_id=titular_id,
+                                   centro_id=centro_id,
+                                   usuario_centro_id=usuario_centro_id,
+                                   titular=titular,
+                                   usuario_centro=usuario_centro_info
+                                   )
+
+        if request.method == 'POST':
+            # Obtener datos del formulario
+            alias = request.form.get('alias', '').strip().upper()
+            estado_usuario_centro = request.form.get('estado_usuario_centro', 'activo')
+
+            # Actualizar el usuario titular
+            db.usuarios_centros.update_one(
+                {'_id': ObjectId(usuario_centro_id)},
+                {
+                    '$set': {
+                        'alias_usuario_centro': alias,
+                        'estado_usuario_centro': estado_usuario_centro
+                    }
+                }
+            )
+
+            flash('Usuario de centro actualizado correctamente', 'success')
+            return redirect(url_for('ug_usuarios_centros.usuarios_centros', 
+                                    gestor_id=gestor_id, 
+                                    titular_id=titular_id, 
+                                    centro_id=centro_id
+                                    ))
+
+    except Exception as e:
+        flash(f'Error al actualizar el usuario-centro: {str(e)}', 'danger')
+        return redirect(url_for('ug_usuarios_centros.usuarios_centros', 
+                                gestor_id=gestor_id, 
+                                titular_id=titular_id, 
+                                centro_id=centro_id
+                                ))
 
 def usuarios_centros_eliminar_vista(gestor_id, titular_id, centro_id, usuario_centro_id):
     '''
