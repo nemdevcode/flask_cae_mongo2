@@ -47,36 +47,6 @@
                             onfocus="this.setSelectionRange(this.value.length, this.value.length)">
                         <label for="filtrar_usuario_gestor">Escriba el nombre, teléfono o email para filtrar</label>
                     </div>
-                    
-                    <!-- Filtro por estado -->
-                    <div class="btn-group" role="group" aria-label="Filtrar por estado" style="flex: 2;">
-                        <input type="radio" 
-                        class="btn-check" 
-                        name="filtrar_estado" 
-                        id="todos" 
-                                value="todos" 
-                                {% if not filtrar_estado or filtrar_estado == 'todos' %}checked{% endif %}
-                                onchange="this.form.submit()">
-                                <label class="btn btn-outline-primary" for="todos">Todos</label>
-        
-                        <input type="radio" 
-                                class="btn-check" 
-                                name="filtrar_estado" 
-                                id="activos" 
-                                value="activo"
-                                {% if filtrar_estado == 'activo' %}checked{% endif %}
-                                onchange="this.form.submit()">
-                        <label class="btn btn-outline-success" for="activos">Activos</label>
-        
-                        <input type="radio" 
-                            class="btn-check" 
-                            name="filtrar_estado" 
-                            id="inactivos" 
-                            value="inactivo"
-                            {% if filtrar_estado == 'inactivo' %}checked{% endif %}
-                            onchange="this.form.submit()">
-                        <label class="btn btn-outline-secondary" for="inactivos">Inactivos</label>
-                    </div>
                     <!-- Boton para limpiar filtro -->
                     <div style="flex: 1;">
                         <a href="{{ url_for(
@@ -97,7 +67,6 @@
                         <th>Nombre</th>
                         <th>Teléfono</th>
                         <th>EMail</th>
-                        <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -109,18 +78,9 @@
                                 <td>{{ usuario_gestor.telefono_usuario }}</td>
                                 <td>{{ usuario_gestor.email }}</td>
                                 <td class="text-center">
-                                    {% if usuario_gestor.estado == 'activo' %}
-                                        <span class="badge bg-success">Activo</span>
-                                    {% else %}
-                                        <span class="badge bg-secondary">Inactivo</span>
-                                    {% endif %}
-                                </td>
-                                <td class="text-center">
-                                    <a href="{{ url_for(
-                                                        'ug_usuarios_gestores.usuarios_gestores', 
-                                                        usuario_gestor_id=usuario_gestor._id) }}" 
-                                                        class="btn btn-primary">
-                                                        Ir</a>
+                                    <a href="" 
+                                            class="btn btn-primary">
+                                            Ir</a>
                                 </td>
                             </tr>
                         {% endfor %}

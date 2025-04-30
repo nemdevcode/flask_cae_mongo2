@@ -23,19 +23,55 @@ def usuarios_cogestores_vista():
             flash('No tienes permisos para acceder a esta página', 'danger')
             return redirect(url_for('usuarios.usuarios'))
         
-        # Obtener el usuario_rol_gestor_id usuario cogestor autenticado
-        usuario_rol_gestor_id = db.usuarios_cogestores.find_one({'usuario_rol_cogestor_id': usuario_rol_cogestor_id})
-        print(f"usuario_rol_gestor_id: {usuario_rol_gestor_id}")
+        # Obtener parámetros de filtrado
+        filtrar_usuario_gestor = request.form.get('filtrar_usuario_gestor', '')
+        vaciar = request.args.get('vaciar', '0')
 
-        # Obtener los gestores con usuario_rol_gestor_id
-        gestores = db.gestores.find({'usuario_rol_gestor_id': usuario_rol_gestor_id})
-        print(f"gestores: {gestores}")
+        # Si se solicita vaciar filtros
+        if vaciar == '1':
+            return redirect(url_for('usuarios_cogestores.usuarios_cogestores'))
         
+        # Obtener todos los usuarios con rol de gestor relacionados al usuario cogestor
+        usuarios_rol_gestor_id = list(db.usuarios_cogestores.find(
+            {'usuario_rol_cogestor_id': usuario_rol_cogestor_id}, 
+            {'usuario_rol_gestor_id': 1}
+        ))
+        print(f"usuarios_rol_gestor_id: {usuarios_rol_gestor_id}")
+
+        # Obtener los usuarios con rol de gestor de la coleccion usuarios_roles
+        usuarios_gestores = []
+        for usuario_gestor_id in usuarios_rol_gestor_id:
+            # Obtener el usuario_rol del gestor
+            usuario_rol_gestor = db.usuarios_roles.find_one(
+                {'_id': usuario_gestor_id['usuario_rol_gestor_id']}
+            )
+            if usuario_rol_gestor:
+                # Obtener el usuario asociado al rol de gestor
+                usuario = db.usuarios.find_one(
+                    {'_id': usuario_rol_gestor['usuario_id']}
+                )
+                if usuario:
+                    # Aplicar filtro si existe
+                    if filtrar_usuario_gestor:
+                        filtro = filtrar_usuario_gestor.lower()
+                        if (filtro not in usuario.get('nombre_usuario', '').lower() and
+                            filtro not in usuario.get('email', '').lower() and
+                            filtro not in usuario.get('telefono_usuario', '').lower()):
+                            continue
+                    
+                    usuarios_gestores.append({
+                        'usuario_rol_id': usuario_rol_gestor['_id'],
+                        'usuario_id': usuario['_id'],
+                        'nombre_usuario': usuario.get('nombre_usuario', ''),
+                        'email': usuario.get('email', ''),
+                        'telefono_usuario': usuario.get('telefono_usuario', '')
+                    })
+        print(f"usuarios_gestores: {usuarios_gestores}")
 
         return render_template('usuarios/usuarios_cogestores.html',
-                               gestores=gestores,
+                               usuarios_gestores=usuarios_gestores,
                                usuario_rol_cogestor_id=usuario_rol_cogestor_id,
-                               usuario_rol_gestor_id=usuario_rol_gestor_id
+                               filtrar_usuario_gestor=filtrar_usuario_gestor
                                )
     
     except Exception as e:
