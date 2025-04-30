@@ -2,7 +2,7 @@ from flask import Blueprint
 
 from core.usuarios_cogestores.usuarios_cogestores import (
     usuarios_cogestores_vista,
-    # usuarios_cogestores_gestor_vista
+    usuarios_cogestores_usuario_gestor_vista
 )
 
 from core._decoradores import login_requerido
@@ -16,7 +16,7 @@ usuarios_cogestores_bp = Blueprint('usuarios_cogestores', __name__, url_prefix='
 def usuarios_cogestores():
     return usuarios_cogestores_vista()
 
-# @usuarios_cogestores_bp.route('/gestor/<usuario_rol_id>/<usuario_rol_gestor_id>/<gestor_id>', methods=['GET', 'POST'])
-# @login_requerido
-# def usuarios_cogestores_gestor(usuario_rol_id, usuario_rol_gestor_id, gestor_id):
-#     return usuarios_cogestores_gestor_vista(usuario_rol_id, usuario_rol_gestor_id, gestor_id) 
+@usuarios_cogestores_bp.route('/usuario_gestor/<usuario_rol_gestor_id>', methods=['GET', 'POST'])
+@login_requerido
+def usuarios_cogestores_usuario_gestor(usuario_rol_gestor_id):
+    return usuarios_cogestores_usuario_gestor_vista(usuario_rol_gestor_id) 
