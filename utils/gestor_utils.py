@@ -4,9 +4,9 @@ from config import conexion_mongo
 
 db = conexion_mongo()
 
-def obtener_gestor_por_usuario(gestor_id, usuario_rol_id):
+def obtener_gestor_por_usuario(gestor_id, usuario_rol_gestor_id):
     """
-    Obtiene el gestor ACTIVO asociado al usuario_rol_id y verifica sus permisos.
+    Obtiene el gestor ACTIVO asociado al usuario_rol_gestor_id y verifica sus permisos.
     
     Args:
         gestor_id (str): ID del gestor a buscar
@@ -17,7 +17,7 @@ def obtener_gestor_por_usuario(gestor_id, usuario_rol_id):
     """
     gestor = db.gestores.find_one({
         '_id': ObjectId(gestor_id),
-        'usuario_rol_id': usuario_rol_id,
+        'usuario_rol_gestor_id': usuario_rol_gestor_id,
         'estado_gestor': 'activo'
     })
     

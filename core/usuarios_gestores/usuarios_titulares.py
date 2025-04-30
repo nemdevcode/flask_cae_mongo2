@@ -29,7 +29,7 @@ def verificaciones_consultas(gestor_id, titular_id):
     Función auxiliar para verificar permisos de gestor y obtener información necesaria
     Retorna:
         - (False, respuesta_redireccion) si hay algún error
-        - (True, (usuario, usuario_rol_id, gestor, titular)) si todo está correcto
+        - (True, (usuario, usuario_rol_gestor_id, gestor, titular)) si todo está correcto
     '''
     # Obtener usuario autenticado y verificar permisos
     usuario, respuesta_redireccion = obtener_usuario_autenticado()
@@ -37,13 +37,13 @@ def verificaciones_consultas(gestor_id, titular_id):
         return False, respuesta_redireccion
 
     # Verificar rol de gestor
-    tiene_rol, usuario_rol_id = verificar_rol_gestor(usuario['_id'])
+    tiene_rol, usuario_rol_gestor_id = verificar_rol_gestor(usuario['_id'])
     if not tiene_rol:
         flash('No tienes permisos para acceder a esta página', 'danger')
         return False, redirect(url_for('usuarios.usuarios'))
 
-    # Obtener el gestor asociado al usuario_rol_id
-    gestor = obtener_gestor_por_usuario(gestor_id, usuario_rol_id)
+    # Obtener el gestor asociado al usuario_rol_gestor_id
+    gestor = obtener_gestor_por_usuario(gestor_id, usuario_rol_gestor_id)
     if not gestor:
         flash('Gestor no encontrado o no tienes permisos para acceder', 'danger')
         return False, redirect(url_for('usuarios_gestores.usuarios_gestores_gestor', 
@@ -59,7 +59,7 @@ def verificaciones_consultas(gestor_id, titular_id):
                                        titular_id=titular_id
                                        ))
 
-    return True, (usuario, usuario_rol_id, gestor, titular)
+    return True, (usuario, usuario_rol_gestor_id, gestor, titular)
 
 def usuarios_titulares_vista(gestor_id, titular_id):
     '''
@@ -71,7 +71,7 @@ def usuarios_titulares_vista(gestor_id, titular_id):
         if not permisos_ok:
             return resultado
 
-        usuario, usuario_rol_id, gestor, titular = resultado
+        usuario, usuario_rol_gestor_id, gestor, titular = resultado
         nombre_gestor = gestor.get('nombre_gestor', 'Gestor')
 
         # Obtener parámetros de filtrado
@@ -156,7 +156,7 @@ def usuarios_titulares_crear_vista(gestor_id, titular_id):
         if not permisos_ok:
             return resultado
 
-        usuario, usuario_rol_id, gestor, titular = resultado
+        usuario, usuario_rol_gestor_id, gestor, titular = resultado
         nombre_gestor = gestor.get('nombre_gestor', 'Gestor')
 
         if request.method == 'GET':
@@ -275,7 +275,7 @@ def usuarios_titulares_actualizar_vista(gestor_id, titular_id, usuario_titular_i
         if not permisos_ok:
             return resultado
 
-        usuario, usuario_rol_id, gestor, titular = resultado
+        usuario, usuario_rol_gestor_id, gestor, titular = resultado
         nombre_gestor = gestor.get('nombre_gestor', 'Gestor')
 
         # Obtener el usuario titular a actualizar
@@ -362,7 +362,7 @@ def usuarios_titulares_eliminar_vista(gestor_id, titular_id, usuario_titular_id)
         if not permisos_ok:
             return resultado
 
-        usuario, usuario_rol_id, gestor, titular = resultado
+        usuario, usuario_rol_gestor_id, gestor, titular = resultado
 
         # Obtener el usuario titular a eliminar
         usuario_titular = db.usuarios_titulares.find_one({'_id': ObjectId(usuario_titular_id)})

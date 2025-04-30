@@ -23,26 +23,19 @@ def usuarios_cogestores_vista():
             flash('No tienes permisos para acceder a esta página', 'danger')
             return redirect(url_for('usuarios.usuarios'))
         
-        # Obtener el usuario cogestor autenticado
-        usuario_cogestor = db.usuarios.find_one({'_id': usuario['_id']})
-        print(f"usuario_cogestor: {usuario_cogestor}")
-
-        # Obtener los usuario_rol_gestor_id del usuario cogestor
-        usuario_rol_gestor_id = usuario_cogestor['usuario_rol_gestor_id']
+        # Obtener el usuario_rol_gestor_id usuario cogestor autenticado
+        usuario_rol_gestor_id = db.usuarios_cogestores.find_one({'usuario_rol_cogestor_id': usuario_rol_cogestor_id})
         print(f"usuario_rol_gestor_id: {usuario_rol_gestor_id}")
-        
-        # Obtener los usuarios gestores asignados al cogestor
-        usuarios_gestores = list(db.usuarios_gestores.find({'usuario_rol_cogestor_id': usuario_rol_cogestor_id}))
-        print(f"type(usuarios_gestores): {type(usuarios_gestores)}")
-        print(f"usuarios_gestores: {usuarios_gestores}")
-        
+
+        # Obtener los gestores con usuario_rol_gestor_id
+        gestores = db.gestores.find({'usuario_rol_gestor_id': usuario_rol_gestor_id})
+        print(f"gestores: {gestores}")
         
 
         return render_template('usuarios/usuarios_cogestores.html',
-                               usuarios_gestores=usuarios_gestores,
+                               gestores=gestores,
                                usuario_rol_cogestor_id=usuario_rol_cogestor_id,
-                               usuario_rol_gestor_id=usuario_rol_gestor_id,
-                               usuario_cogestor=usuario_cogestor
+                               usuario_rol_gestor_id=usuario_rol_gestor_id
                                )
     
     except Exception as e:

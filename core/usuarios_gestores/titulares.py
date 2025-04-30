@@ -19,7 +19,7 @@ def verificaciones_consultas(gestor_id, titular_id=None):
     
     Returns:
         - (False, respuesta_redireccion) si hay algún error
-        - (True, (usuario, usuario_rol_id, gestor)) si todo está correcto
+        - (True, (usuario, usuario_rol_gestor_id, gestor)) si todo está correcto
     '''
     # Obtener usuario autenticado y verificar permisos
     usuario, respuesta_redireccion = obtener_usuario_autenticado()
@@ -27,13 +27,13 @@ def verificaciones_consultas(gestor_id, titular_id=None):
         return False, respuesta_redireccion
 
     # Verificar rol de gestor
-    tiene_rol, usuario_rol_id = verificar_rol_gestor(usuario['_id'])
+    tiene_rol, usuario_rol_gestor_id = verificar_rol_gestor(usuario['_id'])
     if not tiene_rol:
         flash('No tienes permisos para acceder a esta página', 'danger')
         return False, redirect(url_for('usuarios.usuarios'))
 
-    # Obtener el gestor asociado al usuario_rol_id
-    gestor = obtener_gestor_por_usuario(gestor_id, usuario_rol_id)
+    # Obtener el gestor asociado al usuario_rol_gestor_id
+    gestor = obtener_gestor_por_usuario(gestor_id, usuario_rol_gestor_id)
     if not gestor:
         flash('Gestor no encontrado o no tienes permisos para acceder', 'danger')
         return False, redirect(url_for('usuarios_gestores.usuarios_gestores_gestor', 
@@ -52,7 +52,7 @@ def verificaciones_consultas(gestor_id, titular_id=None):
                                            gestor_id=gestor_id
                                            ))
 
-    return True, (usuario, usuario_rol_id, gestor)
+    return True, (usuario, usuario_rol_gestor_id, gestor)
 
 def titulares_vista(gestor_id):
     '''
@@ -64,7 +64,7 @@ def titulares_vista(gestor_id):
         if not permisos_ok:
             return resultado
 
-        usuario, usuario_rol_id, gestor = resultado
+        usuario, usuario_rol_gestor_id, gestor = resultado
         nombre_gestor = gestor.get('nombre_gestor', 'Gestor')
 
         # Obtener parámetros de filtrado

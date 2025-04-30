@@ -20,7 +20,7 @@ def gestores_crear_vista():
             return respuesta_redireccion
 
         # Verificar rol de gestor
-        tiene_rol, usuario_rol_id = verificar_rol_gestor(usuario['_id'])
+        tiene_rol, usuario_rol_gestor_id = verificar_rol_gestor(usuario['_id'])
         if not tiene_rol:
             flash('No tienes permisos para acceder a esta página', 'danger')
             return redirect(url_for('usuarios.usuarios'))
@@ -38,7 +38,7 @@ def gestores_crear_vista():
             # Crear instancia del modelo
             fecha_actual = datetime.now()
             nuevo_gestor = GestoresCollection(
-                usuario_rol_id=usuario_rol_id,
+                usuario_rol_gestor_id=usuario_rol_gestor_id,
                 nombre_gestor=nombre_gestor,
                 cif_dni=cif_dni,
                 domicilio=domicilio,
@@ -65,7 +65,7 @@ def gestores_crear_vista():
                 flash('Error al crear el gestor', 'danger')
 
         return render_template('usuarios_gestores/gestores/crear.html',
-                               usuario_rol_id=usuario_rol_id
+                               usuario_rol_gestor_id=usuario_rol_gestor_id
                                )
 
     except Exception as e:
@@ -84,7 +84,7 @@ def gestores_actualizar_vista(gestor_id):
             return respuesta_redireccion
 
         # Verificar rol de gestor
-        tiene_rol, usuario_rol_id = verificar_rol_gestor(usuario['_id'])
+        tiene_rol, usuario_rol_gestor_id = verificar_rol_gestor(usuario['_id'])
         if not tiene_rol:
             flash('No tienes permisos para acceder a esta página', 'danger')
             return redirect(url_for('usuarios.usuarios'))
@@ -92,7 +92,7 @@ def gestores_actualizar_vista(gestor_id):
         # Buscar el gestor
         gestor = db.gestores.find_one({
             '_id': ObjectId(gestor_id),
-            'usuario_rol_id': usuario_rol_id
+            'usuario_rol_gestor_id': usuario_rol_gestor_id
         })
 
         if request.method == 'POST':
@@ -158,7 +158,7 @@ def gestores_eliminar_vista(gestor_id):
             return redirect(url_for('usuarios.usuarios'))
 
         # Verificar si el usuario tiene el rol de gestor
-        tiene_rol, usuario_rol_id = obtener_usuario_rol(usuario_id, rol_gestor_id)
+        tiene_rol, usuario_rol_gestor_id = obtener_usuario_rol(usuario_id, rol_gestor_id)
         
         if not tiene_rol:
             flash('No tienes permisos para acceder a esta página', 'danger')
@@ -167,7 +167,7 @@ def gestores_eliminar_vista(gestor_id):
         # Buscar el gestor
         gestor = db.gestores.find_one({
             '_id': ObjectId(gestor_id),
-            'usuario_rol_id': usuario_rol_id
+            'usuario_rol_gestor_id': usuario_rol_gestor_id
         })
 
         if not gestor:

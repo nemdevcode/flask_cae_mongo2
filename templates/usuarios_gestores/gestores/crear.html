@@ -7,7 +7,7 @@
                 <h4 class="card-title text-center">Crear nuevo GESTOR</h4>
                 <div class="card-body">
                     <form method="POST" action="{{ url_for('ug_gestores.gestores_crear') }}">
-                        <input type="hidden" name="usuario_rol_id" value="{{ usuario_rol_id }}">
+                        <input type="hidden" name="usuario_rol_gestor_id" value="{{ usuario_rol_gestor_id }}">
                         
                         <div class="form-floating mb-3">
                             <input type="text" class="form-control" id="nombre_gestor" name="nombre_gestor" 

@@ -19,7 +19,7 @@ def usuarios_gestores_vista():
             return respuesta_redireccion
 
         # Verificar rol de gestor
-        tiene_rol, usuario_rol_id = verificar_rol_gestor(usuario['_id'])
+        tiene_rol, usuario_rol_gestor_id = verificar_rol_gestor(usuario['_id'])
         if not tiene_rol:
             flash('No tienes permisos para acceder a esta página', 'danger')
             return redirect(url_for('usuarios.usuarios'))
@@ -33,9 +33,9 @@ def usuarios_gestores_vista():
         if vaciar == '1':
             return redirect(url_for('usuarios_gestores.usuarios_gestores'))
 
-        # Obtener todos los gestores relacionados con el usuario_rol_id
+        # Obtener todos los gestores relacionados con el usuario_rol_gestor_id
         gestores_relacionados = {
-            'usuario_rol_id': usuario_rol_id
+            'usuario_rol_gestor_id': usuario_rol_gestor_id
         }
 
         # Aplicar filtro por estado si no es 'todos'
@@ -82,7 +82,7 @@ def usuarios_gestores_gestor_vista(gestor_id):
             return respuesta_redireccion
         
         # Verificar rol de gestor
-        tiene_rol, usuario_rol_id = verificar_rol_gestor(usuario['_id'])
+        tiene_rol, usuario_rol_gestor_id = verificar_rol_gestor(usuario['_id'])
         if not tiene_rol:
             flash('No tienes permisos para acceder a esta página', 'danger')
             return redirect(url_for('usuarios.usuarios'))
@@ -90,7 +90,7 @@ def usuarios_gestores_gestor_vista(gestor_id):
         # Verificar que el gestor existe y pertenece al usuario actual
         gestor = db.gestores.find_one({
             '_id': ObjectId(gestor_id),
-            'usuario_rol_id': usuario_rol_id,
+            'usuario_rol_gestor_id': usuario_rol_gestor_id,
             'estado_gestor': 'activo'
         })
         if not gestor:
