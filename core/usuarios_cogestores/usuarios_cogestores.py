@@ -52,7 +52,6 @@ def usuarios_cogestores_vista():
             {'usuario_rol_cogestor_id': usuario_rol_cogestor_id}, 
             {'usuario_rol_gestor_id': 1}
         ))
-        print(f"usuarios_rol_gestor_id: {usuarios_rol_gestor_id}")
 
         # Obtener los usuarios con rol de gestor de la coleccion usuarios_roles
         usuarios_gestores = []
@@ -82,12 +81,10 @@ def usuarios_cogestores_vista():
                         'email': usuario.get('email', ''),
                         'telefono_usuario': usuario.get('telefono_usuario', '')
                     })
-        print(f"usuarios_gestores: {usuarios_gestores}")
 
         return render_template('usuarios/usuarios_cogestores.html',
                                usuario_cogestor=usuario,
                                usuarios_gestores=usuarios_gestores,
-                               usuario_rol_cogestor_id=usuario_rol_cogestor_id,
                                filtrar_usuario_gestor=filtrar_usuario_gestor,
                                )
     
@@ -97,8 +94,42 @@ def usuarios_cogestores_vista():
 
 def usuarios_cogestores_usuario_gestor_vista(usuario_rol_gestor_id):
     '''
-    Vista del usuariogestor seleccionado relacionados con el usuario cogestor autenticado.
+    Vista del usuario gestor seleccionado relacionados con el usuario cogestor autenticado.
     '''
-    return render_template('usuarios_cogestores/index.html',
-                           usuario_rol_gestor_id=usuario_rol_gestor_id
-                           )
+
+    try:
+        # Verificar permisos y obtener información
+        permisos_ok, resultado = verificaciones_consultas()
+        if not permisos_ok:
+            return resultado
+
+        usuario, usuario_rol_cogestor_id = resultado
+
+        # Obtener el usuario gestor
+        usuario_gestor = db.usuarios_roles.find_one(
+            {'_id': ObjectId(usuario_rol_gestor_id)}
+        )
+        if usuario_gestor:
+            # Obtener el usuario asociado al rol de gestor
+            usuario_gestor = db.usuarios.find_one(
+                {'_id': usuario_gestor['usuario_id']}
+            )
+        else:
+            flash('Usuario gestor no encontrado', 'danger')
+            return redirect(url_for('usuarios_cogestores.usuarios_cogestores'))
+
+        # Obtener los gestores del usuario gestor
+        gestores = []
+        gestores = list(db.gestores.find(
+            {'usuario_rol_gestor_id': ObjectId(usuario_rol_gestor_id)}
+        ))
+
+        return render_template('usuarios_cogestores/index.html',
+                            usuario_rol_gestor_id=usuario_rol_gestor_id,
+                            usuario_gestor=usuario_gestor,
+                            gestores=gestores
+                            )
+    except Exception as e:
+        flash(f'Error al cargar la vista de uusuario gestor: {str(e)}', 'danger')
+        return redirect(url_for('usuarios_cogestores.usuarios_cogestores'))
+    

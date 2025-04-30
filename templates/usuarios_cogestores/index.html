@@ -18,6 +18,10 @@
                 </li>
             </ul>
             <div class="d-grid gap-2 d-md-flex justify-content-md-end align-items-center">
+                <span class="my-auto">Volver a:</span>
+                    <a href="{{ url_for('usuarios_cogestores.usuarios_cogestores') }}" 
+                        class="btn btn-outline-primary">
+                        Cogestor</a>
                 <a href="{{ url_for('logout') }}" class="btn btn-outline-dark">Cerrar sesión</a>
             </div>
                 
@@ -27,8 +31,8 @@
 
 {% block main %}
     <div class="container mt-5">
-        <h3 class="text-center">Listado de GESTORES de: usuario_gestor </h3>
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="text-center">Listado de GESTORES del gestor: {{ usuario_gestor.nombre_usuario }} </h3>
+        <div class="d-flex justify-content-between align-items-center mt-5">
             <!-- Formulario para filtrar gestores -->
             <form action="{{ url_for(
                                     'usuarios_cogestores.usuarios_cogestores') }}" method="post" 
@@ -54,19 +58,21 @@
                         class="btn-check" 
                         name="filtrar_estado" 
                         id="todos" 
-                                value="todos" 
-                                {% if not filtrar_estado or filtrar_estado == 'todos' %}checked{% endif %}
-                                onchange="this.form.submit()">
-                                <label class="btn btn-outline-primary" for="todos">Todos</label>
+                            value="todos" 
+                            {% if not filtrar_estado or filtrar_estado == 'todos' %}checked{% endif %}
+                            onchange="this.form.submit()">
+                            <label class="btn btn-outline-primary" for="todos">
+                            Todos</label>
         
                         <input type="radio" 
-                                class="btn-check" 
-                                name="filtrar_estado" 
-                                id="activos" 
-                                value="activo"
-                                {% if filtrar_estado == 'activo' %}checked{% endif %}
-                                onchange="this.form.submit()">
-                        <label class="btn btn-outline-success" for="activos">Activos</label>
+                            class="btn-check" 
+                            name="filtrar_estado" 
+                            id="activos" 
+                            value="activo"
+                            {% if filtrar_estado == 'activo' %}checked{% endif %}
+                            onchange="this.form.submit()">
+                            <label class="btn btn-outline-success" for="activos">
+                            Activos</label>
         
                         <input type="radio" 
                             class="btn-check" 
@@ -75,29 +81,40 @@
                             value="inactivo"
                             {% if filtrar_estado == 'inactivo' %}checked{% endif %}
                             onchange="this.form.submit()">
-                        <label class="btn btn-outline-secondary" for="inactivos">Inactivos</label>
+                            <label class="btn btn-outline-secondary" for="inactivos">
+                            Inactivos</label>
                     </div>
                     <!-- Boton para limpiar filtro -->
                     <div style="flex: 1;">
                         <a href="{{ url_for(
-                                            'usuarios_cogestores.usuarios_cogestores', 
-                                            vaciar=1) }}" 
-                                            class="btn btn-secondary">
-                                            Limpiar filtros</a>
+                            'usuarios_cogestores.usuarios_cogestores', 
+                            vaciar=1) }}" 
+                            class="btn btn-secondary">
+                            Limpiar filtros</a>
                     </div>
                 </div>
             </form>
+            <!-- Botón crear -->
+            <a href="{{ url_for(
+                'ug_gestores.gestores_crear',
+                usuario_rol_gestor_id=usuario_rol_gestor_id
+                ) }}" 
+                class="btn btn-success">
+                Crear</a>
         </div>
 
         <!-- Tabla de gestores -->
-        <div class="table-responsive">
+        <div class="table-responsive mt-5">
             <table class="table table-striped">
                 <thead class="text-center">
                     <tr>
-                        <th>Alias</th>
                         <th>Nombre</th>
+                        <th>CIF/DNI</th>
+                        <th>Domicilio</th>
+                        <th>Código Postal</th>
+                        <th>Población</th>
+                        <th>Provincia</th>
                         <th>Teléfono</th>
-                        <th>EMail</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
@@ -106,12 +123,15 @@
                     {% if gestores %}
                         {% for gestor in gestores %}
                             <tr>
-                                <td>{{ gestor.gestor_info.alias }}</td>
-                                <td>{{ gestor.gestor_info.nombre_usuario }}</td>
-                                <td>{{ gestor.gestor_info.telefono_usuario }}</td>
-                                <td>{{ gestor.email }}</td>
+                                <td>{{ gestor.nombre_gestor }}</td>
+                                <td>{{ gestor.cif_dni }}</td>
+                                <td>{{ gestor.domicilio }}</td>
+                                <td>{{ gestor.codigo_postal }}</td>
+                                <td>{{ gestor.poblacion }}</td>
+                                <td>{{ gestor.provincia }}</td>
+                                <td>{{ gestor.telefono_gestor }}</td>
                                 <td class="text-center">
-                                    {% if gestor.gestor_info.estado == 'activo' %}
+                                    {% if gestor.estado_gestor == 'activo' %}
                                         <span class="badge bg-success">Activo</span>
                                     {% else %}
                                         <span class="badge bg-secondary">Inactivo</span>
@@ -119,10 +139,20 @@
                                 </td>
                                 <td class="text-center">
                                     <a href="{{ url_for(
-                                                        'ug_usuarios_gestores.usuarios_gestores', 
-                                                        gestor_id=gestor.gestor_info._id) }}" 
-                                                        class="btn btn-primary">
-                                                        Ir</a>
+                                        'usuarios_gestores.usuarios_gestores_gestor', 
+                                        gestor_id=gestor._id|string) }}" 
+                                        class="btn btn-primary btn-sm">
+                                        Ir</a>
+                                    <a href="{{ url_for(
+                                        'ug_gestores.gestores_actualizar', 
+                                        gestor_id=gestor._id|string) }}" 
+                                        class="btn btn-warning btn-sm">
+                                        Editar</a>
+                                    <button type="button" 
+                                        class="btn btn-danger btn-sm" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#confirmarEliminar{{ gestor._id }}">
+                                        Eliminar</button>
                                 </td>
                             </tr>
                         {% endfor %}

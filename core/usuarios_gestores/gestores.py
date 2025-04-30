@@ -2,7 +2,7 @@ from flask import render_template, request, redirect, url_for, session, flash
 from bson.objectid import ObjectId
 from datetime import datetime
 from utils.usuario_utils import obtener_usuario_autenticado
-from utils.rol_utils import obtener_rol, verificar_rol_gestor
+from utils.rol_utils import obtener_rol, verificar_rol_gestor, verificar_rol_gestor_cogestor
 from utils.usuario_rol_utils import obtener_usuario_rol
 from models.gestores_model import GestoresCollection
 from config import conexion_mongo
@@ -83,8 +83,11 @@ def gestores_actualizar_vista(gestor_id):
         if respuesta_redireccion:
             return respuesta_redireccion
 
-        # Verificar rol de gestor
+        # Verificar rol de gestor o cogestor
         tiene_rol, usuario_rol_gestor_id = verificar_rol_gestor(usuario['_id'])
+        print(f"tiene_rol: {tiene_rol}")
+        print(f"usuario_rol_gestor_id: {usuario_rol_gestor_id}")
+        print(type(usuario_rol_gestor_id))
         if not tiene_rol:
             flash('No tienes permisos para acceder a esta página', 'danger')
             return redirect(url_for('usuarios.usuarios'))

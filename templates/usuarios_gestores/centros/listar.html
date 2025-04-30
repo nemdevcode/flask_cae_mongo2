@@ -36,48 +36,49 @@
                     <!-- Input para filtrar centro -->
                     <div class="form-floating" style="flex: 2; min-height: 80px;">
                         <input type="text" 
-                                class="form-control" 
-                                id="filtrar_centro"
-                                name="filtrar_centro"
-                                value="{{ request.form.get('filtrar_centro', '') }}"
-                                oninput="this.form.submit()"
-                                autocomplete="off"
-                                autofocus
-                                onfocus="this.setSelectionRange(this.value.length, this.value.length)"
-                                style="height: 80px;">
-                        <label for="filtrar_centro" style="white-space: normal; line-height: 1.2; height: auto; padding-top: 0.5rem; transform-origin: 0 0;">Escriba el nombre, domicilio, código postal, población o provincia para filtrar...</label>
+                            class="form-control" 
+                            id="filtrar_centro"
+                            name="filtrar_centro"
+                            value="{{ request.form.get('filtrar_centro', '') }}"
+                            oninput="this.form.submit()"
+                            autocomplete="off"
+                            autofocus
+                            onfocus="this.setSelectionRange(this.value.length, this.value.length)"
+                            style="height: 80px;">
+                            <label for="filtrar_centro" style="white-space: normal; line-height: 1.2; height: auto; padding-top: 0.5rem; transform-origin: 0 0;">
+                            Escriba el nombre, domicilio, código postal, población o provincia para filtrar...</label>
                     </div>
                     
                     <!-- Filtro por estado -->
                     <div class="btn-group" role="group" aria-label="Filtrar por estado" style="flex: 2;">
                         <input type="radio" 
-                                class="btn-check" 
-                                name="filtrar_estado" 
-                                id="todos" 
-                                value="todos" 
-                                {% if not request.form.get('filtrar_estado') or request.form.get('filtrar_estado') == 'todos' %}checked{% endif %}
-                                onchange="this.form.submit()">
-                        <label class="btn btn-outline-primary" for="todos">
+                            class="btn-check" 
+                            name="filtrar_estado" 
+                            id="todos" 
+                            value="todos" 
+                            {% if not request.form.get('filtrar_estado') or request.form.get('filtrar_estado') == 'todos' %}checked{% endif %}
+                            onchange="this.form.submit()">
+                            <label class="btn btn-outline-primary" for="todos">
                             Todos</label>
                         
                         <input type="radio" 
-                                class="btn-check" 
-                                name="filtrar_estado" 
-                                id="activos" 
-                                value="activo"
-                                {% if request.form.get('filtrar_estado') == 'activo' %}checked{% endif %}
-                                onchange="this.form.submit()">
-                        <label class="btn btn-outline-success" for="activos">
+                            class="btn-check" 
+                            name="filtrar_estado" 
+                            id="activos" 
+                            value="activo"
+                            {% if request.form.get('filtrar_estado') == 'activo' %}checked{% endif %}
+                            onchange="this.form.submit()">
+                            <label class="btn btn-outline-success" for="activos">
                             Activos</label>
                         
                         <input type="radio" 
-                                class="btn-check" 
-                                name="filtrar_estado" 
-                                id="inactivos" 
-                                value="inactivo"
-                                {% if request.form.get('filtrar_estado') == 'inactivo' %}checked{% endif %}
-                                onchange="this.form.submit()">
-                        <label class="btn btn-outline-secondary" for="inactivos">
+                            class="btn-check" 
+                            name="filtrar_estado" 
+                            id="inactivos" 
+                            value="inactivo"
+                            {% if request.form.get('filtrar_estado') == 'inactivo' %}checked{% endif %}
+                            onchange="this.form.submit()">
+                            <label class="btn btn-outline-secondary" for="inactivos">
                             Inactivos</label>
                     </div>
                     
