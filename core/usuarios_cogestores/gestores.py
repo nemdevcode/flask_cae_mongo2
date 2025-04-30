@@ -2,16 +2,16 @@ from flask import render_template, request, redirect, url_for, session, flash
 from bson.objectid import ObjectId
 from datetime import datetime
 from utils.usuario_utils import obtener_usuario_autenticado
-from utils.rol_utils import obtener_rol, verificar_rol_gestor
+from utils.rol_utils import obtener_rol, verificar_rol_cogestor
 from utils.usuario_rol_utils import obtener_usuario_rol
 from models.gestores_model import GestoresCollection
 from config import conexion_mongo
 
 db = conexion_mongo()
 
-def gestores_crear_vista():
+def gestores_crear_vista(usuario_rol_gestor_id):
     '''
-    Vista para crear un nuevo gestor que se asignara al usuario autenticado con rol de gestor.
+    Vista para crear un nuevo gestor que se asignara al usuario autenticado con rol de cogestor.
     '''
     try:
         # Obtener usuario autenticado y verificar permisos
@@ -19,12 +19,12 @@ def gestores_crear_vista():
         if respuesta_redireccion:
             return respuesta_redireccion
 
-        # Verificar rol de gestor
-        tiene_rol, usuario_rol_gestor_id = verificar_rol_gestor(usuario['_id'])
+        # Verificar rol de cogestor
+        tiene_rol, usuario_rol_cogestor_id = verificar_rol_cogestor(usuario['_id'])
         if not tiene_rol:
             flash('No tienes permisos para acceder a esta página', 'danger')
             return redirect(url_for('usuarios.usuarios'))
-
+        
         if request.method == 'POST':
             # Obtener datos del formulario
             nombre_gestor = request.form.get('nombre_gestor').upper()
@@ -60,19 +60,19 @@ def gestores_crear_vista():
 
             if resultado.inserted_id:
                 flash('Gestor creado exitosamente', 'success')
-                return redirect(url_for('usuarios_gestores.usuarios_gestores'))
+                return redirect(url_for('usuarios_cogestores.usuarios_cogestores'))
             else:
                 flash('Error al crear el gestor', 'danger')
 
-        return render_template('usuarios_gestores/gestores/crear.html',
+        return render_template('usuarios_cogestores/gestores/crear.html',
                                usuario_rol_gestor_id=usuario_rol_gestor_id
                                )
 
     except Exception as e:
         flash(f'Error al crear el gestor: {str(e)}', 'danger')
-        return redirect(url_for('usuarios_gestores.usuarios_gestores'))
+        return redirect(url_for('usuarios_cogestores.usuarios_cogestores'))
 
-def gestores_actualizar_vista(gestor_id):
+def gestores_actualizar_vista(usuario_rol_gestor_id, gestor_id):
     '''
     Vista para actualizar un gestor relacionado con el usuario autenticado con rol de gestor. una vez actualizado el gestor, 
     se redirigira a la vista de usuarios gestores.
@@ -83,11 +83,8 @@ def gestores_actualizar_vista(gestor_id):
         if respuesta_redireccion:
             return respuesta_redireccion
 
-        # Verificar rol de gestor o cogestor
-        tiene_rol, usuario_rol_gestor_id = verificar_rol_gestor(usuario['_id'])
-        print(f"tiene_rol: {tiene_rol}")
-        print(f"usuario_rol_gestor_id: {usuario_rol_gestor_id}")
-        print(type(usuario_rol_gestor_id))
+        # Verificar rol de cogestor
+        tiene_rol, usuario_rol_cogestor_id = verificar_rol_cogestor(usuario['_id'])
         if not tiene_rol:
             flash('No tienes permisos para acceder a esta página', 'danger')
             return redirect(url_for('usuarios.usuarios'))
@@ -136,15 +133,15 @@ def gestores_actualizar_vista(gestor_id):
 
         # Convertir ObjectId a string para el template
         gestor['_id'] = str(gestor['_id'])
-        return render_template('usuarios_gestores/gestores/actualizar.html',
+        return render_template('usuarios_cogestores/gestores/actualizar.html',
                                gestor=gestor
                                )
 
     except Exception as e:
         flash(f'Error al actualizar el gestor: {str(e)}', 'danger')
-        return redirect(url_for('usuarios_gestores.usuarios_gestores'))
+        return redirect(url_for('usuarios_cogestores.usuarios_cogestores'))
 
-def gestores_eliminar_vista(gestor_id):
+def gestores_eliminar_vista(usuario_rol_gestor_id, gestor_id):
     try:
         # Obtener el ID del usuario actual
         usuario_id = session.get('usuario_id')
@@ -175,7 +172,7 @@ def gestores_eliminar_vista(gestor_id):
 
         if not gestor:
             flash('Gestor no encontrado o no tienes permisos para eliminarlo', 'danger')
-            return redirect(url_for('usuarios_gestores.usuarios_gestores'))
+            return redirect(url_for('usuarios_cogestores.usuarios_cogestores'))
 
         # Eliminar el gestor de la base de datos
         resultado = db.gestores.delete_one({'_id': ObjectId(gestor_id)})
@@ -185,9 +182,9 @@ def gestores_eliminar_vista(gestor_id):
         else:
             flash('Error al eliminar el gestor', 'danger')
 
-        return redirect(url_for('usuarios_gestores.usuarios_gestores'))
+        return redirect(url_for('usuarios_cogestores.usuarios_cogestores'))
 
     except Exception as e:
         flash(f'Error al eliminar el gestor: {str(e)}', 'danger')
-        return redirect(url_for('usuarios_gestores.usuarios_gestores'))
+        return redirect(url_for('usuarios_cogestores.usuarios_cogestores'))
 
