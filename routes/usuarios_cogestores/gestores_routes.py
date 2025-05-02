@@ -2,7 +2,8 @@ from flask import Blueprint
 from core.usuarios_cogestores.gestores import (
     gestores_crear_vista,
     gestores_actualizar_vista,
-    gestores_eliminar_vista
+    gestores_eliminar_vista,
+    gestor_vista
 )
 # from core.usuarios_cogestores.titulares import titulares_vista
 
@@ -24,6 +25,11 @@ def gestores_actualizar(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_i
 @login_requerido
 def gestores_eliminar(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id):
     return gestores_eliminar_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id)
+
+@uc_gestores_bp.route('/gestor/<usuario_rol_cogestor_id>/<usuario_rol_gestor_id>/<gestor_id>', methods=['GET'])
+@login_requerido
+def gestor(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id):
+    return gestor_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id)
 
 # @uc_gestores_bp.route('/titulares/<gestor_id>', methods=['GET'])
 # @login_requerido

@@ -1,40 +1,48 @@
+
 {% extends "_base.html" %}
 
 {% block header %}
     <nav class="navbar navbar-expand-lg" style="background-color: #e3f2fd;">
         <div class="container-fluid">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
-                <a class="navbar-brand">CAE Accesible</a>
-                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/usuarios">Inicio</a>
-                    </li>
-                </ul>
-                <div class="d-grid gap-2 d-md-flex justify-content-md-end align-items-center">
-                    <span class="my-auto">Volver a:</span>
-                    <div class="btn-group" role="group" aria-label="Navegación entre tipos de usuarios">
-                        <a href="{{ url_for(
-                            'usuarios_gestores.usuarios_gestores_gestor', 
-                            gestor_id=gestor_id|string) }}" class="btn btn-outline-primary">
-                            Gestor</a>
-                    </div>
-                    <a href="{{ url_for('logout') }}" class="btn btn-outline-dark">Cerrar sesión</a>
-                </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+            <a class="navbar-brand">CAE Accesible</a>
+            <a class="btn btn-info rounded-circle p-1" data-bs-toggle="modal" data-bs-target="#infoModal">
+                <img src="{{ url_for('static', filename='info-circle-fill.svg') }}" 
+                        alt="Información" style="width: 20px; height: 20px; filter: brightness(0) invert(1);">
+            </a>
+            <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/usuarios">Inicio</a>
+                </li>
+            </ul>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end align-items-center">
+                <span class="my-auto">Volver a:</span>
+                <a href="{{ url_for(
+                    'uc_gestores.gestor', 
+                    usuario_rol_cogestor_id=usuario_rol_cogestor_id, 
+                    usuario_rol_gestor_id=usuario_rol_gestor_id,
+                    gestor_id=gestor_id) }}" 
+                    class="btn btn-outline-primary">
+                    Gestor</a>
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-dark">Cerrar sesión</a>
             </div>
+                
         </div>
     </nav>
 {% endblock %}
 
 {% block main %}
     <div class="container mt-5">
-        <h3 class="text-center">Listado de TITULARES del gestor: {{ nombre_gestor }}</h3>
+        <h3 class="text-center">Listado de TITULARES del gestor: nombre_gestor</h3>
         <div class="d-flex justify-content-between align-items-center mt-5">
             <!-- Formulario para filtrar titulares -->
             <form action="{{ url_for(
-                'ug_titulares.titulares', 
+                'uc_titulares.titulares', 
+                usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                usuario_rol_gestor_id=usuario_rol_gestor_id,
                 gestor_id=gestor_id|string) }}" 
                 method="post" id="filtroForm" class="flex-grow-1 me-3">
                 <div class="d-flex gap-3 align-items-center">
@@ -86,7 +94,9 @@
                     <!-- Boton para limpiar filtro -->
                     <div style="flex: 1;">
                         <a href="{{ url_for(
-                            'ug_titulares.titulares', 
+                            'uc_titulares.titulares', 
+                            usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                            usuario_rol_gestor_id=usuario_rol_gestor_id,
                             gestor_id=gestor_id|string, vaciar=1) }}" 
                             class="btn btn-secondary">
                             Limpiar filtros</a>
@@ -95,7 +105,9 @@
             </form>
             <!-- Botón crear -->
             <a href="{{ url_for(
-                'ug_titulares.titulares_crear', 
+                'uc_titulares.titulares_crear', 
+                usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                usuario_rol_gestor_id=usuario_rol_gestor_id,
                 gestor_id=gestor_id|string) }}" class="btn btn-success">
                 Crear</a>
         </div>
@@ -134,13 +146,19 @@
                             </td>
                             <td class="text-center">
                                 <a href="{{ url_for(
-                                    'ug_titulares.titulares_titular',
-                                    gestor_id=gestor_id|string, titular_id=titular._id|string) }}" 
+                                    'uc_titulares.titulares_titular',
+                                    usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                    usuario_rol_gestor_id=usuario_rol_gestor_id,
+                                    gestor_id=gestor_id|string, 
+                                    titular_id=titular._id|string) }}" 
                                     class="btn btn-primary btn-sm">
                                     Ir</a>
                                 <a href="{{ url_for(
-                                    'ug_titulares.titulares_actualizar', 
-                                    gestor_id=gestor_id|string, titular_id=titular._id|string) }}" 
+                                    'uc_titulares.titulares_actualizar', 
+                                    usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                    usuario_rol_gestor_id=usuario_rol_gestor_id,
+                                    gestor_id=gestor_id|string, 
+                                    titular_id=titular._id|string) }}" 
                                     class="btn btn-warning btn-sm">
                                     Editar</a>
                                 <button type="button" 
@@ -169,8 +187,11 @@
                                     </div>
                                     <div class="modal-footer">
                                         <form action="{{ url_for(
-                                            'ug_titulares.titulares_eliminar', 
-                                            gestor_id=gestor_id|string, titular_id=titular._id|string) }}" 
+                                            'uc_titulares.titulares_eliminar', 
+                                            usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                            usuario_rol_gestor_id=usuario_rol_gestor_id,
+                                            gestor_id=gestor_id|string, 
+                                            titular_id=titular._id|string) }}" 
                                             method="POST" style="display: inline;">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                                                 <i class="fas fa-times me-1"></i>
@@ -191,6 +212,25 @@
                     {% endif %}
                 </tbody>
             </table>
+        </div>
+    </div>
+    <!-- Modal de Información -->
+    <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-center w-100" id="infoModalLabel">Información/Ayuda</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>...</p>
+                    <hr>
+                    <p>...</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}
