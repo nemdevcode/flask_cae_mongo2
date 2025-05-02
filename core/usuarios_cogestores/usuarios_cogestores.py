@@ -83,6 +83,7 @@ def usuarios_cogestores_vista():
                     })
 
         return render_template('usuarios/usuarios_cogestores.html',
+                               usuario_rol_cogestor_id=usuario_rol_cogestor_id,
                                usuario_cogestor=usuario,
                                usuarios_gestores=usuarios_gestores,
                                filtrar_usuario_gestor=filtrar_usuario_gestor,
@@ -92,18 +93,18 @@ def usuarios_cogestores_vista():
         flash(f'Error al cargar la vista de usuarios cogestores: {str(e)}', 'danger')
         return redirect(url_for('usuarios.usuarios'))
 
-def usuarios_cogestores_usuario_gestor_vista(usuario_rol_gestor_id):
+def usuarios_cogestores_usuario_gestor_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id):
     '''
     Vista del usuario gestor seleccionado relacionados con el usuario cogestor autenticado.
     '''
 
     try:
         # Verificar permisos y obtener información
-        permisos_ok, resultado = verificaciones_consultas()
-        if not permisos_ok:
-            return resultado
+        # permisos_ok, resultado = verificaciones_consultas()
+        # if not permisos_ok:
+        #     return resultado
 
-        usuario, usuario_rol_cogestor_id = resultado
+        # usuario, usuario_rol_cogestor_id = resultado
 
         # Obtener el usuario gestor
         usuario_gestor = db.usuarios_roles.find_one(
@@ -117,19 +118,57 @@ def usuarios_cogestores_usuario_gestor_vista(usuario_rol_gestor_id):
         else:
             flash('Usuario gestor no encontrado', 'danger')
             return redirect(url_for('usuarios_cogestores.usuarios_cogestores'))
+        
+        # Obtener parámetros de filtrado
+        filtrar_gestor = request.form.get('filtrar_gestor', '')
+        filtrar_estado = request.form.get('filtrar_estado', 'todos')
+        vaciar = request.args.get('vaciar', '0')
 
+        # Si se solicita vaciar filtros
+        if vaciar == '1':
+            return redirect(url_for('usuarios_cogestores.usuarios_cogestores_usuario_gestor',
+                                    usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                    usuario_rol_gestor_id=usuario_rol_gestor_id
+                                    ))
+        
+        # Construir la consulta base - buscar gestores donde el usuario_rol_gestor_id sea el del usuario gestor actual
+        consulta_filtros = {'usuario_rol_gestor_id': ObjectId(usuario_rol_gestor_id)}
+
+        # Aplicar filtros si existen
+        if filtrar_estado != 'todos':
+            consulta_filtros['estado_gestor'] = filtrar_estado
+            
         # Obtener los gestores del usuario gestor
         gestores = []
         gestores = list(db.gestores.find(
-            {'usuario_rol_gestor_id': ObjectId(usuario_rol_gestor_id)}
+            consulta_filtros
         ))
 
+        # Si hay filtro por texto, filtrar los gestores
+        if filtrar_gestor:
+            gestores_filtrados = []
+            for gestor in gestores:
+                if (filtrar_gestor.lower() in gestor['nombre_gestor'].lower() or
+                    filtrar_gestor.lower() in gestor['domicilio'].lower() or
+                    filtrar_gestor.lower() in gestor['codigo_postal'].lower() or
+                    filtrar_gestor.lower() in gestor['poblacion'].lower() or
+                    filtrar_gestor.lower() in gestor['provincia'].lower() or
+                    filtrar_gestor.lower() in gestor.get('telefono_gestor', '').lower()):
+                    gestores_filtrados.append(gestor)
+            gestores = gestores_filtrados
+
         return render_template('usuarios_cogestores/index.html',
-                            usuario_rol_gestor_id=usuario_rol_gestor_id,
-                            usuario_gestor=usuario_gestor,
-                            gestores=gestores
-                            )
+                               usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                               usuario_rol_gestor_id=usuario_rol_gestor_id,
+                               usuario_gestor=usuario_gestor,
+                               gestores=gestores,
+                               filtrar_gestor=filtrar_gestor,
+                               filtrar_estado=filtrar_estado
+                               )
     except Exception as e:
         flash(f'Error al cargar la vista de uusuario gestor: {str(e)}', 'danger')
-        return redirect(url_for('usuarios_cogestores.usuarios_cogestores'))
+        return redirect(url_for('usuarios_cogestores.usuarios_cogestores_usuario_gestor',
+                                usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                usuario_rol_gestor_id=usuario_rol_gestor_id
+                                ))
     

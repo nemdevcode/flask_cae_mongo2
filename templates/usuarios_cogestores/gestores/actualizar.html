@@ -1,0 +1,93 @@
+{% extends "_base.html" %}
+
+{% block main %}
+    <div class="d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card shadow bg-dark text-white" style="min-width: 500px;">
+            <div class="card-body">
+                <h4 class="card-title text-center">Actualizar GESTOR</h4>
+                <div class="card-body">
+                    <form action="{{ url_for(
+                        'uc_gestores.gestores_actualizar', 
+                        usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                        usuario_rol_gestor_id=usuario_rol_gestor_id,
+                        gestor_id=gestor._id|string) }}" 
+                        method="post">
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                class="form-control" 
+                                id="nombre_gestor" 
+                                name="nombre_gestor" 
+                                value="{{ gestor.nombre_gestor }}"
+                                required>
+                                <label for="nombre_gestor">
+                                Nombre de la empresa:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="cif_dni" 
+                                   name="cif_dni" 
+                                   value="{{ gestor.cif_dni }}"
+                                   required>
+                            <label for="cif_dni">CIF/DNI:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="domicilio" name="domicilio" 
+                                   value="{{ gestor.domicilio }}" required>
+                            <label for="domicilio">Dirección:</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="codigo_postal" name="codigo_postal" 
+                                   value="{{ gestor.codigo_postal }}" required>
+                            <label for="codigo_postal">Código Postal:</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="poblacion" name="poblacion" 
+                                   value="{{ gestor.poblacion }}" required>
+                            <label for="poblacion">Población:</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="provincia" name="provincia" 
+                                   value="{{ gestor.provincia }}" required>
+                            <label for="provincia">Provincia:</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="tel" class="form-control" id="telefono_gestor" name="telefono_gestor" 
+                                   value="{{ gestor.telefono_gestor }}" required>
+                            <label for="telefono_gestor">Teléfono:</label>
+                        </div>
+                        <div class="btn-group text-center w-100 mb-3" role="group" aria-label="Basic radio toggle button group">
+                            <input type="radio" 
+                                   class="btn-check" 
+                                   name="estado_gestor" 
+                                   id="estado-activo{{ gestor._id }}" 
+                                   value="activo" 
+                                   {% if gestor.estado_gestor == 'activo' %}checked{% endif %}>
+                            <label class="btn btn-outline-success" for="estado-activo{{ gestor._id }}">Activo</label> 
+                            <input type="radio" 
+                                   class="btn-check" 
+                                   name="estado_gestor" 
+                                   id="estado-inactivo{{ gestor._id }}" 
+                                   value="inactivo"
+                                   {% if gestor.estado_gestor == 'inactivo' %}checked{% endif %}>
+                            <label class="btn btn-outline-secondary" for="estado-inactivo{{ gestor._id }}">Inactivo</label>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-center gap-2">
+                            <a href="{{ url_for(
+                                'usuarios_cogestores.usuarios_cogestores_usuario_gestor',
+                                usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                usuario_rol_gestor_id=usuario_rol_gestor_id) }}" 
+                                class="btn btn-secondary">
+                                Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Actualizar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

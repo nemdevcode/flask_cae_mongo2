@@ -8,6 +8,7 @@
                 <div class="card-body">
                     <form method="POST" action="{{ url_for(
                         'uc_gestores.gestores_crear',
+                        usuario_rol_cogestor_id=usuario_rol_cogestor_id,
                         usuario_rol_gestor_id=usuario_rol_gestor_id) }}">
                         
                         <div class="form-floating mb-3">
@@ -55,6 +56,7 @@
                         <div class="d-flex justify-content-end align-items-center gap-2">
                             <a href="{{ url_for(
                                 'usuarios_cogestores.usuarios_cogestores_usuario_gestor',
+                                usuario_rol_cogestor_id=usuario_rol_cogestor_id,
                                 usuario_rol_gestor_id=usuario_rol_gestor_id) }}" 
                                 class="btn btn-secondary">
                                 Cancelar</a>

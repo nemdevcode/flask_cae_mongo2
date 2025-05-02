@@ -45,15 +45,16 @@
                             autocomplete="off"
                             autofocus
                             onfocus="this.setSelectionRange(this.value.length, this.value.length)">
-                        <label for="filtrar_usuario_gestor">Escriba el nombre, teléfono o email para filtrar</label>
+                            <label for="filtrar_usuario_gestor">
+                            Escriba el nombre, teléfono o email para filtrar</label>
                     </div>
                     <!-- Boton para limpiar filtro -->
                     <div style="flex: 1;">
                         <a href="{{ url_for(
-                                            'usuarios_cogestores.usuarios_cogestores', 
-                                            vaciar=1) }}" 
-                                            class="btn btn-secondary">
-                                            Limpiar filtros</a>
+                            'usuarios_cogestores.usuarios_cogestores', 
+                            vaciar=1) }}" 
+                            class="btn btn-secondary">
+                            Limpiar filtros</a>
                     </div>
                 </div>
             </form>
@@ -80,6 +81,7 @@
                                 <td class="text-center">
                                     <a href="{{ url_for(
                                         'usuarios_cogestores.usuarios_cogestores_usuario_gestor',
+                                        usuario_rol_cogestor_id=usuario_rol_cogestor_id,
                                         usuario_rol_gestor_id=usuario_gestor.usuario_rol_id) }}" 
                                         class="btn btn-primary">
                                         Ir</a>

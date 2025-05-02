@@ -35,8 +35,10 @@
         <div class="d-flex justify-content-between align-items-center mt-5">
             <!-- Formulario para filtrar gestores -->
             <form action="{{ url_for(
-                                    'usuarios_cogestores.usuarios_cogestores') }}" method="post" 
-                                    id="filtroForm" class="flex-grow-1 me-3">
+                'usuarios_cogestores.usuarios_cogestores_usuario_gestor', 
+                usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                usuario_rol_gestor_id=usuario_rol_gestor_id) }}" 
+                method="post" id="filtroForm" class="flex-grow-1 me-3">
                 <div class="d-flex gap-3 align-items-center">
                     <!-- Input para filtrar gestor por nombre -->
                     <div class="form-floating" style="flex: 2;">
@@ -49,7 +51,8 @@
                             autocomplete="off"
                             autofocus
                             onfocus="this.setSelectionRange(this.value.length, this.value.length)">
-                        <label for="filtrar_gestor">Escriba el nombre, alias, teléfono o email para filtrar</label>
+                            <label for="filtrar_gestor">
+                            Escriba para filtrar</label>
                     </div>
                     
                     <!-- Filtro por estado -->
@@ -87,7 +90,9 @@
                     <!-- Boton para limpiar filtro -->
                     <div style="flex: 1;">
                         <a href="{{ url_for(
-                            'usuarios_cogestores.usuarios_cogestores', 
+                            'usuarios_cogestores.usuarios_cogestores_usuario_gestor', 
+                            usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                            usuario_rol_gestor_id=usuario_rol_gestor_id,
                             vaciar=1) }}" 
                             class="btn btn-secondary">
                             Limpiar filtros</a>
@@ -97,6 +102,7 @@
             <!-- Botón crear -->
             <a href="{{ url_for(
                 'uc_gestores.gestores_crear',
+                usuario_rol_cogestor_id=usuario_rol_cogestor_id,
                 usuario_rol_gestor_id=usuario_rol_gestor_id) }}" 
                 class="btn btn-success">
                 Crear</a>
@@ -138,13 +144,17 @@
                                 </td>
                                 <td class="text-center">
                                     <a href="{{ url_for(
-                                        'usuarios_gestores.usuarios_gestores_gestor', 
+                                        'usuarios_cogestores.usuarios_cogestores_usuario_gestor', 
+                                        usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                        usuario_rol_gestor_id=usuario_rol_gestor_id,
                                         gestor_id=gestor._id|string) }}" 
                                         class="btn btn-primary btn-sm">
                                         Ir</a>
                                     <a href="{{ url_for(
-                                        'ug_gestores.gestores_actualizar', 
-                                        gestor_id=gestor._id|string) }}" 
+                                        'uc_gestores.gestores_actualizar', 
+                                        usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                        usuario_rol_gestor_id=usuario_rol_gestor_id,
+                                        gestor_id=gestor._id) }}" 
                                         class="btn btn-warning btn-sm">
                                         Editar</a>
                                     <button type="button" 
@@ -154,10 +164,45 @@
                                         Eliminar</button>
                                 </td>
                             </tr>
+                            <!-- Modal de confirmación de eliminación -->
+                            <div class="modal fade" id="confirmarEliminar{{ gestor._id }}" tabindex="-1" aria-labelledby="confirmarEliminarLabel{{ gestor._id }}" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content bg-dark text-white">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title text-danger text-center w-100" id="confirmarEliminarLabel{{ gestor._id }}">
+                                                <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                                                ¡ Confirmar ELIMINACIÓN !</h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p class="mb-0">¿Estás seguro de que deseas eliminar el gestor <strong>"{{ gestor.nombre_gestor }}"</strong>?</p>
+                                            <p class="text-danger mt-2">
+                                                <i class="fas fa-exclamation-circle me-1"></i>
+                                                Esta acción no se puede deshacer.
+                                            </p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <form action="{{ url_for(
+                                                'uc_gestores.gestores_eliminar', 
+                                                usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                                usuario_rol_gestor_id=usuario_rol_gestor_id,
+                                                gestor_id=gestor._id) }}" 
+                                                method="POST" style="display: inline;">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                    <i class="fas fa-times me-1"></i>
+                                                    Cancelar</button>
+                                                <button type="submit" class="btn btn-danger">
+                                                    <i class="fas fa-trash-alt me-1"></i>
+                                                    Eliminar</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         {% endfor %}
                     {% else %}
                         <tr>
-                            <td colspan="6" class="text-center">No hay gestores registrados</td>
+                            <td colspan="9" class="text-center">No hay gestores registrados</td>
                         </tr>
                     {% endif %}
                 </tbody>
