@@ -6,7 +6,12 @@
             <div class="card-body">
                 <h4 class="card-title text-center">Editar TITULAR</h4>
                 <div class="card-body">
-                    <form action="{{ url_for('ug_titulares.titulares_actualizar', titular_id=titular._id|string, gestor_id=gestor_id|string) }}" method="post">
+                    <form action="{{ url_for(
+                        'ug_titulares.titulares_actualizar', 
+                        usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                        usuario_rol_gestor_id=usuario_rol_gestor_id,
+                        gestor_id=gestor_id|string,
+                        titular_id=titular._id|string) }}" method="post">
                         <div class="form-floating mb-3">
                             <input type="text" class="form-control" id="nombre_titular" name="nombre_titular" 
                                    value="{{ titular.nombre_titular }}" required>
