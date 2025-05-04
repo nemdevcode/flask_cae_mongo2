@@ -73,12 +73,82 @@ def titulares_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id):
                            filtrar_estado=filtrar_estado
                            )
 
+def crear_titular(gestor_id, datos_formulario):
+    '''
+    Crea un nuevo titular en la base de datos.
+    '''
+    try:
+        # Obtener los datos del formulario
+        nombre_titular = datos_formulario.get('nombre_titular')
+        cif_dni = datos_formulario.get('cif_dni')
+        domicilio = datos_formulario.get('domicilio')
+        codigo_postal = datos_formulario.get('codigo_postal')
+        poblacion = datos_formulario.get('poblacion')
+        provincia = datos_formulario.get('provincia')
+        telefono_titular = datos_formulario.get('telefono_titular')
+
+        # Insertar el titular en la base de datos
+        insert = db.titulares.insert_one({
+            'gestor_id': ObjectId(gestor_id),
+            'nombre_titular': nombre_titular,
+            'cif_dni': cif_dni,
+            'domicilio': domicilio,
+            'codigo_postal': codigo_postal,
+            'poblacion': poblacion,
+            'provincia': provincia,
+            'telefono_titular': telefono_titular,
+            'estado_titular': 'activo',
+            'fecha_activacion': datetime.now(),
+            'fecha_modificacion': datetime.now(),
+            'fecha_inactivacion': None
+        })
+
+        if insert.inserted_id:
+            flash('Titular creado exitosamente', 'success')
+            return True, None
+        else:
+            flash('Error al crear el titular', 'danger')
+            return False, datos_formulario
+    except Exception as e:
+        flash(f'Error al procesar el formulario: {str(e)}', 'danger')
+        return False, datos_formulario
+
 def titulares_crear_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id):
-    return render_template('usuarios_cogestores/titulares/crear.html',
-                           usuario_rol_cogestor_id=usuario_rol_cogestor_id,
-                           usuario_rol_gestor_id=usuario_rol_gestor_id,
-                           gestor_id=gestor_id
-                           )
+    '''
+    Vista para crear un titular
+    '''
+    try:
+        # Si es una petición POST, procesar el formulario
+        if request.method == 'POST':
+            creado, datos_formulario = crear_titular(gestor_id, request.form)
+            if creado:
+                return redirect(url_for('uc_titulares.titulares',
+                                        usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                        usuario_rol_gestor_id=usuario_rol_gestor_id,
+                                        gestor_id=gestor_id
+                                        ))
+            else:
+                return render_template('usuarios_cogestores/titulares/crear.html',
+                                usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                usuario_rol_gestor_id=usuario_rol_gestor_id,
+                                gestor_id=gestor_id,
+                                datos_formulario=datos_formulario
+                                )
+
+        # Si es una petición GET, mostrar el formulario vacío
+        return render_template('usuarios_cogestores/titulares/crear.html',
+                                usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                usuario_rol_gestor_id=usuario_rol_gestor_id,
+                                gestor_id=gestor_id
+                                )
+
+    except Exception as e:
+        flash(f'Error al crear el titular: {str(e)}', 'danger')
+        return redirect(url_for('uc_titulares.titulares',
+                                usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                usuario_rol_gestor_id=usuario_rol_gestor_id,
+                                gestor_id=gestor_id
+                                ))
 
 def actualizar_titular(titular_id, gestor_id, datos_formulario):
     '''
@@ -167,12 +237,30 @@ def titulares_actualizar_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, g
                                 ))
     
 def titulares_eliminar_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, titular_id):
-    return render_template('usuarios_cogestores/titulares/eliminar.html',
+    try:
+        # Eliminar el titular
+        delete = db.titulares.delete_one({
+            '_id': ObjectId(titular_id),
+            'gestor_id': ObjectId(gestor_id)
+        })
+        if delete.deleted_count > 0:
+            flash('Titular eliminado exitosamente', 'success')
+        else:
+            flash('No se pudo eliminar el titular', 'danger')
+
+        return redirect(url_for('uc_titulares.titulares',
                            usuario_rol_cogestor_id=usuario_rol_cogestor_id,
                            usuario_rol_gestor_id=usuario_rol_gestor_id,
                            gestor_id=gestor_id,
                            titular_id=titular_id
-                           )
+                           ))
+    except Exception as e:
+        flash(f'Error al eliminar el titular: {str(e)}', 'danger')
+        return redirect(url_for('uc_titulares.titulares',
+                                usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                usuario_rol_gestor_id=usuario_rol_gestor_id,
+                                gestor_id=gestor_id
+                                ))
 
 def titulares_titular_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, titular_id):
     return render_template('usuarios_cogestores/titulares/index.html',
