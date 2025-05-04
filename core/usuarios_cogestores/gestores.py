@@ -214,7 +214,7 @@ def gestores_eliminar_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gest
                                 ))
 
 def gestor_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id):
-    return render_template('usuarios_cogestores/gestor_index.html',
+    return render_template('usuarios_cogestores/gestor/index.html',
                            usuario_rol_cogestor_id=usuario_rol_cogestor_id,
                            usuario_rol_gestor_id=usuario_rol_gestor_id,
                            gestor_id=gestor_id)

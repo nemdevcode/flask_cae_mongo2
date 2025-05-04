@@ -80,61 +80,92 @@ def titulares_crear_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor
                            gestor_id=gestor_id
                            )
 
-def titulares_actualizar_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, titular_id, form_data):
+def actualizar_titular(titular_id, gestor_id, datos_formulario):
+    '''
+    Actualiza un titular existente en la base de datos.
+    '''
+    try:       
+        # Obtener los datos del formulario
+        nombre_titular = datos_formulario.get('nombre_titular')
+        cif_dni = datos_formulario.get('cif_dni')
+        domicilio = datos_formulario.get('domicilio')
+        codigo_postal = datos_formulario.get('codigo_postal')
+        poblacion = datos_formulario.get('poblacion')
+        provincia = datos_formulario.get('provincia')
+        telefono_titular = datos_formulario.get('telefono_titular')
+        estado_titular = datos_formulario.get('estado_titular')
+
+        # Actualizar el titular
+        result = db.titulares.update_one(
+            {'_id': ObjectId(titular_id)},
+            {'$set': {
+                'nombre_titular': nombre_titular,
+                'cif_dni': cif_dni,
+                'domicilio': domicilio,
+                'codigo_postal': codigo_postal,
+                'poblacion': poblacion,
+                'provincia': provincia,
+                'telefono_titular': telefono_titular,
+                'estado_titular': estado_titular
+            }}
+        )
+
+        if result.modified_count > 0:
+            flash('Titular actualizado exitosamente', 'success')
+            return True, None
+        else:
+            flash('No se realizaron cambios en el titular', 'info')
+            return True, None
+
+    except Exception as e:
+        flash(f'Error al procesar el formulario: {str(e)}', 'danger')
+        return False, datos_formulario
+
+
+def titulares_actualizar_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, titular_id):
     '''
     Vista para actualizar un titular
     '''
-    # Obtener el titular a actualizar
-    titular = db.titulares.find_one({
-        '_id': ObjectId(titular_id),
-        'gestor_id': ObjectId(gestor_id)
-    })
-    
-    # Obtener los datos del formulario
-    nombre_titular = form_data.get('nombre_titular')
-    cif_dni = form_data.get('cif_dni')
-    domicilio = form_data.get('domicilio')
-    codigo_postal = form_data.get('codigo_postal')
-    poblacion = form_data.get('poblacion')
-    provincia = form_data.get('provincia')
-    telefono_titular = form_data.get('telefono_titular')
-    estado_titular = form_data.get('estado_titular')
 
-    # Actualizar el titular
-    result = db.titulares.update_one(
-        {'_id': ObjectId(titular_id)},
-        {'$set': {
-            'nombre_titular': nombre_titular,
-            'cif_dni': cif_dni,
-            'domicilio': domicilio,
-            'codigo_postal': codigo_postal,
-            'poblacion': poblacion,
-            'provincia': provincia,
-            'telefono_titular': telefono_titular,
-            'estado_titular': estado_titular
-        }}
-    )
+    try:
+        # Obtener el titular a actualizar
+        titular = db.titulares.find_one({
+            '_id': ObjectId(titular_id),
+            'gestor_id': ObjectId(gestor_id)
+        })
+        
+        # Si es una petición POST, procesar el formulario
+        if request.method == 'POST':
+            actualizar = actualizar_titular(titular_id, gestor_id, request.form)
+            if actualizar:
+                return redirect(url_for('uc_titulares.titulares', 
+                                        usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                        usuario_rol_gestor_id=usuario_rol_gestor_id,
+                                        gestor_id=gestor_id
+                                        ))
+            else:
+                return render_template('usuarios_cogestores/titulares/actualizar.html',
+                                       gestor_id=gestor_id,
+                                       titular=titular
+                                       )
+  
 
-    if result.modified_count > 0:
-        flash('Titular actualizado exitosamente', 'success')
-    else:
-        flash('No se realizaron cambios en el titular', 'info')
-
-    # Redirigir a la vista de titulares
-    return redirect(url_for('uc_titulares.titulares',
+        return render_template('usuarios_cogestores/titulares/actualizar.html',
                             usuario_rol_cogestor_id=usuario_rol_cogestor_id,
                             usuario_rol_gestor_id=usuario_rol_gestor_id,
-                            gestor_id=gestor_id
-                            ))
+                            gestor_id=gestor_id,
+                            titular_id=titular_id,
+                            titular=titular
+                            )
 
-    return render_template('usuarios_cogestores/titulares/actualizar.html',
-                           usuario_rol_cogestor_id=usuario_rol_cogestor_id,
-                           usuario_rol_gestor_id=usuario_rol_gestor_id,
-                           gestor_id=gestor_id,
-                           titular_id=titular_id,
-                           titular=titular
-                           )
-
+    except Exception as e:
+        flash(f'Error al actualizar el titular: {str(e)}', 'danger')
+        return redirect(url_for('uc_titulares.titulares',
+                                usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                usuario_rol_gestor_id=usuario_rol_gestor_id,
+                                gestor_id=gestor_id
+                                ))
+    
 def titulares_eliminar_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, titular_id):
     return render_template('usuarios_cogestores/titulares/eliminar.html',
                            usuario_rol_cogestor_id=usuario_rol_cogestor_id,
