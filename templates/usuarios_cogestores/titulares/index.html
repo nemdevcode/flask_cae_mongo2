@@ -36,7 +36,12 @@
                         titular_id=titular_id) }}" 
                         class="btn btn-secondary">
                         Usuarios</a>
-                    <a href="" 
+                    <a href="{{ url_for(
+                        'uc_centros.centros',
+                        usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                        usuario_rol_gestor_id=usuario_rol_gestor_id,
+                        gestor_id=gestor_id,
+                        titular_id=titular_id) }}" 
                         class="btn btn-secondary">
                         Centros</a>
                     <a href="" 
