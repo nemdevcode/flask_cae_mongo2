@@ -191,7 +191,6 @@ def actualizar_titular(titular_id, gestor_id, datos_formulario):
         flash(f'Error al procesar el formulario: {str(e)}', 'danger')
         return False, datos_formulario
 
-
 def titulares_actualizar_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, titular_id):
     '''
     Vista para actualizar un titular
@@ -263,6 +262,7 @@ def titulares_eliminar_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, ges
                                 ))
 
 def titulares_titular_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, titular_id):
+
     return render_template('usuarios_cogestores/titulares/index.html',
                            usuario_rol_cogestor_id=usuario_rol_cogestor_id,
                            usuario_rol_gestor_id=usuario_rol_gestor_id,

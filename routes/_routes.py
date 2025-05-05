@@ -14,6 +14,7 @@ from routes.usuarios_gestores.usuarios_titulares_routes import ug_usuarios_titul
 from routes.usuarios_cogestores.usuarios_cogestores_routes import usuarios_cogestores_bp
 from routes.usuarios_cogestores.gestores_routes import uc_gestores_bp
 from routes.usuarios_cogestores.titulares_routes import uc_titulares_bp
+from routes.usuarios_cogestores.usuarios_titulares_routes import uc_usuarios_titulares_bp
 
 from core.login import login_vista
 from core.registrate import registrate_vista
@@ -35,6 +36,7 @@ def rutas(app):
     app.register_blueprint(usuarios_cogestores_bp)
     app.register_blueprint(uc_gestores_bp)
     app.register_blueprint(uc_titulares_bp)
+    app.register_blueprint(uc_usuarios_titulares_bp)
 
     # Rutas comunes
 
