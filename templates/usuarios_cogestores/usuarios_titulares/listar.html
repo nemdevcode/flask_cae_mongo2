@@ -94,7 +94,11 @@
                 </div>
             </form>
             <!-- Botón crear -->
-            <a href="" 
+            <a href="{{ url_for('uc_usuarios_titulares.usuarios_titulares_crear', 
+                                usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                usuario_rol_gestor_id=usuario_rol_gestor_id,
+                                gestor_id=gestor_id,
+                                titular_id=titular_id) }}" 
                 class="btn btn-success">
                 Crear</a>
         </div>
@@ -156,7 +160,12 @@
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                            <a href="" 
+                                            <a href="{{ url_for('uc_usuarios_titulares.usuarios_titulares_eliminar', 
+                                                usuario_rol_cogestor_id=usuario_rol_cogestor_id, 
+                                                usuario_rol_gestor_id=usuario_rol_gestor_id, 
+                                                gestor_id=gestor_id, 
+                                                titular_id=titular_id, 
+                                                usuario_titular_id=usuario_titular._id) }}" 
                                                 class="btn btn-danger">
                                                 Eliminar</a>
                                         </div>

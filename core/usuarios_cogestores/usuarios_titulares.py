@@ -1,7 +1,10 @@
 from flask import render_template, request, redirect, url_for, session, flash
 from bson.objectid import ObjectId
-from utils.usuario_utils import obtener_usuario_autenticado
-from utils.rol_utils import verificar_rol_cogestor
+from utils.usuario_utils import verificar_usuario_existente, crear_usuario
+from utils.rol_utils import obtener_rol, crear_rol, obtener_usuario_rol
+from utils.usuario_rol_utils import crear_usuario_rol
+from utils.token_utils import generar_token_verificacion
+from utils.email_utils import enviar_email
 from config import conexion_mongo
 
 db = conexion_mongo()
@@ -79,26 +82,165 @@ def usuarios_titulares_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, ges
                                 gestor_id=gestor_id, 
                                 titular_id=titular_id
                                 ))
-def crear_usuario_titular(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, titular_id):
+
+def crear_usuario_titular(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, titular_id, datos_formulario):
     '''
     Función para crear un usuario titular
     '''
-    return render_template('usuarios_cogestores/usuarios_titulares/crear.html',
-                           usuario_rol_cogestor_id=usuario_rol_cogestor_id, 
-                           usuario_rol_gestor_id=usuario_rol_gestor_id, 
-                           gestor_id=gestor_id, 
-                           titular_id=titular_id
-                           )
+    try:
+        # Obtener los datos del formulario
+        email = datos_formulario.get('email', '').strip().lower()
+        alias = datos_formulario.get('alias', '').strip().upper()
+
+        # Verificar si el usuario existe
+        existe_usuario, usuario_titular_id = verificar_usuario_existente(email)
+
+        if existe_usuario:
+            # Obtener rol de titular
+                existe_rol, rol_titular_id = obtener_rol('titular')
+                
+                if not existe_rol:
+                    rol_titular_id = crear_rol('titular')
+                
+                # Verificar si el usuario ya tiene el rol de titular
+                tiene_rol_titular, usuario_rol_titular_id = obtener_usuario_rol(usuario_titular_id, rol_titular_id)
+                
+                if tiene_rol_titular:
+                    # Verificar si ya es usuario titular para este titular específico
+                    titular_existente = db.usuarios_titulares.find_one({
+                        'usuario_rol_titular_id': usuario_rol_titular_id,
+                        'titular_id': ObjectId(titular_id)
+                    })
+                    
+                    if titular_existente:
+                        flash('Este email ya está registrado como usuario titular para este titular', 'danger')
+                        return False, {
+                            'email': email,
+                            'alias': alias
+                        }
+                    
+                else:
+                    # Si no tiene el rol de titular, crearlo
+                    usuario_rol_titular_id = crear_usuario_rol(usuario_titular_id, rol_titular_id)
+        
+        # Obtener rol de titular
+        existe_rol, rol_titular_id = obtener_rol('titular')
+        
+        if not existe_rol:
+            rol_titular_id = crear_rol('titular')
+
+        # Verificar si el usuario ya tiene el rol de titular
+        tiene_rol_titular, usuario_rol_titular_id = obtener_usuario_rol(usuario_titular_id, rol_titular_id)
+        
+        if tiene_rol_titular:
+            # Insertar el usuario titular en la base de datos
+            insert = db.usuarios_titulares.insert_one({
+                'usuario_rol_titular_id': ObjectId(usuario_rol_titular_id),
+                'titular_id': ObjectId(titular_id),
+                'alias_usuario_titular': alias,
+                'estado_usuario_titular': 'activo'
+            })
+            flash('Este email ya está registrado se ha creado un usuario titular para este titular', 'info')
+            return True, None
+        
+        # Si el usuario no existe, crear nuevo usuario y usuario titular
+        # Generar token de verificación
+        token = generar_token_verificacion(email)
+        
+        # Crear diccionario con los datos del nuevo usuario
+        datos_usuario = {
+            'token_verificacion': token,
+            'verificado': False,
+            'estado_usuario': 'pendiente'
+        }
+        
+        # Crear el nuevo usuario
+        nuevo_usuario_id = crear_usuario(email, datos_usuario)
+        
+        # Obtener rol de titular y crear usuario_rol
+        existe_rol, rol_titular_id = obtener_rol('titular')
+        if not existe_rol:
+            rol_titular_id = crear_rol('titular')
+        
+        usuario_rol_titular_id = crear_usuario_rol(nuevo_usuario_id, rol_titular_id)
+
+        # Insertar el usuario titular en la base de datos
+        insert = db.usuarios_titulares.insert_one({
+            'usuario_rol_titular_id': ObjectId(usuario_rol_titular_id),
+            'titular_id': ObjectId(titular_id),
+            'alias_usuario_titular': alias,
+            'estado_usuario_titular': 'activo'
+        })
+
+        # Enviar email de verificación solo para usuarios nuevos
+        link_verificacion = url_for('verificar_email', 
+                                    token=token, 
+                                    email=email, 
+                                    _external=True
+                                    )
+        cuerpo_email = render_template('emails/registro_titular.html',
+                                        alias=alias,
+                                        link_verificacion=link_verificacion
+                                        )
+
+        if enviar_email(email, "Activación de cuenta - CAE Accesible", cuerpo_email):
+            # flash('Usuario titular creado correctamente. Se ha enviado un email de activación.', 'success')
+            if insert.inserted_id:
+                flash('Usuario titular creado correctamente. Se ha enviado un email de activación.', 'success')
+                return True, None
+            else:
+                flash('Error al crear el usuario titular', 'danger')
+                return False, datos_formulario
+        else:
+            flash('Usuario titular creado pero hubo un error al enviar el email de activación.', 'warning')
+
+        
+    except Exception as e:
+        flash(f'Error al crear el usuario titular: {str(e)}', 'danger')
+        return False, datos_formulario
+
 def usuarios_titulares_crear_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, titular_id):
     '''
     Vista para crear un usuario titular
     '''
-    return render_template('usuarios_cogestores/usuarios_titulares/crear.html',
-                           usuario_rol_cogestor_id=usuario_rol_cogestor_id, 
-                           usuario_rol_gestor_id=usuario_rol_gestor_id, 
-                           gestor_id=gestor_id, 
-                           titular_id=titular_id
-                           )
+    try:
+        if request.method == 'GET':
+            datos_formulario = {}
+            return render_template('usuarios_cogestores/usuarios_titulares/crear.html',
+                                    usuario_rol_cogestor_id=usuario_rol_cogestor_id, 
+                                    usuario_rol_gestor_id=usuario_rol_gestor_id, 
+                                    gestor_id=gestor_id, 
+                                    titular_id=titular_id,
+                                    datos_formulario=datos_formulario
+                                    )
+        
+        if request.method == 'POST':
+            # Crear usuario titular
+            creado, datos_formulario = crear_usuario_titular(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, titular_id, request.form)
+            if creado:
+                return redirect(url_for('uc_usuarios_titulares.usuarios_titulares', 
+                                        usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                        usuario_rol_gestor_id=usuario_rol_gestor_id,
+                                        gestor_id=gestor_id, 
+                                        titular_id=titular_id
+                                        ))
+            else:
+                return render_template('usuarios_cogestores/usuarios_titulares/crear.html',
+                                usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                usuario_rol_gestor_id=usuario_rol_gestor_id,
+                                gestor_id=gestor_id,
+                                titular_id=titular_id,
+                                datos_formulario=datos_formulario
+                                )
+
+    except Exception as e:
+        flash(f'Error al crear el usuario titular: {str(e)}', 'danger')
+        return redirect(url_for('uc_usuarios_titulares.usuarios_titulares', 
+                                usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                usuario_rol_gestor_id=usuario_rol_gestor_id,
+                                gestor_id=gestor_id, 
+                                titular_id=titular_id
+                                ))
 
 def actualizar_usuario_titular(usuario_titular_id, datos_formulario):
     '''
@@ -129,7 +271,6 @@ def actualizar_usuario_titular(usuario_titular_id, datos_formulario):
         flash(f'Error al actualizar el usuario titular: {str(e)}', 'danger')
         return False, datos_formulario
 
-
 def usuarios_titulares_actualizar_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, titular_id, usuario_titular_id):
     '''
     Vista para actualizar un usuario titular
@@ -150,6 +291,7 @@ def usuarios_titulares_actualizar_vista(usuario_rol_cogestor_id, usuario_rol_ges
             },
             'email': usuario['email']
         }
+
         # Si es una petición POST, procesar el formulario
         if request.method == 'POST':
             actualizar = actualizar_usuario_titular(usuario_titular_id, request.form)
@@ -158,22 +300,14 @@ def usuarios_titulares_actualizar_vista(usuario_rol_cogestor_id, usuario_rol_ges
                                         usuario_rol_cogestor_id=usuario_rol_cogestor_id,
                                         usuario_rol_gestor_id=usuario_rol_gestor_id,
                                         gestor_id=gestor_id, 
-                                        titular_id=titular_id, 
-                                        usuario_titular_id=usuario_titular_id,
-                                        usuario_titular=usuario_titular_info
+                                        titular_id=titular_id
                                         ))
-            else:
-                return render_template('usuarios_cogestores/usuarios_titulares/actualizar.html',
-                                       usuario_rol_cogestor_id=usuario_rol_cogestor_id, 
-                                       usuario_rol_gestor_id=usuario_rol_gestor_id, 
-                                       gestor_id=gestor_id, 
-                                       usuario_titular_id=usuario_titular_id,
-                                       usuario_titular=usuario_titular_info
-                                       )
+
         return render_template('usuarios_cogestores/usuarios_titulares/actualizar.html',
                            usuario_rol_cogestor_id=usuario_rol_cogestor_id, 
                            usuario_rol_gestor_id=usuario_rol_gestor_id, 
                            gestor_id=gestor_id, 
+                           titular_id=titular_id,
                            usuario_titular_id=usuario_titular_id,
                            usuario_titular=usuario_titular_info
                            )
@@ -187,20 +321,36 @@ def usuarios_titulares_actualizar_vista(usuario_rol_cogestor_id, usuario_rol_ges
                                 usuario_titular_id=usuario_titular_id
                                 ))
 
-
 def usuarios_titulares_eliminar_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, titular_id, usuario_titular_id):
     '''
     Vista para eliminar un usuario titular
     '''
-    return render_template('usuarios_cogestores/usuarios_titulares/eliminar.html',
-                           usuario_rol_cogestor_id=usuario_rol_cogestor_id, 
-                           usuario_rol_gestor_id=usuario_rol_gestor_id, 
-                           gestor_id=gestor_id, 
-                           titular_id=titular_id, 
-                           usuario_titular_id=usuario_titular_id
-                           )
+    try:
+        # Eliminar el usuario titular
+        delete = db.usuarios_titulares.delete_one({
+            '_id': ObjectId(usuario_titular_id)
+        })
+        if delete.deleted_count > 0:
+            flash('Usuario titular eliminado exitosamente', 'success')
+        else:
+            flash('No se pudo eliminar el usuario titular', 'danger')
 
+        return redirect(url_for('uc_usuarios_titulares.usuarios_titulares',
+                                usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                usuario_rol_gestor_id=usuario_rol_gestor_id,
+                                gestor_id=gestor_id,
+                                titular_id=titular_id,
+                                usuario_titular_id=usuario_titular_id
+                                ))
 
-
+    except Exception as e:
+        flash(f'Error al eliminar el usuario titular: {str(e)}', 'danger')
+        return redirect(url_for('uc_usuarios_titulares.usuarios_titulares', 
+                                usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                usuario_rol_gestor_id=usuario_rol_gestor_id,
+                                gestor_id=gestor_id, 
+                                titular_id=titular_id, 
+                                usuario_titular_id=usuario_titular_id
+                                ))
 
 

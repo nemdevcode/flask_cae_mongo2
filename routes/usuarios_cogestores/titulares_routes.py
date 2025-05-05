@@ -48,10 +48,6 @@ Rutas para gestión de elementos de cada titular, funciones:
 @uc_titulares_bp.route('/titular/<usuario_rol_cogestor_id>/<usuario_rol_gestor_id>/<gestor_id>/<titular_id>', methods=['GET', 'POST'])
 @login_requerido
 def titulares_titular(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, titular_id):
-    print(f'ruta usuario_rol_cogestor_id: {usuario_rol_cogestor_id}')
-    print(f'ruta usuario_rol_gestor_id: {usuario_rol_gestor_id}')
-    print(f'ruta gestor_id: {gestor_id}')
-    print(f'ruta titular_id: {titular_id}')
     return titulares_titular_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, titular_id)
 
 

@@ -16,15 +16,30 @@
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end align-items-center">
                     <span class="my-auto">Volver a:</span>
                     <div class="btn-group" role="group" aria-label="Navegación entre tipos de usuarios">
-                        <a href="{{ url_for('ug_titulares.titulares', gestor_id=gestor_id|string) }}" class="btn btn-outline-primary">
+                        <a href="{{ url_for(
+                            'ug_titulares.titulares', 
+                            gestor_id=gestor_id|string) }}" 
+                            class="btn btn-outline-primary">
                             Titulares</a>
                     </div>
                     <div class="btn-group" role="group" aria-label="Navegación entre elementos de usuario">
-                        <a href="{{ url_for('ug_usuarios_titulares.usuarios_titulares', gestor_id=gestor_id|string, titular_id=titular._id|string) }}" class="btn btn-secondary">
+                        <a href="{{ url_for(
+                            'ug_usuarios_titulares.usuarios_titulares', 
+                            gestor_id=gestor_id|string, 
+                            titular_id=titular._id|string) }}" 
+                            class="btn btn-secondary">
                             Usuarios</a>
-                        <a href="{{ url_for('ug_centros.centros', gestor_id=gestor_id|string, titular_id=titular._id|string) }}" class="btn btn-secondary">
+                        <a href="{{ url_for(
+                            'ug_centros.centros', 
+                            gestor_id=gestor_id|string, 
+                            titular_id=titular._id|string) }}" 
+                            class="btn btn-secondary">
                             Centros</a>
-                        <a href="{{ url_for('ug_contratas.contratas', gestor_id=gestor_id|string, titular_id=titular._id|string) }}" class="btn btn-secondary">
+                        <a href="{{ url_for(
+                            'ug_contratas.contratas', 
+                            gestor_id=gestor_id|string, 
+                            titular_id=titular._id|string) }}" 
+                            class="btn btn-secondary">
                             Contratas</a>
                     </div>
                     <a href="{{ url_for('logout') }}" class="btn btn-outline-dark">Cerrar sesión</a>
