@@ -1,1 +1,232 @@
-listar centros
+{% extends "_base.html" %}
+
+{% block header %}
+    <nav class="navbar navbar-expand-lg" style="background-color: #e3f2fd;">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+                <a class="navbar-brand">CAE Accesible</a>
+                <a class="btn btn-info rounded-circle p-1" data-bs-toggle="modal" data-bs-target="#infoModal">
+                    <img src="{{ url_for('static', filename='info-circle-fill.svg') }}" 
+                            alt="Información" style="width: 20px; height: 20px; filter: brightness(0) invert(1);">
+                </a>
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/usuarios">Inicio</a>
+                    </li>
+                </ul>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end align-items-center">
+                    <span class="my-auto">Volver a:</span>
+                    <a href="{{ url_for('uc_titulares.titulares_titular', 
+                        usuario_rol_cogestor_id=usuario_rol_cogestor_id, 
+                        usuario_rol_gestor_id=usuario_rol_gestor_id, 
+                        gestor_id=gestor_id, 
+                        titular_id=titular_id) }}" class="btn btn-outline-primary">
+                        Titular</a>
+                    <a href="{{ url_for('logout') }}" class="btn btn-outline-dark">
+                        Cerrar sesión</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+{% endblock %}
+
+{% block main %}
+    <!-- Listado de centros por titular -->
+    <div class="container mt-5">
+        <h3 class="text-center">Listado de centros del titular: {{ nombre_titular }}</h3>
+        <div class="d-flex justify-content-between align-items-center mt-5">
+            <!-- Formulario para filtrar centros -->
+            <form action="{{ url_for('uc_centros.centros', 
+                        usuario_rol_cogestor_id=usuario_rol_cogestor_id, 
+                        usuario_rol_gestor_id=usuario_rol_gestor_id, 
+                        gestor_id=gestor_id, 
+                        titular_id=titular_id) }}" 
+                        method="post" class="flex-grow-1 me-3">
+                <div class="d-flex gap-3 align-items-center">
+                    <!-- Input para filtrar centro -->
+                    <div class="form-floating" style="flex: 2; min-height: 80px;">
+                        <input type="text" 
+                            class="form-control" 
+                            id="filtrar_centro"
+                            name="filtrar_centro"
+                            value="{{ request.form.get('filtrar_centro', '') }}"
+                            oninput="this.form.submit()"
+                            autocomplete="off"
+                            autofocus
+                            onfocus="this.setSelectionRange(this.value.length, this.value.length)"
+                            style="height: 80px;">
+                            <label for="filtrar_centro" style="white-space: normal; line-height: 1.2; height: auto; padding-top: 0.5rem; transform-origin: 0 0;">
+                            Escriba el nombre, domicilio, código postal, población o provincia para filtrar...</label>
+                    </div>
+                    
+                    <!-- Filtro por estado -->
+                    <div class="btn-group" role="group" aria-label="Filtrar por estado" style="flex: 2;">
+                        <input type="radio" 
+                            class="btn-check" 
+                            name="filtrar_estado" 
+                            id="todos" 
+                            value="todos" 
+                            {% if not request.form.get('filtrar_estado') or request.form.get('filtrar_estado') == 'todos' %}checked{% endif %}
+                            onchange="this.form.submit()">
+                            <label class="btn btn-outline-primary" for="todos">
+                            Todos</label>
+                        
+                        <input type="radio" 
+                            class="btn-check" 
+                            name="filtrar_estado" 
+                            id="activos" 
+                            value="activo"
+                            {% if request.form.get('filtrar_estado') == 'activo' %}checked{% endif %}
+                            onchange="this.form.submit()">
+                            <label class="btn btn-outline-success" for="activos">
+                            Activos</label>
+                        
+                        <input type="radio" 
+                            class="btn-check" 
+                            name="filtrar_estado" 
+                            id="inactivos" 
+                            value="inactivo"
+                            {% if request.form.get('filtrar_estado') == 'inactivo' %}checked{% endif %}
+                            onchange="this.form.submit()">
+                            <label class="btn btn-outline-secondary" for="inactivos">
+                            Inactivos</label>
+                    </div>
+                    
+                    <!-- Botón para limpiar filtro -->
+                    <div style="flex: 1;">
+                        <a href="{{ url_for('uc_centros.centros', 
+                            usuario_rol_cogestor_id=usuario_rol_cogestor_id, 
+                            usuario_rol_gestor_id=usuario_rol_gestor_id, 
+                            gestor_id=gestor_id, 
+                            titular_id=titular_id) }}" 
+                            class="btn btn-secondary">
+                            Limpiar filtros</a>
+                    </div>
+                </div>
+            </form>
+            <!-- Botón crear -->
+            <a href="{{ url_for('uc_centros.centros_crear', 
+                        usuario_rol_cogestor_id=usuario_rol_cogestor_id, 
+                        usuario_rol_gestor_id=usuario_rol_gestor_id, 
+                        gestor_id=gestor_id, 
+                        titular_id=titular_id) }}" 
+                        class="btn btn-success">
+                Crear</a>
+        </div>
+        <!-- Tabla de centros -->
+        <div class="table-responsive mt-5">
+            <table class="table table-striped">
+                <thead class="text-center">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Domicilio</th>
+                        <th>Código Postal</th>
+                        <th>Población</th>
+                        <th>Provincia</th>
+                        <th>Teléfono</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if centros %}
+                        {% for centro in centros %}
+                            <tr>
+                                <td>{{ centro.nombre_centro }}</td>
+                                <td>{{ centro.domicilio }}</td>
+                                <td>{{ centro.codigo_postal }}</td>
+                                <td>{{ centro.poblacion }}</td>
+                                <td>{{ centro.provincia }}</td>
+                                <td>{{ centro.telefono_centro }}</td>
+                                <td class="text-center">
+                                    {% if centro.estado_centro == 'activo' %}
+                                        <span class="badge bg-success">Activo</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactivo</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <a href="{{ url_for('uc_centros.centros_centro', 
+                                        usuario_rol_cogestor_id=usuario_rol_cogestor_id, 
+                                        usuario_rol_gestor_id=usuario_rol_gestor_id, 
+                                        gestor_id=gestor_id, 
+                                        titular_id=titular_id, 
+                                        centro_id=centro._id) }}" 
+                                        class="btn btn-primary btn-sm">
+                                        Ir</a>
+                                    <a href="{{ url_for('uc_centros.centros_actualizar', 
+                                        usuario_rol_cogestor_id=usuario_rol_cogestor_id, 
+                                        usuario_rol_gestor_id=usuario_rol_gestor_id, 
+                                        gestor_id=gestor_id, 
+                                        titular_id=titular_id, 
+                                        centro_id=centro._id) }}" 
+                                        class="btn btn-warning btn-sm">
+                                        Editar</a>
+                                    <button type="button" 
+                                        class="btn btn-danger btn-sm" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#confirmarEliminar{{ centro._id }}">
+                                        Eliminar
+                                    </button>
+                                </td>
+                            </tr>
+                            <!-- Modal de confirmación de eliminación -->
+                            <div class="modal fade" id="confirmarEliminar{{ centro._id }}" tabindex="-1" aria-labelledby="confirmarEliminarLabel{{ centro._id }}" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content bg-dark text-white">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title text-danger text-center w-100" id="confirmarEliminarLabel{{ centro._id }}">Confirmar eliminación</h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            ¿Está seguro que desea eliminar el centro "{{ centro.nombre_centro }}"? 
+                                            <br>
+                                            <strong>Domicilio:</strong> {{ centro.domicilio }}
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                            <a href="{{ url_for('uc_centros.centros_eliminar', 
+                                                usuario_rol_cogestor_id=usuario_rol_cogestor_id, 
+                                                usuario_rol_gestor_id=usuario_rol_gestor_id, 
+                                                gestor_id=gestor_id, 
+                                                titular_id=titular_id, 
+                                                centro_id=centro._id) }}" 
+                                                class="btn btn-danger">
+                                                Eliminar</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center">No hay centros para mostrar</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- Modal de Información -->
+    <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-center w-100" id="infoModalLabel">Información/Ayuda</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>...</p>
+                    <hr>
+                    <p>...</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

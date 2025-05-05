@@ -246,13 +246,13 @@ def titulares_eliminar_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, ges
             flash('Titular eliminado exitosamente', 'success')
         else:
             flash('No se pudo eliminar el titular', 'danger')
-
-        return redirect(url_for('uc_titulares.titulares',
+            return redirect(url_for('uc_titulares.titulares',
                            usuario_rol_cogestor_id=usuario_rol_cogestor_id,
                            usuario_rol_gestor_id=usuario_rol_gestor_id,
                            gestor_id=gestor_id,
                            titular_id=titular_id
                            ))
+        
     except Exception as e:
         flash(f'Error al eliminar el titular: {str(e)}', 'danger')
         return redirect(url_for('uc_titulares.titulares',
