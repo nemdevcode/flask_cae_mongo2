@@ -5,23 +5,24 @@ from config import conexion_mongo
 
 db = conexion_mongo()
 
-def centros_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, titular_id):
+def contratas_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, titular_id):
     '''
-    Vista para listar los centros del gestor asignado como cogestor
+    Vista para listar las contratas del titular asignado como cogestor
     '''
     try:
          # Obtener parámetros de filtrado
-        filtrar_centro = request.form.get('filtrar_centro', '')
+        filtrar_contrata = request.form.get('filtrar_contrata', '')
         filtrar_estado = request.form.get('filtrar_estado', 'todos')
         vaciar = request.args.get('vaciar', '0')
         
         # Si se solicita vaciar filtros
         if vaciar == '1':
-            return redirect(url_for('uc_centros.centros', 
+            return redirect(url_for('uc_contratas.contratas', 
                                     usuario_rol_cogestor_id=usuario_rol_cogestor_id, 
                                     usuario_rol_gestor_id=usuario_rol_gestor_id, 
                                     gestor_id=gestor_id, 
-                                    titular_id=titular_id))
+                                    titular_id=titular_id
+                                    ))
         
         # Construir la consulta base - buscar centros donde el titular_id sea el del titular actual
         consulta_filtros = {'titular_id': ObjectId(titular_id)}
@@ -30,30 +31,32 @@ def centros_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, tit
         if filtrar_estado != 'todos':
             consulta_filtros['estado_centro'] = filtrar_estado
         
-        # Obtener los centros asociados al titular
-        centros = []
-        centros_titular = db.centros.find(consulta_filtros)
+        # Obtener las contratas asociadas al titular
+        contratas = []
+        contratas_titular = db.contratas.find(consulta_filtros)
         
-        for centro in centros_titular:
+        for contrata in contratas_titular:
             # Si hay filtro por texto, verificar si coincide en algún campo
-            if filtrar_centro:
-                if (filtrar_centro.lower() not in centro['nombre_centro'].lower() and
-                    filtrar_centro.lower() not in centro['domicilio'].lower() and
-                    filtrar_centro.lower() not in centro['codigo_postal'].lower() and
-                    filtrar_centro.lower() not in centro['poblacion'].lower() and
-                    filtrar_centro.lower() not in centro['provincia'].lower() and
-                    filtrar_centro.lower() not in centro.get('telefono_centro', '').lower()):
+            if filtrar_contrata:
+                if (filtrar_contrata.lower() not in contrata['nombre_contrata'].lower() and
+                    filtrar_contrata.lower() not in contrata['cif_dni'].lower() and
+                    filtrar_contrata.lower() not in contrata['domicilio'].lower() and
+                    filtrar_contrata.lower() not in contrata['codigo_postal'].lower() and
+                    filtrar_contrata.lower() not in contrata['poblacion'].lower() and
+                    filtrar_contrata.lower() not in contrata['provincia'].lower() and
+                    filtrar_contrata.lower() not in contrata.get('telefono_contrata', '').lower()):
                     continue
 
-            centros.append({
-                '_id': str(centro['_id']),
-                'nombre_centro': centro['nombre_centro'],
-                'domicilio': centro['domicilio'],
-                'codigo_postal': centro['codigo_postal'],
-                'poblacion': centro['poblacion'],
-                'provincia': centro['provincia'],
-                'telefono_centro': centro.get('telefono_centro', ''),
-                'estado_centro': centro.get('estado_centro', centro.get('estado', 'activo'))
+            contratas.append({
+                '_id': str(contrata['_id']),
+                'nombre_contrata': contrata['nombre_contrata'],
+                'cif_dni': contrata['cif_dni'],
+                'domicilio': contrata['domicilio'],
+                'codigo_postal': contrata['codigo_postal'],
+                'poblacion': contrata['poblacion'],
+                'provincia': contrata['provincia'],
+                'telefono_contrata': contrata.get('telefono_contrata', ''),
+                'estado_contrata': contrata.get('estado_contrata', contrata.get('estado', 'activo'))
             })
 
         # Obtener el nombre del titular seleccionado
@@ -62,79 +65,81 @@ def centros_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, tit
         }, {'nombre_titular': 1, '_id': 0})
 
 
-        return render_template('usuarios_cogestores/centros/listar.html', 
+        return render_template('usuarios_cogestores/contratas/listar.html', 
                                usuario_rol_cogestor_id=usuario_rol_cogestor_id, 
                                usuario_rol_gestor_id=usuario_rol_gestor_id, 
                                gestor_id=gestor_id, 
                                titular_id=titular_id,
                                nombre_titular=nombre_titular.get('nombre_titular'),
-                               centros=centros,
-                               filtrar_centro=filtrar_centro,
+                               contratas=contratas,
+                               filtrar_contrata=filtrar_contrata,
                                filtrar_estado=filtrar_estado
                                )
     except Exception as e:
-        print(f"Error en centros_vista: {e}")
-        return render_template('usuarios_cogestores/centros/listar.html', 
+        print(f"Error en contratas_vista: {e}")
+        return render_template('usuarios_cogestores/contratas/listar.html', 
                            usuario_rol_cogestor_id=usuario_rol_cogestor_id, 
                            usuario_rol_gestor_id=usuario_rol_gestor_id, 
                            gestor_id=gestor_id, 
                            titular_id=titular_id)
 
-def crear_centro(titular_id, datos_formulario):
+def crear_contrata(titular_id, datos_formulario):
     '''
-    Crea un nuevo centro en la base de datos.
+    Crea una nueva contrata en la base de datos.
     '''
     try:
          # Obtener los datos del formulario
-        nombre_centro = datos_formulario.get('nombre_centro')
+        nombre_contrata = datos_formulario.get('nombre_contrata')
+        cif_dni = datos_formulario.get('cif_dni')
         domicilio = datos_formulario.get('domicilio')
         codigo_postal = datos_formulario.get('codigo_postal')
         poblacion = datos_formulario.get('poblacion')
         provincia = datos_formulario.get('provincia')
-        telefono_centro = datos_formulario.get('telefono_centro')
+        telefono_contrata = datos_formulario.get('telefono_contrata')
 
-        # Insertar el centro en la base de datos
-        insert = db.centros.insert_one({
+        # Insertar la contrata en la base de datos
+        insert = db.contratas.insert_one({
             'titular_id': ObjectId(titular_id),
-            'nombre_centro': nombre_centro,
+            'nombre_contrata': nombre_contrata,
+            'cif_dni': cif_dni,
             'domicilio': domicilio,
             'codigo_postal': codigo_postal,
             'poblacion': poblacion,
             'provincia': provincia,
-            'telefono_centro': telefono_centro,
+            'telefono_contrata': telefono_contrata,
             'fecha_activacion': datetime.now(),
             'fecha_modificacion': datetime.now(),
             'fecha_inactivacion': None,
-            'estado_centro': 'activo'
+            'estado_contrata': 'activo'
         })
 
         if insert.inserted_id:
-            flash('Centro creado exitosamente', 'success')
+            flash('Contrata creada correctamente', 'success')
             return True, None
         else:
-            flash('Error al crear el centro', 'danger')
+            flash('Error al crear la contrata', 'danger')
             return False, datos_formulario
         
     except Exception as e:
         flash(f'Error al procesar el formulario: {str(e)}', 'danger')
         return False, datos_formulario
 
-def centros_crear_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, titular_id):
+def contratas_crear_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, titular_id):
     '''
-    Vista para crear un centro
+    Vista para crear una contrata
     '''
     try:
         # Si es una petición POST, procesar el formulario
         if request.method == 'POST':
-            creado, datos_formulario = crear_centro(titular_id, request.form)
+            creado, datos_formulario = crear_contrata(titular_id, request.form)
             if creado:
-                return redirect(url_for('uc_centros.centros',
+                return redirect(url_for('uc_contratas.contratas',
                                         usuario_rol_cogestor_id=usuario_rol_cogestor_id,
                                         usuario_rol_gestor_id=usuario_rol_gestor_id,
                                         gestor_id=gestor_id,
                                         titular_id=titular_id))
             else:
-                return render_template('usuarios_cogestores/centros/crear.html',
+                return render_template('usuarios_cogestores/contratas/crear.html',
                                 usuario_rol_cogestor_id=usuario_rol_cogestor_id,
                                 usuario_rol_gestor_id=usuario_rol_gestor_id,
                                 gestor_id=gestor_id,
@@ -142,132 +147,136 @@ def centros_crear_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_i
                                 datos_formulario=datos_formulario)
             
         # Si es una petición GET, mostrar el formulario vacío
-        return render_template('usuarios_cogestores/centros/crear.html',
+        return render_template('usuarios_cogestores/contratas/crear.html',
                                 usuario_rol_cogestor_id=usuario_rol_cogestor_id,
                                 usuario_rol_gestor_id=usuario_rol_gestor_id,
                                 gestor_id=gestor_id,
                                 titular_id=titular_id)
 
     except Exception as e:
-        flash(f'Error al crear el centro: {str(e)}', 'danger')
-        return redirect(url_for('uc_centros.centros',
+        flash(f'Error al crear la contrata: {str(e)}', 'danger')
+        return redirect(url_for('uc_contratas.contratas',
                                 usuario_rol_cogestor_id=usuario_rol_cogestor_id,
                                 usuario_rol_gestor_id=usuario_rol_gestor_id,
                                 gestor_id=gestor_id,
                                 titular_id=titular_id))
 
-def actualizar_centro(centro_id, datos_formulario):
+def actualizar_contrata(contrata_id, datos_formulario):
     '''
-    Actualiza un centro existente en la base de datos.
+    Actualiza una contratación existente en la base de datos.
     '''
     try:
         # Obtener los datos del formulario
-        nombre_centro = datos_formulario.get('nombre_centro')
+        nombre_contrata = datos_formulario.get('nombre_contrata')
+        cif_dni = datos_formulario.get('cif_dni')
         domicilio = datos_formulario.get('domicilio')
         codigo_postal = datos_formulario.get('codigo_postal')
         poblacion = datos_formulario.get('poblacion')
         provincia = datos_formulario.get('provincia')
-        telefono_centro = datos_formulario.get('telefono_centro')
-        estado_centro = datos_formulario.get('estado_centro')
+        telefono_contrata = datos_formulario.get('telefono_contrata')
+        estado_contrata = datos_formulario.get('estado_contrata')
+        email_contrata = datos_formulario.get('email_contrata')
 
-        # Actualizar el centro en la base de datos
-        update = db.centros.update_one({
-            '_id': ObjectId(centro_id)
+        # Actualizar la contratación en la base de datos
+        update = db.contratas.update_one({
+            '_id': ObjectId(contrata_id)
         }, {
             '$set': {
-                'nombre_centro': nombre_centro,
+                'nombre_contrata': nombre_contrata,
+                'cif_dni': cif_dni,
                 'domicilio': domicilio,
                 'codigo_postal': codigo_postal,
                 'poblacion': poblacion,
                 'provincia': provincia,
-                'telefono_centro': telefono_centro,
+                'telefono_contrata': telefono_contrata,
                 'fecha_modificacion': datetime.now(),
                 'fecha_inactivacion': None,
-                'estado_centro': estado_centro
+                'estado_contrata': estado_contrata,
+                'email_contrata': email_contrata
             }
         })
 
         if update.modified_count > 0:
-            flash('Centro actualizado exitosamente', 'success')
+            flash('Contrata actualizada exitosamente', 'success')
             return True, None
         else:
-            flash('Error al actualizar el centro', 'danger')
+            flash('Error al actualizar la contratación', 'danger')
             return False, datos_formulario
         
     except Exception as e:
-        flash(f'Error al actualizar el centro: {str(e)}', 'danger')
+        flash(f'Error al actualizar la contratación: {str(e)}', 'danger')
         return False, datos_formulario
-    
-def centros_actualizar_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, titular_id, centro_id):
+
+def contratas_actualizar_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, titular_id, contrata_id):
     '''
-    Vista para actualizar un centro
+    Vista para actualizar una contrata
     '''
     try:
-        # Obtener el centro a actualizar
-        centro = db.centros.find_one({
-            '_id': ObjectId(centro_id)
+        # Obtener la contrata a actualizar
+        contrata = db.contratas.find_one({
+            '_id': ObjectId(contrata_id)
         })
 
         # Si es una petición POST, procesar el formulario
         if request.method == 'POST':
-            actualizado, datos_formulario = actualizar_centro(centro_id, request.form)
+            actualizado, datos_formulario = actualizar_contrata(contrata_id, request.form)
             if actualizado:
-                return redirect(url_for('uc_centros.centros',
+                return redirect(url_for('uc_contratas.contratas',
                                         usuario_rol_cogestor_id=usuario_rol_cogestor_id,
                                         usuario_rol_gestor_id=usuario_rol_gestor_id,
                                         gestor_id=gestor_id,
                                         titular_id=titular_id,
-                                        centro_id=centro_id
+                                        contrata_id=contrata_id
                                         ))
             else:
-                return render_template('usuarios_cogestores/centros/actualizar.html',
+                return render_template('usuarios_cogestores/contratas/actualizar.html',
                                         usuario_rol_cogestor_id=usuario_rol_cogestor_id,
                                         usuario_rol_gestor_id=usuario_rol_gestor_id,
                                         gestor_id=gestor_id,
                                         titular_id=titular_id,
-                                        centro_id=centro_id,
-                                        centro=centro
+                                        contrata_id=contrata_id,
+                                        contrata=contrata
                                         )
 
-        return render_template('usuarios_cogestores/centros/actualizar.html', 
+        return render_template('usuarios_cogestores/contratas/actualizar.html', 
                            usuario_rol_cogestor_id=usuario_rol_cogestor_id, 
                            usuario_rol_gestor_id=usuario_rol_gestor_id, 
                            gestor_id=gestor_id, 
                            titular_id=titular_id, 
-                           centro_id=centro_id,
-                           centro=centro
+                           contrata_id=contrata_id,
+                           contrata=contrata
                            )
 
     except Exception as e:
-        flash(f'Error al actualizar el centro: {str(e)}', 'danger')
-        return redirect(url_for('uc_centros.centros',
+        flash(f'Error al actualizar la contrata: {str(e)}', 'danger')
+        return redirect(url_for('uc_contratas.contratas',
                                 usuario_rol_cogestor_id=usuario_rol_cogestor_id,
                                 usuario_rol_gestor_id=usuario_rol_gestor_id,
                                 gestor_id=gestor_id,
                                 titular_id=titular_id
                                 ))
 
-def centros_eliminar_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, titular_id, centro_id):
+def contratas_eliminar_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, titular_id, contrata_id):
     '''
-    Vista para eliminar un centro
+    Vista para eliminar una contrata
     '''
     try:
-        # Eliminar el centro
-        delete = db.centros.delete_one({
-            '_id': ObjectId(centro_id)
+        # Eliminar la contrata
+        delete = db.contratas.delete_one({
+            '_id': ObjectId(contrata_id)
         })
 
         if delete.deleted_count > 0:
-            flash('Centro eliminado exitosamente', 'success')
-            return redirect(url_for('uc_centros.centros',
+            flash('Contrata eliminada exitosamente', 'success')
+            return redirect(url_for('uc_contratas.contratas',
                                 usuario_rol_cogestor_id=usuario_rol_cogestor_id,
                                 usuario_rol_gestor_id=usuario_rol_gestor_id,
                                 gestor_id=gestor_id,
                                 titular_id=titular_id
                                 ))
         else:
-            flash('Error al eliminar el centro', 'danger')
-            return redirect(url_for('uc_centros.centros',
+            flash('Error al eliminar la contrata', 'danger')
+            return redirect(url_for('uc_contratas.contratas',
                                 usuario_rol_cogestor_id=usuario_rol_cogestor_id,
                                 usuario_rol_gestor_id=usuario_rol_gestor_id,
                                 gestor_id=gestor_id,
@@ -275,21 +284,20 @@ def centros_eliminar_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gesto
                                 ))
 
     except Exception as e:
-        flash(f'Error al eliminar el centro: {str(e)}', 'danger')
-        return redirect(url_for('uc_centros.centros',
+        flash(f'Error al eliminar la contrata: {str(e)}', 'danger')
+        return redirect(url_for('uc_contratas.contratas',
                                 usuario_rol_cogestor_id=usuario_rol_cogestor_id,
                                 usuario_rol_gestor_id=usuario_rol_gestor_id,
                                 gestor_id=gestor_id,
                                 titular_id=titular_id
                                 ))
 
-def centros_centro_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, titular_id, centro_id):
-    return render_template('usuarios_cogestores/centros/index.html', 
+def contratas_contrata_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, titular_id, contrata_id):
+    return render_template('usuarios_cogestores/contratas/index.html', 
                            usuario_rol_cogestor_id=usuario_rol_cogestor_id, 
                            usuario_rol_gestor_id=usuario_rol_gestor_id, 
                            gestor_id=gestor_id, 
                            titular_id=titular_id, 
-                           centro_id=centro_id
+                           contrata_id=contrata_id
                            )
-
 

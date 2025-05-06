@@ -4,20 +4,21 @@
     <div class="d-flex justify-content-center align-items-center min-vh-100">
         <div class="card shadow bg-dark text-white" style="min-width: 500px;">
             <div class="card-body">
-                <h4 class="card-title text-center">Actualizar CONTRATA</h4>
+                <h4 class="card-title text-center">Crear nueva CONTRATA</h4>
                 <div class="card-body">
                     <form action="{{ url_for(
-                        'ug_contratas.contratas_actualizar', 
+                        'uc_contratas.contratas_crear', 
+                        usuario_rol_cogestor_id=usuario_rol_cogestor_id, 
+                        usuario_rol_gestor_id=usuario_rol_gestor_id, 
                         gestor_id=gestor_id|string, 
-                        titular_id=titular_id|string, 
-                        contrata_id=contrata._id|string) }}" 
+                        titular_id=titular_id|string) }}" 
                         method="post">
                         <div class="form-floating mb-3">
                             <input type="text" 
                                 class="form-control" 
                                 id="nombre_contrata" 
                                 name="nombre_contrata" 
-                                value="{{ contrata.nombre_contrata }}"
+                                value="{{ datos_formulario.nombre_contrata if datos_formulario else '' }}"
                                 required>
                                 <label for="nombre_contrata">
                                 Nombre de la Contrata:</label>
@@ -27,7 +28,7 @@
                                 class="form-control" 
                                 id="cif_dni" 
                                 name="cif_dni" 
-                                value="{{ contrata.cif_dni }}"
+                                value="{{ datos_formulario.cif_dni if datos_formulario else '' }}"
                                 required>
                                 <label for="cif_dni">
                                 CIF/DNI:</label>
@@ -37,7 +38,7 @@
                                 class="form-control" 
                                 id="domicilio" 
                                 name="domicilio" 
-                                value="{{ contrata.domicilio }}"
+                                value="{{ datos_formulario.domicilio if datos_formulario else '' }}"
                                 required>
                                 <label for="domicilio">
                                 Domicilio:</label>
@@ -47,7 +48,7 @@
                                 class="form-control" 
                                 id="codigo_postal" 
                                 name="codigo_postal" 
-                                value="{{ contrata.codigo_postal }}"
+                                value="{{ datos_formulario.codigo_postal if datos_formulario else '' }}"
                                 required>
                                 <label for="codigo_postal">
                                 Código Postal:</label>
@@ -57,7 +58,7 @@
                                 class="form-control" 
                                 id="poblacion" 
                                 name="poblacion" 
-                                value="{{ contrata.poblacion }}"
+                                value="{{ datos_formulario.poblacion if datos_formulario else '' }}"
                                 required>
                                 <label for="poblacion">
                                 Población:</label>
@@ -67,7 +68,7 @@
                                 class="form-control" 
                                 id="provincia" 
                                 name="provincia" 
-                                value="{{ contrata.provincia }}"
+                                value="{{ datos_formulario.provincia if datos_formulario else '' }}"
                                 required>
                                 <label for="provincia">
                                 Provincia:</label>
@@ -77,7 +78,7 @@
                                 class="form-control" 
                                 id="telefono_contrata" 
                                 name="telefono_contrata" 
-                                value="{{ contrata.telefono_contrata }}"
+                                value="{{ datos_formulario.telefono_contrata if datos_formulario else '' }}"
                                 required>
                                 <label for="telefono_contrata">
                                 Teléfono:</label>
@@ -87,38 +88,21 @@
                                 class="form-control" 
                                 id="email_contrata" 
                                 name="email_contrata" 
-                                value="{{ contrata.email_contrata }}"
+                                value="{{ datos_formulario.email_contrata if datos_formulario else '' }}"
                                 required>
                                 <label for="email_contrata">
                                 Email notificaciones:</label>
                         </div>
-                        <div class="btn-group text-center w-100 mb-3" role="group" aria-label="Basic radio toggle button group">
-                            <input type="radio" 
-                                class="btn-check" 
-                                name="estado_contrata" 
-                                id="estado-activo{{ contrata._id|string }}" 
-                                value="activo" 
-                                {% if contrata.estado_contrata == 'activo' %}checked{% endif %}>
-                                <label class="btn btn-outline-success" for="estado-activo{{ contrata._id|string }}">
-                                Activo</label> 
-                            
-                            <input type="radio" 
-                                class="btn-check" 
-                                name="estado_contrata" 
-                                id="estado-inactivo{{ contrata._id|string }}" 
-                                value="inactivo"
-                                {% if contrata.estado_contrata == 'inactivo' %}checked{% endif %}>
-                                <label class="btn btn-outline-secondary" for="estado-inactivo{{ contrata._id|string }}">
-                                Inactivo</label>
-                        </div>
                         <div class="d-flex justify-content-end align-items-center gap-2">
                             <a href="{{ url_for(
-                                'ug_contratas.contratas', 
+                                'uc_contratas.contratas', 
+                                usuario_rol_cogestor_id=usuario_rol_cogestor_id, 
+                                usuario_rol_gestor_id=usuario_rol_gestor_id, 
                                 gestor_id=gestor_id|string, 
                                 titular_id=titular_id|string) }}" 
                                 class="btn btn-secondary">
                                 Cancelar</a>
-                            <button type="submit" class="btn btn-primary">Actualizar</button>
+                            <button type="submit" class="btn btn-success">Crear</button>
                         </div>
                     </form>
                 </div>
