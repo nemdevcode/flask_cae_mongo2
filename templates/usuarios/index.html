@@ -45,6 +45,8 @@
                             {{ url_for('usuarios_gestores.usuarios_gestores') }}
                           {%- elif rol.nombre_rol == 'cogestor' -%}
                             {{ url_for('usuarios_cogestores.usuarios_cogestores') }}
+                          {%- elif rol.nombre_rol == 'contrata' -%}
+                            {{ url_for('usuarios_contratas.usuarios_contratas') }}
                           {%- endif -%}"
                           class="btn btn-primary">
                         Ir a rol</a>
