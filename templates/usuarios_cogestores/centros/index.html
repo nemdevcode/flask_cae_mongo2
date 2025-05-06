@@ -29,11 +29,12 @@
                             Centros</a>
                     </div>
                     <div class="btn-group" role="group" aria-label="Navegación entre elementos de usuario">
-                        <a href="{{ url_for('uc_titulares.titulares_titular', 
+                        <a href="{{ url_for('uc_usuarios_centros.usuarios_centros', 
                             usuario_rol_cogestor_id=usuario_rol_cogestor_id, 
                             usuario_rol_gestor_id=usuario_rol_gestor_id, 
                             gestor_id=gestor_id, 
-                            titular_id=titular_id) }}" 
+                            titular_id=titular_id,
+                            centro_id=centro_id) }}" 
                             class="btn btn-secondary">
                             Usuarios</a>
                     </div>

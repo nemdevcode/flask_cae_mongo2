@@ -7,13 +7,12 @@
                 <h4 class="card-title text-center">Crear nuevo USUARIO de CENTRO</h4>
                 <div class="card-body">
                     <form action="{{ url_for(
-                                            'ug_usuarios_centros.usuarios_centros_crear', 
+                                            'uc_usuarios_centros.usuarios_centros_crear', 
+                                            usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                            usuario_rol_gestor_id=usuario_rol_gestor_id,
                                             gestor_id=gestor_id|string, 
-                                            titular_id=titular._id|string, 
-                                            centro_id=centro._id|string) }}" method="post">
-                        <input type="hidden" name="gestor_id" value="{{ gestor_id|string }}">
-                        <input type="hidden" name="titular_id" value="{{ titular._id|string }}">
-                        <input type="hidden" name="centro_id" value="{{ centro._id|string }}">
+                                            titular_id=titular_id|string, 
+                                            centro_id=centro_id|string) }}" method="post">
                         <div class="form-floating mb-3">
                             <input type="text" 
                                    class="form-control" 
@@ -34,11 +33,13 @@
                         </div>
                         <div class="d-flex justify-content-end align-items-center gap-2">
                             <a href="{{ url_for(
-                                                'ug_usuarios_centros.usuarios_centros', 
-                                                gestor_id=gestor_id|string, 
-                                                titular_id=titular._id|string, 
-                                                centro_id=centro._id|string) }}" class="btn btn-secondary">
-                            Cancelar</a>
+                                'uc_usuarios_centros.usuarios_centros', 
+                                usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                usuario_rol_gestor_id=usuario_rol_gestor_id,
+                                gestor_id=gestor_id|string, 
+                                titular_id=titular_id|string, 
+                                centro_id=centro_id|string) }}" class="btn btn-secondary">
+                                Cancelar</a>
                             <button type="submit" class="btn btn-success">
                                 Crear</button>
                         </div>

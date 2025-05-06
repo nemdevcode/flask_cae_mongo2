@@ -41,7 +41,6 @@ def usuarios_titulares_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, ges
         if filtrar_estado != 'todos':
             query['estado_usuario_titular'] = filtrar_estado
         
-
         # Obtener los usuarios titulares asociados al titular_id
         usuarios_titulares = []
         usuarios_titulares_cursor = db.usuarios_titulares.find(query)
@@ -193,7 +192,7 @@ def crear_usuario_titular(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor
                 return False, datos_formulario
         else:
             flash('Usuario titular creado pero hubo un error al enviar el email de activación.', 'warning')
-
+            return False, datos_formulario
         
     except Exception as e:
         flash(f'Error al crear el usuario titular: {str(e)}', 'danger')
