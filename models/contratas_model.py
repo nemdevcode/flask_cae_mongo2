@@ -1,5 +1,6 @@
 class ContratasCollection:
     def __init__(self,
+                 titular_id,
                  nombre_contrata,
                  cif_dni,
                  domicilio,
@@ -12,6 +13,7 @@ class ContratasCollection:
                  fecha_modificacion,
                  fecha_inactivacion,
                  estado_contrata):
+        self.titular_id = titular_id
         self.nombre_contrata = nombre_contrata
         self.cif_dni = cif_dni
         self.domicilio = domicilio
