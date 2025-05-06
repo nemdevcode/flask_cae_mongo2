@@ -1,0 +1,86 @@
+{% extends "_base.html" %}
+
+{% block main %}
+    <div class="d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card shadow bg-dark text-white" style="min-width: 500px;">
+            <div class="card-body">
+                <h4 class="card-title text-center">Actualizar USUARIO de CONTRATA</h4>
+                <div class="card-body">
+                    <form action="{{ url_for(
+                                    'uc_usuarios_contratas.usuarios_contratas_actualizar', 
+                                    usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                    usuario_rol_gestor_id=usuario_rol_gestor_id,
+                                    gestor_id=gestor_id, 
+                                    titular_id=titular_id, 
+                                    contrata_id=contrata_id, 
+                                    usuario_contrata_id=usuario_contrata_id) }}" 
+                                    method="post">
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                class="form-control" 
+                                id="alias" 
+                                name="alias" 
+                                value="{{ usuario_contrata.contrata_info.alias }}"
+                                required>
+                            <label for="alias">Alias:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                class="form-control" 
+                                id="email" 
+                                value="{{ usuario_contrata.email }}"
+                                readonly>
+                                <label for="email">
+                                Email:</label>
+                            <div class="form-text text-light">
+                                El email no puede ser modificado ya que es el identificador de acceso del usuario de contratas.
+                            </div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                class="form-control" 
+                                id="nombre_usuario" 
+                                value="{{ usuario_contrata.nombre_usuario }}"
+                                readonly>
+                                <label for="nombre_usuario">
+                                Nombre de usuario:</label>
+                            <div class="form-text text-light">
+                                El nombre de usuario no puede ser modificado.
+                            </div>
+                        </div>
+                        <div class="btn-group text-center w-100 mb-3" role="group" aria-label="Basic radio toggle button group">
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="estado_usuario_contrata" 
+                                id="estado-activo{{ usuario_contrata_id }}" 
+                                value="activo" 
+                                {% if usuario_contrata.contrata_info.estado_usuario_contrata == 'activo' %}checked{% endif %}>
+                            <label class="btn btn-outline-success" for="estado-activo{{ usuario_contrata_id }}">Activo</label> 
+                            
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="estado_usuario_contrata" 
+                                id="estado-inactivo{{ usuario_contrata_id }}" 
+                                value="inactivo"
+                                {% if usuario_contrata.contrata_info.estado_usuario_contrata == 'inactivo' %}checked{% endif %}>
+                            <label class="btn btn-outline-secondary" for="estado-inactivo{{ usuario_contrata_id }}">Inactivo</label>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-center gap-2">
+                            <a href="{{ url_for(
+                                        'uc_usuarios_contratas.usuarios_contratas', 
+                                        usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                        usuario_rol_gestor_id=usuario_rol_gestor_id,
+                                        gestor_id=gestor_id, 
+                                        titular_id=titular_id, 
+                                        contrata_id=contrata_id) }}" 
+                                        class="btn btn-secondary">
+                                        Cancelar</a>
+                            <button type="submit" class="btn btn-primary">
+                                Actualizar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

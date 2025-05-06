@@ -147,13 +147,7 @@ def crear_usuario_centro(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_
                 
             else:
                 # Si no tiene el rol de centro, crearlo
-                usuario_rol_centro_id = crear_usuario_rol(usuario_centro_id, rol_centro_id)
-
-            # # Obtener rol de centro
-            # existe_rol, rol_centro_id = obtener_rol('centro')
-
-            # if not existe_rol:
-            #     rol_centro_id = crear_rol('centro')
+                usuario_rol_centro_id = crear_usuario
 
             # Verificar si el usuario ya tiene el rol de centro
             tiene_rol_centro, usuario_rol_centro_id = obtener_usuario_rol(usuario_centro_id, rol_centro_id)

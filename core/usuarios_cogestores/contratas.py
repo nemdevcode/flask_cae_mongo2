@@ -96,6 +96,7 @@ def crear_contrata(titular_id, datos_formulario):
         poblacion = datos_formulario.get('poblacion')
         provincia = datos_formulario.get('provincia')
         telefono_contrata = datos_formulario.get('telefono_contrata')
+        email_contrata = datos_formulario.get('email_contrata')
 
         # Insertar la contrata en la base de datos
         insert = db.contratas.insert_one({
@@ -110,7 +111,8 @@ def crear_contrata(titular_id, datos_formulario):
             'fecha_activacion': datetime.now(),
             'fecha_modificacion': datetime.now(),
             'fecha_inactivacion': None,
-            'estado_contrata': 'activo'
+            'estado_contrata': 'activo',
+            'email_contrata': email_contrata
         })
 
         if insert.inserted_id:

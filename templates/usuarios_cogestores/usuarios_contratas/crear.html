@@ -1,0 +1,51 @@
+{% extends "_base.html" %}
+
+{% block main %}
+    <div class="d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card shadow bg-dark text-white" style="min-width: 500px;">
+            <div class="card-body">
+                <h4 class="card-title text-center">Crear nuevo USUARIO de CONTRATA</h4>
+                <div class="card-body">
+                    <form action="{{ url_for(
+                                            'uc_usuarios_contratas.usuarios_contratas_crear', 
+                                            usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                            usuario_rol_gestor_id=usuario_rol_gestor_id,
+                                            gestor_id=gestor_id|string, 
+                                            titular_id=titular_id|string, 
+                                            contrata_id=contrata_id|string) }}" method="post">
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="alias" 
+                                   name="alias" 
+                                   value="{{ datos_formulario.alias if datos_formulario else '' }}"
+                                   required>
+                            <label for="alias">Alias:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="email" 
+                                   name="email" 
+                                   value="{{ datos_formulario.email if datos_formulario else '' }}"
+                                   required>
+                            <label for="email">Email:</label>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-center gap-2">
+                            <a href="{{ url_for(
+                                'uc_usuarios_contratas.usuarios_contratas', 
+                                usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                                usuario_rol_gestor_id=usuario_rol_gestor_id,
+                                gestor_id=gestor_id|string, 
+                                titular_id=titular_id|string, 
+                                contrata_id=contrata_id|string) }}" class="btn btn-secondary">
+                                Cancelar</a>
+                            <button type="submit" class="btn btn-success">
+                                Crear</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
