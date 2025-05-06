@@ -36,7 +36,30 @@ def usuarios_titulares_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, ges
         
         # Aplicar filtros si existen
         if filtrar_usuario_titular:
-            query['alias_usuario_titular'] = {'$regex': filtrar_usuario_titular, '$options': 'i'}
+            # Obtener los usuarios que coinciden con el filtro
+            usuarios_filtrados = list(db.usuarios.find({
+                '$or': [
+                    {'email': {'$regex': filtrar_usuario_titular, '$options': 'i'}},
+                    {'nombre_usuario': {'$regex': filtrar_usuario_titular, '$options': 'i'}}
+                ]
+            }))
+            
+            # Obtener los IDs de los usuarios filtrados
+            usuario_ids = [ObjectId(u['_id']) for u in usuarios_filtrados]
+            
+            # Obtener los roles de usuario que corresponden a estos usuarios
+            roles_filtrados = list(db.usuarios_roles.find({
+                'usuario_id': {'$in': usuario_ids}
+            }))
+            
+            # Obtener los IDs de los roles filtrados
+            rol_ids = [ObjectId(r['_id']) for r in roles_filtrados]
+            
+            # Agregar el filtro de alias y los IDs de roles a la consulta
+            query['$or'] = [
+                {'alias_usuario_titular': {'$regex': filtrar_usuario_titular, '$options': 'i'}},
+                {'usuario_rol_titular_id': {'$in': rol_ids}}
+            ]
 
         if filtrar_estado != 'todos':
             query['estado_usuario_titular'] = filtrar_estado
@@ -75,12 +98,11 @@ def usuarios_titulares_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, ges
                             )
     except Exception as e:
         flash(f'Error al listar los usuarios titulares: {str(e)}', 'danger')
-        return redirect(url_for('uc_usuarios_titulares.usuarios_titulares', 
-                                usuario_rol_cogestor_id=usuario_rol_cogestor_id,
-                                usuario_rol_gestor_id=usuario_rol_gestor_id,
-                                gestor_id=gestor_id, 
-                                titular_id=titular_id
-                                ))
+        return redirect(url_for('uc_titulares.titulares',
+                            usuario_rol_cogestor_id=usuario_rol_cogestor_id,
+                            usuario_rol_gestor_id=usuario_rol_gestor_id,
+                            gestor_id=gestor_id
+                            ))
 
 def crear_usuario_titular(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, titular_id, datos_formulario):
     '''

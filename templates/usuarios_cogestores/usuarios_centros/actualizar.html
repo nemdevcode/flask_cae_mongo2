@@ -30,9 +30,22 @@
                                 id="email" 
                                 value="{{ usuario_centro.email }}"
                                 readonly>
-                            <label for="email">Email:</label>
+                                <label for="email">
+                                Email:</label>
                             <div class="form-text text-light">
                                 El email no puede ser modificado ya que es el identificador de acceso del usuario de centro.
+                            </div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                class="form-control" 
+                                id="nombre_usuario" 
+                                value="{{ usuario_centro.nombre_usuario }}"
+                                readonly>
+                                <label for="nombre_usuario">
+                                Nombre de usuario:</label>
+                            <div class="form-text text-light">
+                                El nombre de usuario no puede ser modificado.
                             </div>
                         </div>
                         <div class="btn-group text-center w-100 mb-3" role="group" aria-label="Basic radio toggle button group">
@@ -62,7 +75,7 @@
                                         centro_id=centro_id) }}" 
                                         class="btn btn-secondary">
                                         Cancelar</a>
-                            <button type="submit" class="btn btn-success">
+                            <button type="submit" class="btn btn-primary">
                                 Actualizar</button>
                         </div>
                     </form>
