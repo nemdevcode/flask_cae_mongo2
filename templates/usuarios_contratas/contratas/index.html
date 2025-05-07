@@ -24,7 +24,29 @@
                             class="btn btn-outline-primary">
                             Contratas</a>
                     </div>
-                    
+                    <div class="btn-group" role="group" aria-label="Navegación entre elementos de usuario">
+                        <a href="{{ url_for(
+                            'ucon_titulares.titulares', 
+                            usuario_rol_contrata_id=usuario_rol_contrata_id, 
+                            contrata_id=contrata_id) }}" 
+                            class="btn btn-secondary">
+                            Titulares</a>
+                        <a href="" 
+                            class="btn btn-secondary">
+                            Trabajadores</a>
+                        <a href="" 
+                            class="btn btn-secondary">
+                            Equipos</a>
+                        <a href="" 
+                            class="btn btn-secondary">
+                            Vehículos</a>
+                        <a href="" 
+                            class="btn btn-secondary">
+                            Productos químicos</a>
+                        <a href="" 
+                            class="btn btn-secondary">
+                            Otros</a>
+                    </div>
                     <a href="{{ url_for('logout') }}" class="btn btn-outline-dark">
                         Cerrar sesión</a>
                 </div>
@@ -35,7 +57,7 @@
 
 {% block main %}
     <div class="container mt-5">
-        <h3 class="text-center">Vista de CONTRATA: </h3>
+        <h3 class="text-center">Vista de CONTRATA: {{ nombre_contrata }}</h3>
     </div>
     <!-- Modal de Información -->
     <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">

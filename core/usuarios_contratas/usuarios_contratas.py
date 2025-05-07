@@ -95,7 +95,15 @@ def usuarios_contratas_contrata_vista(usuario_rol_contrata_id, contrata_id):
     '''
     Vista de usuarios de contratas para la contrata seleccionada.
     '''
-    return render_template('usuarios_contratas/contratas/index.html',
-                           usuario_rol_contrata_id=usuario_rol_contrata_id,
-                           contrata_id=contrata_id
-                           )
+    try:
+        # Obtener nombre de la contrata
+        nombre_contrata = db.contratas.find_one({'_id': ObjectId(contrata_id)})['nombre_contrata']
+        
+        return render_template('usuarios_contratas/contratas/index.html',
+                               usuario_rol_contrata_id=usuario_rol_contrata_id,
+                               contrata_id=contrata_id,
+                               nombre_contrata=nombre_contrata
+                               )
+    except Exception as e:
+        flash(f'Error al cargar la vista de la contrata: {str(e)}', 'danger')
+        return redirect(url_for('usuarios_contratas.usuarios_contratas'))

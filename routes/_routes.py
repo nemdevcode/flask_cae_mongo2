@@ -20,6 +20,7 @@ from routes.usuarios_cogestores.usuarios_centros_routes import uc_usuarios_centr
 from routes.usuarios_cogestores.contratas_routes import uc_contratas_bp
 from routes.usuarios_cogestores.usuarios_contratas_routes import uc_usuarios_contratas_bp
 from routes.usuarios_contratas.usuarios_contratas_routes import usuarios_contratas_bp
+from routes.usuarios_contratas.titulares_routes import ucon_titulares_bp
 
 from core.login import login_vista
 from core.registrate import registrate_vista
@@ -47,6 +48,7 @@ def rutas(app):
     app.register_blueprint(uc_contratas_bp)
     app.register_blueprint(uc_usuarios_contratas_bp)
     app.register_blueprint(usuarios_contratas_bp)
+    app.register_blueprint(ucon_titulares_bp)
     # Rutas comunes
 
     @app.route('/favicon.ico')
