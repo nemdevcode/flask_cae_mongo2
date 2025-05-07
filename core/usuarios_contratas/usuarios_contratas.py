@@ -56,6 +56,7 @@ def usuarios_contratas_vista():
         contratas = []
         for contratas_id in contratas_ids:
             contrata = db.contratas.find_one({'_id': contratas_id['contrata_id']})
+            titular_nombre = db.titulares.find_one({'_id': ObjectId(contrata['titular_id'])})['nombre_titular']
             if contrata:
                 if filtrar_contrata:
                     if (filtrar_contrata.lower() not in contrata['nombre_contrata'].lower() and
@@ -65,7 +66,8 @@ def usuarios_contratas_vista():
                         filtrar_contrata.lower() not in contrata['poblacion'].lower() and
                         filtrar_contrata.lower() not in contrata['provincia'].lower() and
                         filtrar_contrata.lower() not in contrata['telefono_contrata'].lower() and
-                        filtrar_contrata.lower() not in contrata['email_contrata'].lower()):
+                        filtrar_contrata.lower() not in contrata['email_contrata'].lower() and
+                        filtrar_contrata.lower() not in titular_nombre.lower()):
                         continue
 
                 contratas.append({
@@ -77,7 +79,8 @@ def usuarios_contratas_vista():
                     'poblacion': contrata['poblacion'],
                     'provincia': contrata['provincia'],
                     'telefono_contrata': contrata['telefono_contrata'],
-                    'email_contrata': contrata['email_contrata']
+                    'email_contrata': contrata['email_contrata'],
+                    'titular_nombre': titular_nombre
                 })
 
         return render_template('usuarios/usuarios_contratas.html',
@@ -98,11 +101,13 @@ def usuarios_contratas_contrata_vista(usuario_rol_contrata_id, contrata_id):
     try:
         # Obtener nombre de la contrata
         nombre_contrata = db.contratas.find_one({'_id': ObjectId(contrata_id)})['nombre_contrata']
+        nombre_titular = db.titulares.find_one({'_id': ObjectId(db.contratas.find_one({'_id': ObjectId(contrata_id)})['titular_id'])})['nombre_titular']
         
         return render_template('usuarios_contratas/contratas/index.html',
                                usuario_rol_contrata_id=usuario_rol_contrata_id,
                                contrata_id=contrata_id,
-                               nombre_contrata=nombre_contrata
+                               nombre_contrata=nombre_contrata,
+                               nombre_titular=nombre_titular
                                )
     except Exception as e:
         flash(f'Error al cargar la vista de la contrata: {str(e)}', 'danger')

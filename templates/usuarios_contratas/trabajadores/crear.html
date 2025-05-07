@@ -1,0 +1,78 @@
+{% extends "_base.html" %}
+
+{% block main %}
+    <div class="d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card shadow bg-dark text-white" style="min-width: 500px;">
+            <div class="card-body">
+                <h4 class="card-title text-center">Crear nuevo TRABAJADOR</h4>
+                <div class="card-body">
+                    <form action="{{ url_for(
+                        'ucon_trabajadores.trabajadores_crear', 
+                        usuario_rol_contrata_id=usuario_rol_contrata_id, 
+                        contrata_id=contrata_id) }}" 
+                        method="post">
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                class="form-control" 
+                                id="nombre_trabajador" 
+                                name="nombre_trabajador" 
+                                value="{{ datos_formulario.nombre_trabajador if datos_formulario else '' }}"
+                                required>
+                                <label for="nombre_trabajador">
+                                Nombre del trabajador:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                class="form-control" 
+                                id="apellidos_trabajador" 
+                                name="apellidos_trabajador" 
+                                value="{{ datos_formulario.apellidos_trabajador if datos_formulario else '' }}"
+                                required>
+                                <label for="apellidos_trabajador">
+                                Apellidos del trabajador:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                class="form-control" 
+                                id="dni_nie" 
+                                name="dni_nie" 
+                                value="{{ datos_formulario.dni_nie if datos_formulario else '' }}"
+                                required>
+                                <label for="dni_nie">
+                                DNI/NIE:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                class="form-control" 
+                                id="puesto_trabajo" 
+                                name="puesto_trabajo" 
+                                value="{{ datos_formulario.puesto_trabajo if datos_formulario else '' }}"
+                                required>
+                                <label for="puesto_trabajo">
+                                Puesto de trabajo:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                class="form-control" 
+                                id="categoria_profesional" 
+                                name="categoria_profesional" 
+                                value="{{ datos_formulario.categoria_profesional if datos_formulario else '' }}"
+                                required>
+                                <label for="categoria_profesional">
+                                Categoría profesional:</label>
+                        </div>                       
+                        <div class="d-flex justify-content-end align-items-center gap-2">
+                            <a href="{{ url_for(
+                                'ucon_trabajadores.trabajadores', 
+                                usuario_rol_contrata_id=usuario_rol_contrata_id, 
+                                contrata_id=contrata_id) }}" 
+                                class="btn btn-secondary">
+                                Cancelar</a>
+                            <button type="submit" class="btn btn-success">Crear</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

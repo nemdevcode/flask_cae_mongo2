@@ -1,0 +1,98 @@
+{% extends "_base.html" %}
+
+{% block main %}
+    <div class="d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card shadow bg-dark text-white" style="min-width: 500px;">
+            <div class="card-body">
+                <h4 class="card-title text-center">Actualizar TRABAJADOR</h4>
+                <div class="card-body">
+                    <form action="{{ url_for(
+                        'ucon_trabajadores.trabajadores_actualizar', 
+                        usuario_rol_contrata_id=usuario_rol_contrata_id, 
+                        contrata_id=contrata_id, 
+                        trabajador_id=trabajador._id|string) }}" 
+                        method="post">
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                class="form-control" 
+                                id="nombre_trabajador" 
+                                name="nombre_trabajador" 
+                                value="{{ trabajador.nombre_trabajador }}"
+                                required>
+                                <label for="nombre_trabajador">
+                                Nombre del trabajador:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                class="form-control" 
+                                id="apellidos_trabajador" 
+                                name="apellidos_trabajador" 
+                                value="{{ trabajador.apellidos_trabajador }}"
+                                required>
+                                <label for="apellidos_trabajador">
+                                Apellidos del trabajador:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                class="form-control" 
+                                id="dni_nie" 
+                                name="dni_nie" 
+                                value="{{ trabajador.dni_nie }}"
+                                required>
+                                <label for="dni_nie">
+                                DNI/NIE:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                class="form-control" 
+                                id="puesto_trabajo" 
+                                name="puesto_trabajo" 
+                                value="{{ trabajador.puesto_trabajo }}"
+                                required>
+                                <label for="puesto_trabajo">
+                                Puesto de trabajo:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                class="form-control" 
+                                id="categoria_profesional" 
+                                name="categoria_profesional" 
+                                value="{{ trabajador.categoria_profesional }}"
+                                required>
+                                <label for="categoria_profesional">
+                                Categoría profesional:</label>
+                        </div>
+                        <div class="btn-group text-center w-100 mb-3" role="group" aria-label="Basic radio toggle button group">
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="estado_trabajador" 
+                                id="estado-activo{{ trabajador._id|string }}" 
+                                value="activo" 
+                                {% if trabajador.estado_trabajador == 'activo' %}checked{% endif %}>
+                                <label class="btn btn-outline-success" for="estado-activo{{ trabajador._id|string }}">
+                                Activo</label> 
+                            
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="estado_trabajador" 
+                                id="estado-inactivo{{ trabajador._id|string }}" 
+                                value="inactivo"
+                                {% if trabajador.estado_trabajador == 'inactivo' %}checked{% endif %}>
+                                <label class="btn btn-outline-secondary" for="estado-inactivo{{ trabajador._id|string }}">
+                                Inactivo</label>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-center gap-2">
+                            <a href="{{ url_for(
+                                'ucon_trabajadores.trabajadores', 
+                                usuario_rol_contrata_id=usuario_rol_contrata_id, 
+                                contrata_id=contrata_id) }}" 
+                                class="btn btn-secondary">
+                                Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Actualizar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

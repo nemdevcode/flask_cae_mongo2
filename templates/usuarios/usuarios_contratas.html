@@ -47,7 +47,7 @@
                             autofocus
                             onfocus="this.setSelectionRange(this.value.length, this.value.length)">
                             <label for="filtrar_contrata">
-                            Escriba el nombre, teléfono o email para filtrar</label>
+                            Escriba para filtrar</label>
                     </div>
                     <!-- Boton para limpiar filtro -->
                     <div style="flex: 1;">
@@ -74,6 +74,7 @@
                         <th>Provincia</th>
                         <th>Teléfono</th>
                         <th>Email</th>
+                        <th>Titular</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -89,6 +90,7 @@
                                 <td>{{ contrata.provincia }}</td>
                                 <td>{{ contrata.telefono_contrata }}</td>
                                 <td>{{ contrata.email_contrata }}</td>
+                                <td>{{ contrata.titular_nombre }}</td>
                                 <td class="text-center">
                                     <a href="{{ url_for('usuarios_contratas.usuarios_contratas_contrata', 
                                         usuario_rol_contrata_id=usuario_rol_contrata_id, 
@@ -100,7 +102,7 @@
                         {% endfor %}
                     {% else %}
                         <tr>
-                            <td colspan="9" class="text-center">No hay contratas para mostrar</td>
+                            <td colspan="10" class="text-center">No hay contratas para mostrar</td>
                         </tr>
                     {% endif %}
                 </tbody>
