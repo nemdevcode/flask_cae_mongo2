@@ -73,7 +73,7 @@ def centros_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, tit
                                filtrar_estado=filtrar_estado
                                )
     except Exception as e:
-        print(f"Error en centros_vista: {e}")
+        flash(f'Error al cargar la vista de centros: {str(e)}', 'danger')
         return render_template('usuarios_cogestores/centros/listar.html', 
                            usuario_rol_cogestor_id=usuario_rol_cogestor_id, 
                            usuario_rol_gestor_id=usuario_rol_gestor_id, 

@@ -10,7 +10,7 @@ def contratas_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, t
     Vista para listar las contratas del titular asignado como cogestor
     '''
     try:
-         # Obtener parámetros de filtrado
+        # Obtener parámetros de filtrado
         filtrar_contrata = request.form.get('filtrar_contrata', '')
         filtrar_estado = request.form.get('filtrar_estado', 'todos')
         vaciar = request.args.get('vaciar', '0')
@@ -76,7 +76,7 @@ def contratas_vista(usuario_rol_cogestor_id, usuario_rol_gestor_id, gestor_id, t
                                filtrar_estado=filtrar_estado
                                )
     except Exception as e:
-        print(f"Error en contratas_vista: {e}")
+        flash(f'Error al cargar la vista de contratas: {str(e)}', 'danger')
         return render_template('usuarios_cogestores/contratas/listar.html', 
                            usuario_rol_cogestor_id=usuario_rol_cogestor_id, 
                            usuario_rol_gestor_id=usuario_rol_gestor_id, 

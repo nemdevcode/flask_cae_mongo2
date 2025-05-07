@@ -5,6 +5,7 @@ class TrabajadoresCollection:
                  nombre_trabajador,
                  apellidos_trabajador,
                  puesto_trabajo,
+                 categoria_profesional,
                  fecha_activacion,
                  fecha_modificacion,
                  fecha_inactivacion,
@@ -14,6 +15,7 @@ class TrabajadoresCollection:
         self.nombre_trabajador = nombre_trabajador
         self.apellidos_trabajador = apellidos_trabajador
         self.puesto_trabajo = puesto_trabajo
+        self.categoria_profesional = categoria_profesional
         self.fecha_activacion = fecha_activacion
         self.fecha_modificacion = fecha_modificacion
         self.fecha_inactivacion = fecha_inactivacion
