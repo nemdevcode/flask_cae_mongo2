@@ -8,6 +8,10 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
                 <a class="navbar-brand">CAE Accesible</a>
+                <a class="btn btn-info rounded-circle p-1" data-bs-toggle="modal" data-bs-target="#infoModal">
+                    <img src="{{ url_for('static', filename='info-circle-fill.svg') }}" 
+                        alt="Información" style="width: 20px; height: 20px; filter: brightness(0) invert(1);">
+                </a>
                 <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="/usuarios">Inicio</a>
@@ -15,8 +19,10 @@
                 </ul>
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end align-items-center">
                     <span class="my-auto">Volver a:</span>
-                    <a href="{{ url_for('ug_titulares.titulares_titular', gestor_id=gestor_id, titular_id=titular._id) }}" class="btn btn-outline-primary">
-                        Titular</a>
+                    <a href="{{ url_for(
+                        'usuarios_gestores.usuarios_gestores_gestor', 
+                        gestor_id=gestor_id) }}" class="btn btn-outline-primary">
+                        Gestor</a>
                     <a href="{{ url_for('logout') }}" class="btn btn-outline-dark">
                         Cerrar sesión</a>
                 </div>
@@ -26,30 +32,30 @@
 {% endblock %}
 
 {% block main %}
-    <!-- Listado de contratas por titular -->
+    <!-- Listado de requerimientos -->
     <div class="container mt-5">
-        <h3 class="text-center">Listado de contratas del titular: {{ titular.nombre_titular }}</h3>
+        <h3 class="text-center">Listado de REQUERIMIENTOS del GESTOR: {{ nombre_gestor }}</h3>
         <div class="d-flex justify-content-between align-items-center mt-5">
-            <!-- Formulario para filtrar contratas -->
+            <!-- Formulario para filtrar requerimientos -->
             <form action="{{ url_for(
-                'ug_contratas.contratas', 
-                gestor_id=gestor_id, 
-                titular_id=titular._id) }}" method="post" class="flex-grow-1 me-3">
+                'ug_requerimientos.requerimientos', 
+                gestor_id=gestor_id) }}" 
+                method="post" class="flex-grow-1 me-3">
                 <div class="d-flex gap-3 align-items-center">
-                    <!-- Input para filtrar contratas -->
-                    <div class="form-floating" style="flex: 2; min-height: 80px;">
+                    <!-- Input para filtrar requerimientos -->
+                    <div class="form-floating" style="flex: 2;">
                         <input type="text" 
                             class="form-control" 
-                            id="filtrar_contrata"
-                            name="filtrar_contrata"
-                            value="{{ request.form.get('filtrar_contrata', '') }}"
+                            id="filtrar_requerimiento"
+                            name="filtrar_requerimiento"
+                            value="{{ request.form.get('filtrar_requerimiento', '') }}"
                             oninput="this.form.submit()"
                             autocomplete="off"
                             autofocus
                             onfocus="this.setSelectionRange(this.value.length, this.value.length)"
                             style="height: 80px;">
-                            <label for="filtrar_contrata" style="white-space: normal; line-height: 1.2; height: auto; padding-top: 0.5rem; transform-origin: 0 0;">
-                            Escriba el cif, nombre, domicilio, código postal, población o provincia para filtrar...</label>
+                            <label for="filtrar_requerimiento"">
+                            Escriba para filtrar...</label>
                     </div>
                     
                     <!-- Filtro por estado -->
@@ -88,9 +94,8 @@
                     <!-- Botón para limpiar filtro -->
                     <div style="flex: 1;">
                         <a href="{{ url_for(
-                            'ug_contratas.contratas', 
-                            gestor_id=gestor_id, 
-                            titular_id=titular._id) }}" 
+                            'ug_requerimientos.requerimientos', 
+                            gestor_id=gestor_id) }}" 
                             class="btn btn-secondary">
                             Limpiar filtros</a>
                     </div>
@@ -98,92 +103,66 @@
             </form>
             <!-- Botón crear -->
             <a href="{{ url_for(
-                'ug_contratas.contratas_crear', 
-                gestor_id=gestor_id, 
-                titular_id=titular._id) }}" 
+                'ug_requerimientos.requerimientos_crear', 
+                gestor_id=gestor_id) }}" 
                 class="btn btn-success">
                 Crear</a>
         </div>
-        <!-- Tabla de contratas -->
+        <!-- Tabla de requerimientos -->
         <div class="table-responsive mt-5">
             <table class="table table-striped">
                 <thead class="text-center">
                     <tr>
+                        <th>Referencia</th>
                         <th>Nombre</th>
-                        <th>CIF</th>
-                        <th>Domicilio</th>
-                        <th>Código Postal</th>
-                        <th>Población</th>
-                        <th>Provincia</th>
-                        <th>Teléfono</th>
-                        <th>Email</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% if contratas %}
-                        {% for contrata in contratas %}
+                    {% if requerimientos %}
+                        {% for requerimiento in requerimientos %}
                             <tr>
-                                <td>{{ contrata.nombre_contrata }}</td>
-                                <td>{{ contrata.cif_dni }}</td>
-                                <td>{{ contrata.domicilio }}</td>
-                                <td>{{ contrata.codigo_postal }}</td>
-                                <td>{{ contrata.poblacion }}</td>
-                                <td>{{ contrata.provincia }}</td>
-                                <td>{{ contrata.telefono_contrata }}</td>
-                                <td>{{ contrata.email_contrata }}</td>
+                                <td>{{ requerimiento.referencia_requerimiento }}</td>
+                                <td>{{ requerimiento.nombre_requerimiento }}</td>
                                 <td class="text-center">
-                                    {% if contrata.estado_contrata == 'activo' %}
+                                    {% if requerimiento.estado_requerimiento == 'activo' %}
                                         <span class="badge bg-success">Activo</span>
                                     {% else %}
                                         <span class="badge bg-secondary">Inactivo</span>
                                     {% endif %}
                                 </td>
                                 <td class="text-center">
-                                    <a href="{{ url_for(
-                                        'ug_contratas.contratas_contrata', 
-                                        gestor_id=gestor_id|string, 
-                                        titular_id=titular._id|string, 
-                                        contrata_id=contrata._id|string) }}" 
+                                    <a href="" 
                                         class="btn btn-primary btn-sm">
                                         Ir</a>
-                                    <a href="{{ url_for(
-                                        'ug_contratas.contratas_actualizar', 
-                                        gestor_id=gestor_id, 
-                                        titular_id=titular._id, 
-                                        contrata_id=contrata._id) }}" 
+                                    <a href="" 
                                         class="btn btn-warning btn-sm">
                                         Editar</a>
                                     <button type="button" 
                                         class="btn btn-danger btn-sm" 
                                         data-bs-toggle="modal" 
-                                        data-bs-target="#confirmarEliminar{{ contrata._id }}">
+                                        data-bs-target="#confirmarEliminar{{ requerimiento._id }}">
                                         Eliminar
                                     </button>
                                 </td>
                             </tr>
                             <!-- Modal de confirmación de eliminación -->
-                            <div class="modal fade" id="confirmarEliminar{{ contrata._id }}" tabindex="-1" aria-labelledby="confirmarEliminarLabel{{ contrata._id }}" aria-hidden="true">
+                            <div class="modal fade" id="confirmarEliminar{{ requerimiento._id }}" tabindex="-1" aria-labelledby="confirmarEliminarLabel{{ requerimiento._id }}" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content bg-dark text-white">
                                         <div class="modal-header">
-                                            <h5 class="modal-title text-danger text-center w-100" id="confirmarEliminarLabel{{ contrata._id }}">Confirmar eliminación</h5>
+                                            <h5 class="modal-title text-danger text-center w-100" id="confirmarEliminarLabel{{ requerimiento._id }}">Confirmar eliminación</h5>
                                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
-                                            ¿Está seguro que desea eliminar la contrata "{{ contrata.nombre_contrata }}"? 
+                                            ¿Está seguro que desea eliminar el requerimiento "{{ requerimiento.nombre_requerimiento }}"? 
                                             <br>
-                                            <strong>CIF:</strong> {{ contrata.cif_dni }}
+                                            <strong>Referencia:</strong> {{ requerimiento.referencia_requerimiento }}
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                            <a href="{{ url_for(
-                                                'ug_contratas.contratas_eliminar', 
-                                                gestor_id=gestor_id|string, 
-                                                titular_id=titular._id|string, 
-                                                contrata_id=contrata._id|string) }}" 
-                                                class="btn btn-danger">
+                                            <a href="" class="btn btn-danger">
                                                 Eliminar</a>
                                         </div>
                                     </div>
@@ -192,11 +171,30 @@
                         {% endfor %}
                     {% else %}
                         <tr>
-                            <td colspan="10" class="text-center">No hay contratas para mostrar</td>
+                            <td colspan="4" class="text-center">No hay requerimientos para mostrar</td>
                         </tr>
                     {% endif %}
                 </tbody>
             </table>
+        </div>
+    </div>
+    <!-- Modal de Información -->
+    <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-center w-100" id="infoModalLabel">Información/Ayuda</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>...</p>
+                    <hr>
+                    <p>...</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}

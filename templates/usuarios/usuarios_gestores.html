@@ -34,20 +34,23 @@
         <h3 class="text-center">Listado de GESTORES asignados al usuario: {{ nombre_gestor }}</h3>
         <div class="d-flex justify-content-between align-items-center mt-5">
             <!-- Formulario para filtrar gestores -->
-            <form action="{{ url_for('usuarios_gestores.usuarios_gestores') }}" method="post" id="filtroForm" class="flex-grow-1 me-3">
+            <form action="{{ url_for(
+                'usuarios_gestores.usuarios_gestores') }}" 
+                method="post" id="filtroForm" class="flex-grow-1 me-3">
                 <div class="d-flex gap-3 align-items-center">
                     <!-- Input para filtrar gestor por nombre -->
                     <div class="form-floating" style="flex: 2;">
                         <input type="text" 
-                            class="form-control" 
-                            id="filtrar_gestor" 
-                            name="filtrar_gestor"
-                            value="{{ request.form.get('filtrar_gestor', '') }}"
-                            oninput="this.form.submit()"
-                            autocomplete="off"
-                            autofocus
-                            onfocus="this.setSelectionRange(this.value.length, this.value.length)">
-                        <label for="filtrar_gestor">Escriba el nombre, CIF/DNI o domicilio para filtrar</label>
+                        class="form-control" 
+                        id="filtrar_gestor" 
+                        name="filtrar_gestor"
+                        value="{{ request.form.get('filtrar_gestor', '') }}"
+                        oninput="this.form.submit()"
+                        autocomplete="off"
+                        autofocus
+                        onfocus="this.setSelectionRange(this.value.length, this.value.length)">
+                        <label for="filtrar_gestor">
+                        Escriba el nombre, CIF/DNI o domicilio para filtrar</label>
                     </div>
                     
                     <!-- Filtro por estado -->
@@ -59,7 +62,8 @@
                             value="todos" 
                             {% if not request.form.get('filtrar_estado') or request.form.get('filtrar_estado') == 'todos' %}checked{% endif %}
                             onchange="this.form.submit()">
-                        <label class="btn btn-outline-primary" for="todos">Todos</label>
+                            <label class="btn btn-outline-primary" for="todos">
+                            Todos</label>
 
                         <input type="radio" 
                             class="btn-check" 
@@ -68,7 +72,8 @@
                             value="activo"
                             {% if request.form.get('filtrar_estado') == 'activo' %}checked{% endif %}
                             onchange="this.form.submit()">
-                        <label class="btn btn-outline-success" for="activos">Activos</label>
+                            <label class="btn btn-outline-success" for="activos">
+                            Activos</label>
 
                         <input type="radio" 
                             class="btn-check" 
@@ -77,16 +82,22 @@
                             value="inactivo"
                             {% if request.form.get('filtrar_estado') == 'inactivo' %}checked{% endif %}
                             onchange="this.form.submit()">
-                        <label class="btn btn-outline-secondary" for="inactivos">Inactivos</label>
+                            <label class="btn btn-outline-secondary" for="inactivos">
+                            Inactivos</label>
                     </div>
                     <!-- Boton para limpiar filtro -->
                     <div style="flex: 1;">
-                        <a href="{{ url_for('usuarios_gestores.usuarios_gestores', vaciar=1) }}" class="btn btn-secondary">Limpiar filtros</a>
+                        <a href="{{ url_for(
+                            'usuarios_gestores.usuarios_gestores', vaciar=1) }}" 
+                            class="btn btn-secondary">
+                            Limpiar filtros</a>
                     </div>
                 </div>
             </form>
             <!-- Botón crear -->
-            <a href="{{ url_for('ug_gestores.gestores_crear') }}" class="btn btn-success">Crear</a>
+            <a href="{{ url_for('ug_gestores.gestores_crear') }}" 
+                class="btn btn-success">
+                Crear</a>
         </div>
 
         <!-- Tabla de gestores -->
@@ -159,13 +170,16 @@
                                         </p>
                                     </div>
                                     <div class="modal-footer">
-                                        <form action="{{ url_for('ug_gestores.gestores_eliminar', gestor_id=gestor._id) }}" method="POST" style="display: inline;">
+                                        <form action="{{ url_for(
+                                            'ug_gestores.gestores_eliminar', 
+                                            gestor_id=gestor._id) }}" 
+                                            method="POST" style="display: inline;">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                                <i class="fas fa-times me-1"></i>Cancelar
-                                            </button>
+                                                <i class="fas fa-times me-1"></i>
+                                                Cancelar</button>
                                             <button type="submit" class="btn btn-danger">
-                                                <i class="fas fa-trash-alt me-1"></i>Eliminar
-                                            </button>
+                                                <i class="fas fa-trash-alt me-1"></i>
+                                                Eliminar</button>
                                         </form>
                                     </div>
                                 </div>

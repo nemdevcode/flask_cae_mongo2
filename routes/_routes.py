@@ -11,6 +11,7 @@ from routes.usuarios_gestores.usuarios_centros_routes import ug_usuarios_centros
 from routes.usuarios_gestores.usuarios_contratas_routes import ug_usuarios_contratas_bp
 from routes.usuarios_gestores.usuarios_cogestores_routes import ug_usuarios_cogestores_bp
 from routes.usuarios_gestores.usuarios_titulares_routes import ug_usuarios_titulares_bp
+from routes.usuarios_gestores.requerimientos_routes import ug_requerimientos_bp
 from routes.usuarios_cogestores.usuarios_cogestores_routes import usuarios_cogestores_bp
 from routes.usuarios_cogestores.gestores_routes import uc_gestores_bp
 from routes.usuarios_cogestores.titulares_routes import uc_titulares_bp
@@ -39,6 +40,7 @@ def rutas(app):
     app.register_blueprint(ug_usuarios_cogestores_bp)
     app.register_blueprint(ug_usuarios_contratas_bp)
     app.register_blueprint(ug_usuarios_titulares_bp)
+    app.register_blueprint(ug_requerimientos_bp)
     app.register_blueprint(usuarios_cogestores_bp)
     app.register_blueprint(uc_gestores_bp)
     app.register_blueprint(uc_titulares_bp)

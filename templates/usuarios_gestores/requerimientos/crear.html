@@ -1,0 +1,66 @@
+{% extends "_base.html" %}
+
+{% block main %}
+    <div class="d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card shadow bg-dark text-white" style="min-width: 500px;">
+            <div class="card-body">
+                <h4 class="card-title text-center">Crear nuevo REQUERIMIENTO</h4>
+                <div class="card-body">
+                    <form action="{{ url_for(
+                        'ug_requerimientos.requerimientos_crear', 
+                        gestor_id=gestor_id|string) }}" 
+                        method="post">
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                class="form-control" 
+                                id="referencia_requerimiento" 
+                                name="referencia_requerimiento" 
+                                value="{{ datos_formulario.referencia_requerimiento if datos_formulario else '' }}"
+                                required>
+                                <label for="referencia_requerimiento">
+                                Referencia del Requerimiento:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                class="form-control" 
+                                id="nombre_requerimiento" 
+                                name="nombre_requerimiento" 
+                                value="{{ datos_formulario.nombre_requerimiento if datos_formulario else '' }}"
+                                required>
+                                <label for="nombre_requerimiento">
+                                Nombre del Requerimiento:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <textarea 
+                                class="form-control" 
+                                id="descripcion_requerimiento" 
+                                name="descripcion_requerimiento" 
+                                style="height: 150px;">
+                                {{ datos_formulario.descripcion_requerimiento if datos_formulario else '' }}</textarea>
+                                <label for="descripcion_requerimiento">
+                                Descripción del Requerimiento:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <textarea 
+                                class="form-control" 
+                                id="notas_requerimiento" 
+                                name="notas_requerimiento" 
+                                style="height: 150px;">
+                                {{ datos_formulario.notas_requerimiento if datos_formulario else '' }}</textarea>
+                                <label for="notas_requerimiento">
+                                Notas del Requerimiento:</label>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-center gap-2">
+                            <a href="{{ url_for(
+                                'ug_requerimientos.requerimientos', 
+                                gestor_id=gestor_id|string) }}" 
+                                class="btn btn-secondary">
+                                Cancelar</a>
+                            <button type="submit" class="btn btn-success">Crear</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
