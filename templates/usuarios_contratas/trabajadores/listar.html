@@ -141,6 +141,12 @@
                                     {% endif %}
                                 </td>
                                 <td class="text-center">
+                                    <a href="{{ url_for('ucon_trabajadores.trabajadores_asignacion_centros', 
+                                        usuario_rol_contrata_id=usuario_rol_contrata_id, 
+                                        contrata_id=contrata_id, 
+                                        trabajador_id=trabajador._id) }}" 
+                                        class="btn btn-secondary btn-sm">
+                                        Asignar centros</a>
                                     <a href="{{ url_for('ucon_trabajadores.trabajadores_actualizar', 
                                         usuario_rol_contrata_id=usuario_rol_contrata_id, 
                                         contrata_id=contrata_id, 

@@ -3,7 +3,8 @@ from flask import Blueprint
 from core.usuarios_contratas.trabajadores import (
     trabajadores_vista,
     trabajadores_crear_vista,
-    trabajadores_actualizar_vista
+    trabajadores_actualizar_vista,
+    trabajadores_asignacion_centros_vista
 )
 
 from core._decoradores import login_requerido
@@ -26,4 +27,7 @@ def trabajadores_crear(usuario_rol_contrata_id, contrata_id):
 def trabajadores_actualizar(usuario_rol_contrata_id, contrata_id, trabajador_id):
     return trabajadores_actualizar_vista(usuario_rol_contrata_id, contrata_id, trabajador_id)
 
-
+@ucon_trabajadores_bp.route('/asignacion-centros/<usuario_rol_contrata_id>/<contrata_id>/<trabajador_id>', methods=['GET', 'POST'])
+@login_requerido
+def trabajadores_asignacion_centros(usuario_rol_contrata_id, contrata_id, trabajador_id):
+    return trabajadores_asignacion_centros_vista(usuario_rol_contrata_id, contrata_id, trabajador_id)

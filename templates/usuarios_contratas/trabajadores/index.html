@@ -1,0 +1,77 @@
+{% extends "_base.html" %}
+
+{% block main %}
+    <div class="d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card shadow bg-dark text-white" style="min-width: 500px;">
+            <div class="card-body">
+                <h4 class="card-title text-center">Asignación de centros a {{ nombre_completo_trabajador }}</h4>
+                <div class="card-body">
+                    <form action="{{ url_for(
+                        'ucon_trabajadores.trabajadores_asignacion_centros', 
+                        usuario_rol_contrata_id=usuario_rol_contrata_id, 
+                        contrata_id=contrata_id, 
+                        trabajador_id=trabajador_id|string) }}" 
+                        method="post">
+                        <div class="form-floating mb-3">
+                            <ul class="list-group">
+                                {% for centro in centros_no_asignados %}
+                                <li class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <label class="form-check-label">
+                                                {{ centro['nombre_centro'] }}
+                                            </label>
+                                        </div>
+                                        <div class="btn-group" role="group">
+                                            <input type="radio" 
+                                                   class="btn-check" 
+                                                   name="estado_trabajador_centro_{{ centro['_id'] }}" 
+                                                   id="estado-no-asignado{{ centro['_id']|string }}" 
+                                                   value="no_asignado"
+                                                   {% if centro['_id']|string not in centros_asignados %}checked{% endif %}
+                                                   {% if centro['_id']|string in centros_asignados %}disabled{% endif %}>
+                                            <label class="btn btn-outline-danger {% if centro['_id']|string in centros_asignados %}disabled{% endif %}" 
+                                                   for="estado-no-asignado{{ centro['_id']|string }}">
+                                                No asignado
+                                            </label>
+                                            <input type="radio" 
+                                                   class="btn-check" 
+                                                   name="estado_trabajador_centro_{{ centro['_id'] }}" 
+                                                   id="estado-activo{{ centro['_id']|string }}" 
+                                                   value="activo"
+                                                   {% if centro['_id']|string in centros_asignados and centros_asignados[centro['_id']|string] == 'activo' %}checked{% endif %}>
+                                            <label class="btn btn-outline-success" for="estado-activo{{ centro['_id']|string }}">
+                                                Activo
+                                            </label>
+                                            <input type="radio" 
+                                                   class="btn-check" 
+                                                   name="estado_trabajador_centro_{{ centro['_id'] }}" 
+                                                   id="estado-inactivo{{ centro['_id']|string }}" 
+                                                   value="inactivo"
+                                                   {% if centro['_id']|string in centros_asignados and centros_asignados[centro['_id']|string] == 'inactivo' %}checked{% endif %}>
+                                            <label class="btn btn-outline-secondary" for="estado-inactivo{{ centro['_id']|string }}">
+                                                Inactivo
+                                            </label>
+                                        </div>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-center gap-2 mt-3">
+                            <a href="{{ url_for(
+                                'ucon_trabajadores.trabajadores', 
+                                usuario_rol_contrata_id=usuario_rol_contrata_id, 
+                                contrata_id=contrata_id) }}" 
+                                class="btn btn-secondary">
+                                Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Asignar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+{% endblock %}
