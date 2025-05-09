@@ -5,7 +5,7 @@ from core.usuarios_gestores.familias import (
     familias_crear_vista,
     familias_actualizar_vista,
     familias_eliminar_vista,
-    familias_familia_vista
+    familias_asignacion_requerimientos_vista
 )
 
 from core._decoradores import login_requerido
@@ -40,8 +40,8 @@ def familias_actualizar(gestor_id, titular_id, familia_id):
 def familias_eliminar(gestor_id, titular_id, familia_id):
     return familias_eliminar_vista(gestor_id, titular_id, familia_id)
 
-@ug_familias_bp.route('/familia/<gestor_id>/<titular_id>/<familia_id>', methods=['GET', 'POST'])
+@ug_familias_bp.route('/asignacion-requerimientos/<gestor_id>/<titular_id>/<familia_id>', methods=['GET', 'POST'])
 @login_requerido
-def familias_familia(gestor_id, titular_id, familia_id):
-    return familias_familia_vista(gestor_id, titular_id, familia_id)
+def familias_asignacion_requerimientos(gestor_id, titular_id, familia_id):
+    return familias_asignacion_requerimientos_vista(gestor_id, titular_id, familia_id)
 

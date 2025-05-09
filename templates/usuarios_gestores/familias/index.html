@@ -1,0 +1,85 @@
+{% extends "_base.html" %}
+
+{% block main %}
+    <div class="d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card shadow bg-dark text-white" style="min-width: 500px;">
+            <div class="card-body">
+                <h4 class="card-title text-center">Asignación de REQUERIMIENTOS</h4>
+                <p class="text-center">{{ familia['nombre_familia'] }}</p>
+                <div class="card-body">
+                    <!-- Formulario para filtrar requerimientos -->
+                    <form action="{{ url_for('ug_familias.familias_asignacion_requerimientos', 
+                            gestor_id=gestor_id|string, 
+                            titular_id=titular_id|string, 
+                            familia_id=familia_id|string) }}" 
+                            method="post"
+                            class="d-flex gap-3 align-items-center mb-3">
+                        <!-- Input para filtrar requerimiento -->
+                        <div class="form-floating flex-grow-1">
+                            <input type="text" 
+                                class="form-control" 
+                                id="filtrar_requerimientos"
+                                name="filtrar_requerimientos"
+                                value="{{ request.form.get('filtrar_requerimientos', '') }}"
+                                oninput="this.form.submit()"
+                                autocomplete="off"
+                                autofocus
+                                onfocus="this.setSelectionRange(this.value.length, this.value.length)">
+                            <label for="filtrar_requerimientos">
+                                Escriba referencia o nombre para filtrar...</label>
+                        </div>
+                        <!-- Botón para limpiar filtro -->
+                        <a href="{{ url_for('ug_familias.familias_asignacion_requerimientos', 
+                            gestor_id=gestor_id|string, 
+                            titular_id=titular_id|string, 
+                            familia_id=familia_id|string) }}" 
+                            class="btn btn-secondary">
+                            Limpiar filtros</a>
+                    </form>
+                    <form action="{{ url_for(
+                        'ug_familias.familias_asignacion_requerimientos', 
+                        gestor_id=gestor_id|string, 
+                        titular_id=titular_id|string, 
+                        familia_id=familia_id|string) }}" 
+                        method="post">
+                        <div class="form-floating mb-3">
+                            {% if requerimientos %}
+                                <ul class="list-group">
+                                    {% for requerimiento in requerimientos %}
+                                    
+                                    <li class="list-group-item d-flex align-items-center">
+                                        <input class="form-check-input me-2" type="checkbox" 
+                                            value="{{ requerimiento._id }}" 
+                                            id="requerimiento-{{ requerimiento._id }}"
+                                            name="requerimientos_seleccionados[]">
+                                        <label class="form-check-label flex-grow-1" 
+                                            for="requerimiento-{{ requerimiento._id }}">
+                                            {{ requerimiento.referencia_requerimiento }} - {{ requerimiento.nombre_requerimiento }}
+                                        </label>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    No hay requerimientos disponibles para este tipo de familia.
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="d-flex justify-content-end align-items-center gap-2 mt-3">
+                            <a href="{{ url_for(
+                                'ug_familias.familias', 
+                                gestor_id=gestor_id|string, 
+                                titular_id=titular_id|string, 
+                                familia_id=familia_id|string) }}" 
+                                class="btn btn-secondary">
+                                Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Asignar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+{% endblock %}

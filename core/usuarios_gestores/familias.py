@@ -240,11 +240,67 @@ def familias_eliminar_vista(gestor_id, titular_id, familia_id):
                                gestor_id=gestor_id, 
                                titular_id=titular_id))
 
-def familias_familia_vista(gestor_id, titular_id, familia_id):
+def asignar_requerimiento_familia(familia_id):
+    '''
+    Función para asignar un requerimiento a una familia
+    '''
+    pass
+
+def familias_asignacion_requerimientos_vista(gestor_id, titular_id, familia_id):
     '''
     Vista para mostrar una familia y añadir requerimientos a la familia
     '''
-    return render_template('usuarios_gestores/familias/index.html', 
-                           gestor_id=gestor_id, 
-                           titular_id=titular_id, 
-                           familia_id=familia_id)
+    try:
+        # Obtener la familia
+        familia = db.familias.find_one({
+            '_id': ObjectId(familia_id)
+        })
+
+        # Obtener parámetros de filtrado
+        filtrar_requerimientos = request.form.get('filtrar_requerimientos', '')
+        vaciar = request.args.get('vaciar', '0')
+
+        # Si se solicita vaciar filtros
+        if vaciar == '1':
+            return redirect(url_for('ug_familias.familias_asignacion_requerimientos_vista', 
+                                    gestor_id=gestor_id, 
+                                    titular_id=titular_id, 
+                                    familia_id=familia_id))
+        
+        # Obtener los requerimientos donde tipo_requerimiento = tipo_familia
+        consulta_filtros = {
+            'gestor_id': ObjectId(gestor_id),
+            'tipo_requerimiento': familia['tipo_familia'],
+            'estado_requerimiento': 'activo'
+        }
+        if filtrar_requerimientos:
+            consulta_filtros['$or'] = [
+                {'nombre_requerimiento': {'$regex': filtrar_requerimientos, '$options': 'i'}},
+                {'referencia_requerimiento': {'$regex': filtrar_requerimientos, '$options': 'i'}}
+            ]
+
+        requerimientos_cursor = db.requerimientos.find(consulta_filtros)
+
+        # Convertir el cursor a una lista de requerimientos activos
+        requerimientos = []
+        for requerimiento in requerimientos_cursor:
+            requerimientos.append({
+                '_id': str(requerimiento['_id']),
+                'referencia_requerimiento': requerimiento['referencia_requerimiento'],
+                'nombre_requerimiento': requerimiento['nombre_requerimiento'],
+                'tipo_requerimiento': requerimiento['tipo_requerimiento'],
+                'estado_requerimiento': requerimiento['estado_requerimiento']
+            })
+        
+        return render_template('usuarios_gestores/familias/index.html', 
+                               gestor_id=gestor_id, 
+                               titular_id=titular_id, 
+                               familia_id=familia_id,
+                               familia=familia,
+                               requerimientos=requerimientos,
+                               filtrar_requerimientos=filtrar_requerimientos)
+    except Exception as e:
+        flash(f'Error al asignar requerimientos a la familia: {e}', 'danger')
+        return redirect(url_for('ug_familias.familias', 
+                               gestor_id=gestor_id, 
+                               titular_id=titular_id))

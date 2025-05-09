@@ -34,3 +34,18 @@ class FamiliasCollection:
             'descripcion_familia': self.descripcion_familia,
             'notas_familia': self.notas_familia
         }
+
+class FamiliasRequerimientosCollection:
+    def __init__(self,
+                 familia_id,
+                 requerimiento_id):
+        self.familia_id = familia_id
+        self.requerimiento_id = requerimiento_id
+
+    def to_dict(self):
+        return {
+            'familia_id': self.familia_id,
+            'requerimiento_id': self.requerimiento_id
+        }
+
+
