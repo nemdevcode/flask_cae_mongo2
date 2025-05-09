@@ -48,7 +48,10 @@
                             Contratas</a>
                     </div>
                     <div class="btn-group" role="group" aria-label="Navegación entre elementos de usuario">
-                        <a href="" 
+                        <a href="{{ url_for(
+                            'ug_familias.familias', 
+                            gestor_id=gestor_id|string, 
+                            titular_id=titular._id|string) }}" 
                             class="btn btn-outline-secondary">
                             Familias</a>
                     </div>

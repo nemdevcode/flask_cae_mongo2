@@ -1,0 +1,155 @@
+{% extends "_base.html" %}
+
+{% block main %}
+    <div class="d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card shadow bg-dark text-white" style="min-width: 500px;">
+            <div class="card-body">
+                <h4 class="card-title text-center">Actualizar FAMILIA</h4>
+                <div class="card-body">
+                    <form action="{{ url_for(
+                        'ug_familias.familias_actualizar', 
+                        gestor_id=gestor_id|string,
+                        titular_id=titular_id|string,
+                        familia_id=familia._id|string) }}" 
+                        method="post">
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                class="form-control" 
+                                id="referencia_familia" 
+                                name="referencia_familia" 
+                                value="{{ familia.referencia_familia }}"
+                                required>
+                                <label for="referencia_familia">
+                                Referencia de la Familia:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                class="form-control" 
+                                id="nombre_familia" 
+                                name="nombre_familia" 
+                                value="{{ familia.nombre_familia }}"
+                                required>
+                                <label for="nombre_familia">
+                                Nombre de la Familia:</label>
+                        </div>
+                        <div class="btn-group text-center w-100 mb-3" role="group" aria-label="Basic radio toggle button group">
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_familia" 
+                                id="tipo-familia-empresa" 
+                                value="empresa" 
+                                required
+                                {% if familia.tipo_familia == 'empresa' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-familia-empresa">
+                                Empresa</label> 
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_familia" 
+                                id="tipo-familia-centro" 
+                                value="centro"
+                                {% if familia.tipo_familia == 'centro' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-familia-centro">
+                                Centro</label>
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_familia" 
+                                id="tipo-familia-trabajador" 
+                                value="trabajador"
+                                {% if familia.tipo_familia == 'trabajador' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-familia-trabajador">
+                                Trabajador</label>
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_familia" 
+                                id="tipo-familia-maquinaria" 
+                                value="maquinaria"
+                                {% if familia.tipo_familia == 'maquinaria' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-familia-maquinaria">
+                                Maquinaria</label>
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_familia" 
+                                id="tipo-familia-vehiculo" 
+                                value="vehiculo"
+                                {% if familia.tipo_familia == 'vehiculo' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-familia-vehiculo">
+                                Vehículo</label>
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_familia" 
+                                id="tipo-familia-vehiculo-maquinaria" 
+                                value="vehiculo-maquinaria"
+                                {% if familia.tipo_familia == 'vehiculo-maquinaria' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-familia-vehiculo-maquinaria">
+                                Vehículo-Maquinaria</label>
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_familia" 
+                                id="tipo-familia-quimico" 
+                                value="quimico"
+                                {% if familia.tipo_familia == 'quimico' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-familia-quimico">
+                                Producto Químico</label>
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_familia" 
+                                id="tipo-familia-otros" 
+                                value="otros"
+                                {% if familia.tipo_familia == 'otros' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-familia-otros">
+                                Otros</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <textarea 
+                                class="form-control" 
+                                id="descripcion_requerimiento" 
+                                name="descripcion_familia" 
+                                style="height: 150px;">
+                                {{ familia.descripcion_familia }}</textarea>
+                                <label for="descripcion_familia">
+                                Descripción de la Familia:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <textarea 
+                                class="form-control" 
+                                id="notas_familia" 
+                                name="notas_familia" 
+                                style="height: 150px;">
+                                {{ familia.notas_familia }}</textarea>
+                                <label for="notas_familia">
+                                Notas de la Familia:</label>
+                        </div>
+                        <div class="btn-group text-center w-100 mb-3" role="group" aria-label="Basic radio toggle button group">
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="estado_familia" 
+                                id="estado-activo{{ familia._id|string }}" 
+                                value="activo" 
+                                {% if familia.estado_familia == 'activo' %}checked{% endif %}>
+                                <label class="btn btn-outline-success" for="estado-activo{{ familia._id|string }}">
+                                Activo</label> 
+                            
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="estado_familia" 
+                                id="estado-inactivo{{ familia._id|string }}" 
+                                value="inactivo"
+                                {% if familia.estado_familia == 'inactivo' %}checked{% endif %}>
+                                <label class="btn btn-outline-secondary" for="estado-inactivo{{ familia._id|string }}">
+                                Inactivo</label>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-center gap-2">
+                            <a href="{{ url_for(
+                                'ug_familias.familias', 
+                                gestor_id=gestor_id|string,
+                                titular_id=titular_id|string) }}" 
+                                class="btn btn-secondary">
+                                Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Actualizar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

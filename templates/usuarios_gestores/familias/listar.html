@@ -8,10 +8,6 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
                 <a class="navbar-brand">CAE Accesible</a>
-                <a class="btn btn-info rounded-circle p-1" data-bs-toggle="modal" data-bs-target="#infoModal">
-                    <img src="{{ url_for('static', filename='info-circle-fill.svg') }}" 
-                        alt="Información" style="width: 20px; height: 20px; filter: brightness(0) invert(1);">
-                </a>
                 <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="/usuarios">Inicio</a>
@@ -19,13 +15,15 @@
                 </ul>
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end align-items-center">
                     <span class="my-auto">Volver a:</span>
-                    <a href="{{ url_for(
-                        'usuarios_gestores.usuarios_gestores_gestor', 
-                        gestor_id=gestor_id) }}" 
-                        class="btn btn-outline-primary">
-                        Gestor</a>
-                    <a href="{{ url_for('logout') }}" class="btn btn-outline-dark">
-                        Cerrar sesión</a>
+                    <div class="btn-group" role="group" aria-label="Navegación entre tipos de usuarios">
+                        <a href="{{ url_for(
+                            'ug_titulares.titulares_titular', 
+                            gestor_id=gestor_id,
+                            titular_id=titular_id) }}" 
+                            class="btn btn-outline-primary">
+                            Titular</a>
+                    </div>
+                    <a href="{{ url_for('logout') }}" class="btn btn-outline-dark">Cerrar sesión</a>
                 </div>
             </div>
         </div>
@@ -33,29 +31,29 @@
 {% endblock %}
 
 {% block main %}
-    <!-- Listado de requerimientos -->
     <div class="container mt-5">
-        <h3 class="text-center">Listado de REQUERIMIENTOS del GESTOR: {{ nombre_gestor }}</h3>
+        <h3 class="text-center">Listado de FAMILIAS del titular: {{ nombre_titular }}</h3>
         <div class="d-flex justify-content-between align-items-center mt-5">
-            <!-- Formulario para filtrar requerimientos -->
+            <!-- Formulario para filtrar familias -->
             <form action="{{ url_for(
-                'ug_requerimientos.requerimientos', 
-                gestor_id=gestor_id) }}" 
+                'ug_familias.familias', 
+                gestor_id=gestor_id,
+                titular_id=titular_id) }}" 
                 method="post" class="flex-grow-1 me-3">
                 <div class="d-flex gap-3 align-items-center">
-                    <!-- Input para filtrar requerimientos -->
+                    <!-- Input para filtrar familias -->
                     <div class="form-floating" style="flex: 2;">
                         <input type="text" 
                             class="form-control" 
-                            id="filtrar_requerimiento"
-                            name="filtrar_requerimiento"
-                            value="{{ request.form.get('filtrar_requerimiento', '') }}"
+                            id="filtrar_familia"
+                            name="filtrar_familia"
+                            value="{{ request.form.get('filtrar_familia', '') }}"
                             oninput="this.form.submit()"
                             autocomplete="off"
                             autofocus
                             onfocus="this.setSelectionRange(this.value.length, this.value.length)"
                             style="height: 80px;">
-                            <label for="filtrar_requerimiento"">
+                            <label for="filtrar_familia">
                             Escriba para filtrar...</label>
                     </div>
                     <!-- Filtro por estado y botón limpiar -->
@@ -96,8 +94,9 @@
                         </div>
                         <!-- Botón para limpiar filtro -->
                         <a href="{{ url_for(
-                            'ug_requerimientos.requerimientos', 
-                            gestor_id=gestor_id) }}" 
+                            'ug_familias.familias', 
+                            gestor_id=gestor_id,
+                            titular_id=titular_id) }}" 
                             class="btn btn-secondary">
                             Limpiar filtros</a>
                     </div>
@@ -201,18 +200,19 @@
             <!-- Botón crear -->
             <div class="d-flex align-items-center">
                 <a href="{{ url_for(
-                    'ug_requerimientos.requerimientos_crear', 
-                    gestor_id=gestor_id) }}" 
+                    'ug_familias.familias_crear', 
+                    gestor_id=gestor_id,
+                    titular_id=titular_id) }}" 
                     class="btn btn-success">
                     Crear</a>
             </div>
         </div>
-        <!-- Tabla de requerimientos -->
+
+        <!-- Tabla de familias -->
         <div class="table-responsive mt-5">
             <table class="table table-striped">
                 <thead class="text-center">
                     <tr>
-                        <th>Referencia</th>
                         <th>Nombre</th>
                         <th>Tipo</th>
                         <th>Estado</th>
@@ -220,96 +220,80 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% if requerimientos %}
-                        {% for requerimiento in requerimientos %}
-                            <tr>
-                                <td>{{ requerimiento.referencia_requerimiento }}</td>
-                                <td>{{ requerimiento.nombre_requerimiento }}</td>
-                                <td class="text-center">
-                                    <span class="badge bg-primary">{{ requerimiento.tipo_requerimiento }}</span>
-                                </td>
-                                <td class="text-center">
-                                    {% if requerimiento.estado_requerimiento == 'activo' %}
-                                        <span class="badge bg-success">Activo</span>
-                                    {% else %}
-                                        <span class="badge bg-secondary">Inactivo</span>
-                                    {% endif %}
-                                </td>
-                                <td class="text-center">
-                                    <a href="{{ url_for(
-                                        'ug_requerimientos.requerimientos_actualizar', 
-                                        gestor_id=gestor_id,
-                                        requerimiento_id=requerimiento._id) }}" 
-                                        class="btn btn-warning btn-sm">
-                                        Editar</a>
-                                    <button type="button" 
-                                        class="btn btn-danger btn-sm" 
-                                        data-bs-toggle="modal" 
-                                        data-bs-target="#confirmarEliminar{{ requerimiento._id }}">
-                                        Eliminar
-                                    </button>
-                                </td>
-                            </tr>
-                            <!-- Modal de confirmación de eliminación -->
-                            <div class="modal fade" id="confirmarEliminar{{ requerimiento._id }}" tabindex="-1" 
-                                aria-labelledby="confirmarEliminarLabel{{ requerimiento._id }}" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content bg-dark text-white">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title text-danger text-center w-100" 
-                                                id="confirmarEliminarLabel{{ requerimiento._id }}">
-                                                <i class="fas fa-exclamation-triangle text-warning me-2"></i>
-                                                ¡ Confirmar ELIMINACIÓN !</h5>
-                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            ¿Está seguro que desea eliminar el requerimiento "{{ requerimiento.nombre_requerimiento }}"? 
-                                            <br>
-                                            <strong>Referencia:</strong> {{ requerimiento.referencia_requerimiento }}
-                                            <p class="text-danger mt-2">
-                                                <i class="fas fa-exclamation-circle me-1"></i>
-                                                Esta acción no se puede deshacer.
-                                            </p>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                            <a href="{{ url_for(
-                                                'ug_requerimientos.requerimientos_eliminar', 
-                                                gestor_id=gestor_id,
-                                                requerimiento_id=requerimiento._id) }}" 
-                                                class="btn btn-danger">
-                                                Eliminar</a>
-                                        </div>
+                    {% if familias %}
+                        {% for familia in familias %}
+                        <tr>
+                            <td>{{ familia.nombre_familia }}</td>
+                            <td class="text-center">
+                                <span class="badge bg-primary">{{ familia.tipo_familia }}</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge {% if familia.estado_familia == 'activo' %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {{ familia.estado_familia }}
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <a href="{{ url_for(
+                                    'ug_familias.familias_familia', 
+                                    gestor_id=gestor_id|string, 
+                                    titular_id=titular_id|string,
+                                    familia_id=familia._id|string) }}" 
+                                    class="btn btn-primary btn-sm">
+                                    Ir</a>
+                                <a href="{{ url_for(
+                                    'ug_familias.familias_actualizar', 
+                                    gestor_id=gestor_id|string, 
+                                    titular_id=titular_id|string,
+                                    familia_id=familia._id|string) }}" 
+                                    class="btn btn-warning btn-sm">
+                                    Editar</a>
+                                <button type="button" 
+                                    class="btn btn-danger btn-sm" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#confirmarEliminar{{ familia._id }}">
+                                    Eliminar</button>
+                            </td>
+                        </tr>
+                        <!-- Modal de confirmación de eliminación -->
+                        <div class="modal fade" id="confirmarEliminar{{ familia._id }}" tabindex="-1" 
+                            aria-labelledby="confirmarEliminarLabel{{ familia._id }}" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content bg-dark text-white">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title text-danger text-center w-100" 
+                                            id="confirmarEliminarLabel{{ familia._id }}">
+                                            <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                                            ¡ Confirmar ELIMINACIÓN !</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p class="mb-0">¿Estás seguro de que deseas eliminar la familia <strong>"{{ familia.nombre_familia }}"</strong>?</p>
+                                        <p class="text-danger mt-2">
+                                            <i class="fas fa-exclamation-circle me-1"></i>
+                                            Esta acción no se puede deshacer.
+                                        </p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <a href="{{ url_for(
+                                            'ug_familias.familias_eliminar', 
+                                            gestor_id=gestor_id,
+                                            titular_id=titular_id,
+                                            familia_id=familia._id) }}" 
+                                            class="btn btn-danger">
+                                            Eliminar</a>
                                     </div>
                                 </div>
                             </div>
+                        </div>
                         {% endfor %}
                     {% else %}
                         <tr>
-                            <td colspan="5" class="text-center">No hay requerimientos para mostrar</td>
+                            <td colspan="4" class="text-center">No hay familias registradas</td>
                         </tr>
                     {% endif %}
                 </tbody>
             </table>
-        </div>
-    </div>
-    <!-- Modal de Información -->
-    <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title text-center w-100" id="infoModalLabel">Información/Ayuda</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>...</p>
-                    <hr>
-                    <p>...</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                </div>
-            </div>
         </div>
     </div>
 {% endblock %}

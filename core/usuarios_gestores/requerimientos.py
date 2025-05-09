@@ -44,8 +44,7 @@ def requerimientos_vista(gestor_id):
             # Si hay filtro por texto, verificar si coincide en algún campo
             if filtrar_requerimiento:
                 if (filtrar_requerimiento.lower() not in requerimiento['referencia_requerimiento'].lower() and
-                    filtrar_requerimiento.lower() not in requerimiento['nombre_requerimiento'].lower() and
-                    filtrar_requerimiento.lower() not in requerimiento['tipo_requerimiento'].lower()):
+                    filtrar_requerimiento.lower() not in requerimiento['nombre_requerimiento'].lower()):
                     continue
             
             requerimientos.append({

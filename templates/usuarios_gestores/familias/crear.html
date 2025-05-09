@@ -1,0 +1,135 @@
+{% extends "_base.html" %}
+
+{% block main %}
+    <div class="d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card shadow bg-dark text-white" style="min-width: 500px;">
+            <div class="card-body">
+                <h4 class="card-title text-center">Crear nueva FAMILIA</h4>
+                <div class="card-body">
+                    <form action="{{ url_for(
+                        'ug_familias.familias_crear', 
+                        gestor_id=gestor_id|string, 
+                        titular_id=titular_id|string) }}" 
+                        method="post">
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                class="form-control" 
+                                id="referencia_familia" 
+                                name="referencia_familia" 
+                                value="{{ datos_formulario.referencia_familia if datos_formulario else '' }}"
+                                required>
+                                <label for="referencia_familia">
+                                Referencia de la Familia:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                class="form-control" 
+                                id="nombre_familia" 
+                                name="nombre_familia" 
+                                value="{{ datos_formulario.nombre_familia if datos_formulario else '' }}"
+                                required>
+                                <label for="nombre_familia">
+                                Nombre de la Familia:</label>
+                        </div>
+                        <div class="btn-group text-center w-100 mb-3" role="group" aria-label="Basic radio toggle button group">
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_familia" 
+                                id="tipo-familia-empresa" 
+                                value="empresa" 
+                                required
+                                {% if datos_formulario and datos_formulario.tipo_familia == 'empresa' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-familia-empresa">
+                                Empresa</label> 
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_familia" 
+                                id="tipo-familia-centro" 
+                                value="centro"
+                                {% if datos_formulario and datos_formulario.tipo_familia == 'centro' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-familia-centro">
+                                Centro</label>
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_familia" 
+                                id="tipo-familia-trabajador" 
+                                value="trabajador"
+                                {% if datos_formulario and datos_formulario.tipo_familia == 'trabajador' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-familia-trabajador">
+                                Trabajador</label>
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_familia" 
+                                id="tipo-familia-maquinaria" 
+                                value="maquinaria"
+                                {% if datos_formulario and datos_formulario.tipo_familia == 'maquinaria' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-familia-maquinaria">
+                                Maquinaria</label>
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_familia" 
+                                id="tipo-familia-vehiculo" 
+                                value="vehiculo"
+                                {% if datos_formulario and datos_formulario.tipo_familia == 'vehiculo' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-familia-vehiculo">
+                                Vehículo</label>
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_requerimiento" 
+                                id="tipo-requerimiento-vehiculo-maquinaria" 
+                                value="vehiculo-maquinaria"
+                                {% if datos_formulario and datos_formulario.tipo_familia == 'vehiculo-maquinaria' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-familia-vehiculo-maquinaria">
+                                Vehículo-Maquinaria</label>
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_familia" 
+                                id="tipo-familia-quimico" 
+                                value="quimico"
+                                {% if datos_formulario and datos_formulario.tipo_familia == 'quimico' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-familia-quimico">
+                                Producto Químico</label>
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_familia" 
+                                id="tipo-familia-otros" 
+                                value="otros"
+                                {% if datos_formulario and datos_formulario.tipo_familia == 'otros' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-familia-otros">
+                                Otros</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <textarea 
+                                class="form-control" 
+                                id="descripcion_familia" 
+                                name="descripcion_familia" 
+                                style="height: 150px;">
+                                {{ datos_formulario.descripcion_familia if datos_formulario else '' }}</textarea>
+                                <label for="descripcion_familia">
+                                Descripción de la Familia:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <textarea 
+                                class="form-control" 
+                                id="notas_familia" 
+                                name="notas_familia" 
+                                style="height: 150px;">
+                                {{ datos_formulario.notas_familia if datos_formulario else '' }}</textarea>
+                                <label for="notas_familia">
+                                Notas de la Familia:</label>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-center gap-2">
+                            <a href="{{ url_for(
+                                'ug_familias.familias', 
+                                gestor_id=gestor_id|string, 
+                                titular_id=titular_id|string) }}" 
+                                class="btn btn-secondary">
+                                Cancelar</a>
+                            <button type="submit" class="btn btn-success">Crear</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
