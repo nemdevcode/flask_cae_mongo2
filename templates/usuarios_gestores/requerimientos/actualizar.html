@@ -1,0 +1,153 @@
+{% extends "_base.html" %}
+
+{% block main %}
+    <div class="d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card shadow bg-dark text-white" style="min-width: 500px;">
+            <div class="card-body">
+                <h4 class="card-title text-center">Actualizar REQUERIMIENTO</h4>
+                <div class="card-body">
+                    <form action="{{ url_for(
+                        'ug_requerimientos.requerimientos_actualizar', 
+                        gestor_id=gestor_id,
+                        requerimiento_id=requerimiento._id) }}" 
+                        method="post">
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                class="form-control" 
+                                id="referencia_requerimiento" 
+                                name="referencia_requerimiento" 
+                                value="{{ requerimiento.referencia_requerimiento }}"
+                                required>
+                                <label for="referencia_requerimiento">
+                                Referencia del Requerimiento:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" 
+                                class="form-control" 
+                                id="nombre_requerimiento" 
+                                name="nombre_requerimiento" 
+                                value="{{ requerimiento.nombre_requerimiento }}"
+                                required>
+                                <label for="nombre_requerimiento">
+                                Nombre del Requerimiento:</label>
+                        </div>
+                        <div class="btn-group text-center w-100 mb-3" role="group" aria-label="Basic radio toggle button group">
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_requerimiento" 
+                                id="tipo-requerimiento-empresa" 
+                                value="empresa" 
+                                required
+                                {% if requerimiento.tipo_requerimiento == 'empresa' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-requerimiento-empresa">
+                                Empresa</label> 
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_requerimiento" 
+                                id="tipo-requerimiento-centro" 
+                                value="centro"
+                                {% if requerimiento.tipo_requerimiento == 'centro' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-requerimiento-centro">
+                                Centro</label>
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_requerimiento" 
+                                id="tipo-requerimiento-trabajador" 
+                                value="trabajador"
+                                {% if requerimiento.tipo_requerimiento == 'trabajador' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-requerimiento-trabajador">
+                                Trabajador</label>
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_requerimiento" 
+                                id="tipo-requerimiento-maquinaria" 
+                                value="maquinaria"
+                                {% if requerimiento.tipo_requerimiento == 'maquinaria' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-requerimiento-maquinaria">
+                                Maquinaria</label>
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_requerimiento" 
+                                id="tipo-requerimiento-vehiculo" 
+                                value="vehiculo"
+                                {% if requerimiento.tipo_requerimiento == 'vehiculo' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-requerimiento-vehiculo">
+                                Vehículo</label>
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_requerimiento" 
+                                id="tipo-requerimiento-vehiculo-maquinaria" 
+                                value="vehiculo-maquinaria"
+                                {% if requerimiento.tipo_requerimiento == 'vehiculo-maquinaria' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-requerimiento-vehiculo-maquinaria">
+                                Vehículo-Maquinaria</label>
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_requerimiento" 
+                                id="tipo-requerimiento-quimico" 
+                                value="quimico"
+                                {% if requerimiento.tipo_requerimiento == 'quimico' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-requerimiento-quimico">
+                                Producto Químico</label>
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_requerimiento" 
+                                id="tipo-requerimiento-otros" 
+                                value="otros"
+                                {% if requerimiento.tipo_requerimiento == 'otros' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-requerimiento-otros">
+                                Otros</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <textarea 
+                                class="form-control" 
+                                id="descripcion_requerimiento" 
+                                name="descripcion_requerimiento" 
+                                style="height: 150px;">
+                                {{ requerimiento.descripcion_requerimiento }}</textarea>
+                                <label for="descripcion_requerimiento">
+                                Descripción del Requerimiento:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <textarea 
+                                class="form-control" 
+                                id="notas_requerimiento" 
+                                name="notas_requerimiento" 
+                                style="height: 150px;">
+                                {{ requerimiento.notas_requerimiento }}</textarea>
+                                <label for="notas_requerimiento">
+                                Notas del Requerimiento:</label>
+                        </div>
+                        <div class="btn-group text-center w-100 mb-3" role="group" aria-label="Basic radio toggle button group">
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="estado_requerimiento" 
+                                id="estado-activo{{ requerimiento._id|string }}" 
+                                value="activo" 
+                                {% if requerimiento.estado_requerimiento == 'activo' %}checked{% endif %}>
+                                <label class="btn btn-outline-success" for="estado-activo{{ requerimiento._id|string }}">
+                                Activo</label> 
+                            
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="estado_requerimiento" 
+                                id="estado-inactivo{{ requerimiento._id|string }}" 
+                                value="inactivo"
+                                {% if requerimiento.estado_requerimiento == 'inactivo' %}checked{% endif %}>
+                                <label class="btn btn-outline-secondary" for="estado-inactivo{{ requerimiento._id|string }}">
+                                Inactivo</label>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-center gap-2">
+                            <a href="{{ url_for(
+                                'ug_requerimientos.requerimientos', 
+                                gestor_id=gestor_id|string) }}" 
+                                class="btn btn-secondary">
+                                Cancelar</a>
+                            <button type="submit" class="btn btn-primary">Actualizar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

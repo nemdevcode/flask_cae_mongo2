@@ -21,7 +21,8 @@
                     <span class="my-auto">Volver a:</span>
                     <a href="{{ url_for(
                         'usuarios_gestores.usuarios_gestores_gestor', 
-                        gestor_id=gestor_id) }}" class="btn btn-outline-primary">
+                        gestor_id=gestor_id) }}" 
+                        class="btn btn-outline-primary">
                         Gestor</a>
                     <a href="{{ url_for('logout') }}" class="btn btn-outline-dark">
                         Cerrar sesión</a>
@@ -57,42 +58,43 @@
                             <label for="filtrar_requerimiento"">
                             Escriba para filtrar...</label>
                     </div>
-                    
-                    <!-- Filtro por estado -->
-                    <div class="btn-group" role="group" aria-label="Filtrar por estado" style="flex: 2;">
-                        <input type="radio" 
-                            class="btn-check" 
-                            name="filtrar_estado" 
-                            id="todos" 
-                            value="todos" 
-                            {% if not request.form.get('filtrar_estado') or request.form.get('filtrar_estado') == 'todos' %}checked{% endif %}
-                            onchange="this.form.submit()">
-                            <label class="btn btn-outline-primary" for="todos">
-                            Todos</label>
-                        
-                        <input type="radio" 
-                            class="btn-check" 
-                            name="filtrar_estado" 
-                            id="activos" 
-                            value="activo"
-                            {% if request.form.get('filtrar_estado') == 'activo' %}checked{% endif %}
-                            onchange="this.form.submit()">
-                            <label class="btn btn-outline-success" for="activos">
-                            Activos</label>
-                        
-                        <input type="radio" 
-                            class="btn-check" 
-                            name="filtrar_estado" 
-                            id="inactivos" 
-                            value="inactivo"
-                            {% if request.form.get('filtrar_estado') == 'inactivo' %}checked{% endif %}
-                            onchange="this.form.submit()">
-                            <label class="btn btn-outline-secondary" for="inactivos">
-                            Inactivos</label>
-                    </div>
-                    
-                    <!-- Botón para limpiar filtro -->
-                    <div style="flex: 1;">
+                    <!-- Filtro por estado y botón limpiar -->
+                    <div class="d-flex gap-3 align-items-center">
+                        <div class="d-flex flex-column">
+                            <label class="form-label mb-2">Filtro por estado:</label>
+                            <div class="btn-group" role="group" aria-label="Filtrar por estado">
+                                <input type="radio" 
+                                    class="btn-check" 
+                                    name="filtrar_estado" 
+                                    id="todos_estados" 
+                                    value="todos_estados" 
+                                    {% if not request.form.get('filtrar_estado') or request.form.get('filtrar_estado') == 'todos_estados' %}checked{% endif %}
+                                    onchange="this.form.submit()">
+                                    <label class="btn btn-outline-primary" for="todos_estados">
+                                    Todos</label>
+                                
+                                <input type="radio" 
+                                    class="btn-check" 
+                                    name="filtrar_estado" 
+                                    id="activos" 
+                                    value="activo"
+                                    {% if request.form.get('filtrar_estado') == 'activo' %}checked{% endif %}
+                                    onchange="this.form.submit()">
+                                    <label class="btn btn-outline-success" for="activos">
+                                    Activos</label>
+                                
+                                <input type="radio" 
+                                    class="btn-check" 
+                                    name="filtrar_estado" 
+                                    id="inactivos" 
+                                    value="inactivo"
+                                    {% if request.form.get('filtrar_estado') == 'inactivo' %}checked{% endif %}
+                                    onchange="this.form.submit()">
+                                    <label class="btn btn-outline-secondary" for="inactivos">
+                                    Inactivos</label>
+                            </div>
+                        </div>
+                        <!-- Botón para limpiar filtro -->
                         <a href="{{ url_for(
                             'ug_requerimientos.requerimientos', 
                             gestor_id=gestor_id) }}" 
@@ -100,13 +102,110 @@
                             Limpiar filtros</a>
                     </div>
                 </div>
+                <!-- Filtro por tipo -->
+                <div class="d-flex flex-column mt-3">
+                    <label class="form-label mb-2">Filtro por tipo:</label>
+                    <div class="btn-group" role="group" aria-label="Filtrar por tipo">
+                        <input type="radio" 
+                            class="btn-check" 
+                            name="filtrar_tipo" 
+                            id="todos_tipos" 
+                            value="todos_tipos" 
+                            {% if not request.form.get('filtrar_tipo') or request.form.get('filtrar_tipo') == 'todos_tipos' %}checked{% endif %}
+                            onchange="this.form.submit()">
+                            <label class="btn btn-outline-primary" for="todos_tipos">
+                            Todos</label>
+
+                        <input type="radio" 
+                            class="btn-check" 
+                            name="filtrar_tipo" 
+                            id="empresa" 
+                            value="empresa" 
+                            {% if request.form.get('filtrar_tipo') == 'empresa' %}checked{% endif %}
+                            onchange="this.form.submit()">
+                            <label class="btn btn-outline-primary" for="empresa">
+                            Empresa</label>
+
+                        <input type="radio" 
+                            class="btn-check" 
+                            name="filtrar_tipo" 
+                            id="centro" 
+                            value="centro" 
+                            {% if request.form.get('filtrar_tipo') == 'centro' %}checked{% endif %}
+                            onchange="this.form.submit()">
+                            <label class="btn btn-outline-primary" for="centro">
+                            Centro</label>
+
+                        <input type="radio" 
+                            class="btn-check" 
+                            name="filtrar_tipo" 
+                            id="trabajador"     
+                            value="trabajador" 
+                            {% if request.form.get('filtrar_tipo') == 'trabajador' %}checked{% endif %}
+                            onchange="this.form.submit()">
+                            <label class="btn btn-outline-primary" for="trabajador">
+                            Trabajador</label>
+
+                        <input type="radio" 
+                            class="btn-check" 
+                            name="filtrar_tipo" 
+                            id="maquinaria"     
+                            value="maquinaria" 
+                            {% if request.form.get('filtrar_tipo') == 'maquinaria' %}checked{% endif %}
+                            onchange="this.form.submit()">
+                            <label class="btn btn-outline-primary" for="maquinaria">
+                            Maquinaria</label>
+
+                        <input type="radio" 
+                            class="btn-check" 
+                            name="filtrar_tipo" 
+                            id="vehiculo"     
+                            value="vehiculo" 
+                            {% if request.form.get('filtrar_tipo') == 'vehiculo' %}checked{% endif %}
+                            onchange="this.form.submit()">
+                            <label class="btn btn-outline-primary" for="vehiculo">
+                            Vehículo</label>
+
+                        <input type="radio" 
+                            class="btn-check" 
+                            name="filtrar_tipo" 
+                            id="vehiculo-maquinaria"     
+                            value="vehiculo-maquinaria" 
+                            {% if request.form.get('filtrar_tipo') == 'vehiculo-maquinaria' %}checked{% endif %}
+                            onchange="this.form.submit()">
+                            <label class="btn btn-outline-primary" for="vehiculo-maquinaria">
+                            Vehículo-Maquinaria</label>
+
+                        <input type="radio" 
+                            class="btn-check" 
+                            name="filtrar_tipo" 
+                            id="quimico"     
+                            value="quimico" 
+                            {% if request.form.get('filtrar_tipo') == 'quimico' %}checked{% endif %}
+                            onchange="this.form.submit()">
+                            <label class="btn btn-outline-primary" for="quimico">
+                            Producto Químico</label>
+                            
+                        <input type="radio" 
+                            class="btn-check" 
+                            name="filtrar_tipo" 
+                            id="otros"     
+                            value="otros" 
+                            {% if request.form.get('filtrar_tipo') == 'otros' %}checked{% endif %}
+                            onchange="this.form.submit()">
+                            <label class="btn btn-outline-primary" for="otros">
+                            Otros</label>
+                    </div>
+                </div>
             </form>
             <!-- Botón crear -->
-            <a href="{{ url_for(
-                'ug_requerimientos.requerimientos_crear', 
-                gestor_id=gestor_id) }}" 
-                class="btn btn-success">
-                Crear</a>
+            <div class="d-flex align-items-center">
+                <a href="{{ url_for(
+                    'ug_requerimientos.requerimientos_crear', 
+                    gestor_id=gestor_id) }}" 
+                    class="btn btn-success">
+                    Crear</a>
+            </div>
         </div>
         <!-- Tabla de requerimientos -->
         <div class="table-responsive mt-5">
@@ -115,6 +214,7 @@
                     <tr>
                         <th>Referencia</th>
                         <th>Nombre</th>
+                        <th>Tipo</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
@@ -126,6 +226,9 @@
                                 <td>{{ requerimiento.referencia_requerimiento }}</td>
                                 <td>{{ requerimiento.nombre_requerimiento }}</td>
                                 <td class="text-center">
+                                    <span class="badge bg-primary">{{ requerimiento.tipo_requerimiento }}</span>
+                                </td>
+                                <td class="text-center">
                                     {% if requerimiento.estado_requerimiento == 'activo' %}
                                         <span class="badge bg-success">Activo</span>
                                     {% else %}
@@ -133,10 +236,10 @@
                                     {% endif %}
                                 </td>
                                 <td class="text-center">
-                                    <a href="" 
-                                        class="btn btn-primary btn-sm">
-                                        Ir</a>
-                                    <a href="" 
+                                    <a href="{{ url_for(
+                                        'ug_requerimientos.requerimientos_actualizar', 
+                                        gestor_id=gestor_id,
+                                        requerimiento_id=requerimiento._id) }}" 
                                         class="btn btn-warning btn-sm">
                                         Editar</a>
                                     <button type="button" 
@@ -159,10 +262,18 @@
                                             ¿Está seguro que desea eliminar el requerimiento "{{ requerimiento.nombre_requerimiento }}"? 
                                             <br>
                                             <strong>Referencia:</strong> {{ requerimiento.referencia_requerimiento }}
+                                            <p class="text-danger mt-2">
+                                                <i class="fas fa-exclamation-circle me-1"></i>
+                                                Esta acción no se puede deshacer.
+                                            </p>
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                            <a href="" class="btn btn-danger">
+                                            <a href="{{ url_for(
+                                                'ug_requerimientos.requerimientos_eliminar', 
+                                                gestor_id=gestor_id,
+                                                requerimiento_id=requerimiento._id) }}" 
+                                                class="btn btn-danger">
                                                 Eliminar</a>
                                         </div>
                                     </div>
@@ -171,7 +282,7 @@
                         {% endfor %}
                     {% else %}
                         <tr>
-                            <td colspan="4" class="text-center">No hay requerimientos para mostrar</td>
+                            <td colspan="5" class="text-center">No hay requerimientos para mostrar</td>
                         </tr>
                     {% endif %}
                 </tbody>

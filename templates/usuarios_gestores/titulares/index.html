@@ -8,6 +8,10 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
                 <a class="navbar-brand">CAE Accesible</a>
+                <a class="btn btn-info rounded-circle p-1" data-bs-toggle="modal" data-bs-target="#infoModal">
+                    <img src="{{ url_for('static', filename='info-circle-fill.svg') }}" 
+                        alt="Información" style="width: 20px; height: 20px; filter: brightness(0) invert(1);">
+                </a>
                 <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="/usuarios">Inicio</a>
@@ -22,6 +26,7 @@
                             class="btn btn-outline-primary">
                             Titulares</a>
                     </div>
+                    <span class="my-auto">Ir a:</span>
                     <div class="btn-group" role="group" aria-label="Navegación entre elementos de usuario">
                         <a href="{{ url_for(
                             'ug_usuarios_titulares.usuarios_titulares', 
@@ -42,6 +47,11 @@
                             class="btn btn-secondary">
                             Contratas</a>
                     </div>
+                    <div class="btn-group" role="group" aria-label="Navegación entre elementos de usuario">
+                        <a href="" 
+                            class="btn btn-outline-secondary">
+                            Familias</a>
+                    </div>
                     <a href="{{ url_for('logout') }}" class="btn btn-outline-dark">Cerrar sesión</a>
                 </div>
             </div>
@@ -52,5 +62,24 @@
 {% block main %}
     <div class="container mt-5">
         <h3 class="text-center">Vista de estado del TITULAR: {{ titular.nombre_titular }}</h3>
+    </div>
+    <!-- Modal de Información -->
+    <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-center w-100" id="infoModalLabel">Información/Ayuda</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>...</p>
+                    <hr>
+                    <p>...</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}

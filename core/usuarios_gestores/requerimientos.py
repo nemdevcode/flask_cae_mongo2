@@ -16,7 +16,8 @@ def requerimientos_vista(gestor_id):
 
         # Obtener parámetros de filtrado
         filtrar_requerimiento = request.form.get('filtrar_requerimiento', '')
-        filtrar_estado = request.form.get('filtrar_estado', 'todos')
+        filtrar_estado = request.form.get('filtrar_estado', 'todos_estados')
+        filtrar_tipo = request.form.get('filtrar_tipo', 'todos_tipos')
         vaciar = request.args.get('vaciar', '0')
         
         # Si se solicita vaciar filtros
@@ -29,8 +30,11 @@ def requerimientos_vista(gestor_id):
         consulta_filtros = {'gestor_id': ObjectId(gestor_id)}
 
         # Aplicar filtros si existen
-        if filtrar_estado != 'todos':
+        if filtrar_estado != 'todos_estados':
             consulta_filtros['estado_requerimiento'] = filtrar_estado
+        
+        if filtrar_tipo != 'todos_tipos':
+            consulta_filtros['tipo_requerimiento'] = filtrar_tipo
         
         # Obtener los requerimientos del gestor
         requerimientos = []
@@ -40,13 +44,15 @@ def requerimientos_vista(gestor_id):
             # Si hay filtro por texto, verificar si coincide en algún campo
             if filtrar_requerimiento:
                 if (filtrar_requerimiento.lower() not in requerimiento['referencia_requerimiento'].lower() and
-                    filtrar_requerimiento.lower() not in requerimiento['nombre_requerimiento'].lower()):
+                    filtrar_requerimiento.lower() not in requerimiento['nombre_requerimiento'].lower() and
+                    filtrar_requerimiento.lower() not in requerimiento['tipo_requerimiento'].lower()):
                     continue
             
             requerimientos.append({
                 '_id': str(requerimiento['_id']),
                 'referencia_requerimiento': requerimiento['referencia_requerimiento'],
                 'nombre_requerimiento': requerimiento['nombre_requerimiento'],
+                'tipo_requerimiento': requerimiento['tipo_requerimiento'],
                 'estado_requerimiento': requerimiento['estado_requerimiento']
             })
 
@@ -55,7 +61,8 @@ def requerimientos_vista(gestor_id):
                                nombre_gestor=nombre_gestor,
                                requerimientos=requerimientos,
                                filtrar_requerimiento=filtrar_requerimiento,
-                               filtrar_estado=filtrar_estado)
+                               filtrar_estado=filtrar_estado,
+                               filtrar_tipo=filtrar_tipo)
     
     except Exception as e:
         flash(f'Error al cargar la vista de requerimientos: {str(e)}', 'danger')
@@ -70,6 +77,7 @@ def crear_requerimiento(gestor_id, datos_formulario):
         # Obtener los datos del formulario
         referencia_requerimiento = datos_formulario.get('referencia_requerimiento')
         nombre_requerimiento = datos_formulario.get('nombre_requerimiento')
+        tipo_requerimiento = datos_formulario.get('tipo_requerimiento')
         descripcion_requerimiento = datos_formulario.get('descripcion_requerimiento')
         notas_requerimiento = datos_formulario.get('notas_requerimiento')
 
@@ -78,6 +86,7 @@ def crear_requerimiento(gestor_id, datos_formulario):
             gestor_id=ObjectId(gestor_id),
             referencia_requerimiento=referencia_requerimiento,
             nombre_requerimiento=nombre_requerimiento,
+            tipo_requerimiento=tipo_requerimiento,
             estado_requerimiento='activo',
             fecha_activacion=datetime.now(),
             fecha_modificacion=datetime.now(),
@@ -122,7 +131,7 @@ def requerimientos_crear_vista(gestor_id):
 
     except Exception as e:
         flash(f'Error al procesar el formulario: {str(e)}', 'danger')
-        return redirect(url_for('ug_requerimientos.requerimientos_crear', 
+        return redirect(url_for('ug_requerimientos.requerimientos', 
                                 gestor_id=gestor_id))
 
 def actualizar_requerimiento(requerimiento_id, datos_formulario):
@@ -133,11 +142,10 @@ def actualizar_requerimiento(requerimiento_id, datos_formulario):
         # Obtener los datos del formulario
         referencia_requerimiento = datos_formulario.get('referencia_requerimiento')
         nombre_requerimiento = datos_formulario.get('nombre_requerimiento')
+        tipo_requerimiento = datos_formulario.get('tipo_requerimiento')
         estado_requerimiento = datos_formulario.get('estado_requerimiento')
         descripcion_requerimiento = datos_formulario.get('descripcion_requerimiento')
         notas_requerimiento = datos_formulario.get('notas_requerimiento')
-        # Obtener el requerimiento actual
-        requerimiento_actual = db.requerimientos.find_one({'_id': ObjectId(requerimiento_id)})
 
         # Actualizar el requerimiento en la base de datos
         update = db.requerimientos.update_one({
@@ -146,6 +154,7 @@ def actualizar_requerimiento(requerimiento_id, datos_formulario):
             '$set': {
                 'referencia_requerimiento': referencia_requerimiento,
                 'nombre_requerimiento': nombre_requerimiento,
+                'tipo_requerimiento': tipo_requerimiento,
                 'estado_requerimiento': estado_requerimiento,
                 'fecha_modificacion': datetime.now(),
                 'fecha_inactivacion': None,
@@ -192,14 +201,34 @@ def requerimientos_actualizar_vista(gestor_id, requerimiento_id):
 
     except Exception as e:
         flash(f'Error al actualizar el requerimiento: {str(e)}', 'danger')
-        return redirect(url_for('ug_requerimientos.requerimientos_actualizar', 
-                                gestor_id=gestor_id, 
-                                requerimiento_id=requerimiento_id))
+        return redirect(url_for('ug_requerimientos.requerimientos', 
+                                gestor_id=gestor_id))
 
 def requerimientos_eliminar_vista(gestor_id, requerimiento_id):
     '''
     Vista de usuarios de gestores para eliminar un requerimiento.
     '''
-    return render_template('usuarios_gestores/requerimientos/eliminar.html', gestor_id=gestor_id, requerimiento_id=requerimiento_id)
+    try:
+        # Eliminar el requerimiento
+        delete = db.requerimientos.delete_one({
+            '_id': ObjectId(requerimiento_id)
+        })
+
+        if delete.deleted_count > 0:
+            flash('Requerimiento eliminado exitosamente', 'success')
+            return redirect(url_for('ug_requerimientos.requerimientos',
+                                gestor_id=gestor_id
+                                ))
+        else:
+            flash('Error al eliminar el requerimiento', 'danger')
+            return redirect(url_for('ug_requerimientos.requerimientos',
+                                gestor_id=gestor_id
+                                ))
+
+    except Exception as e:
+        flash(f'Error al eliminar el requerimiento: {str(e)}', 'danger')
+        return redirect(url_for('ug_requerimientos.requerimientos',
+                                gestor_id=gestor_id
+                                ))
 
 

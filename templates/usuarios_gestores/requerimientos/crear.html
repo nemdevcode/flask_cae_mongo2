@@ -30,6 +30,73 @@
                                 <label for="nombre_requerimiento">
                                 Nombre del Requerimiento:</label>
                         </div>
+                        <div class="btn-group text-center w-100 mb-3" role="group" aria-label="Basic radio toggle button group">
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_requerimiento" 
+                                id="tipo-requerimiento-empresa" 
+                                value="empresa" 
+                                required
+                                {% if datos_formulario and datos_formulario.tipo_requerimiento == 'empresa' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-requerimiento-empresa">
+                                Empresa</label> 
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_requerimiento" 
+                                id="tipo-requerimiento-centro" 
+                                value="centro"
+                                {% if datos_formulario and datos_formulario.tipo_requerimiento == 'centro' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-requerimiento-centro">
+                                Centro</label>
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_requerimiento" 
+                                id="tipo-requerimiento-trabajador" 
+                                value="trabajador"
+                                {% if datos_formulario and datos_formulario.tipo_requerimiento == 'trabajador' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-requerimiento-trabajador">
+                                Trabajador</label>
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_requerimiento" 
+                                id="tipo-requerimiento-maquinaria" 
+                                value="maquinaria"
+                                {% if datos_formulario and datos_formulario.tipo_requerimiento == 'maquinaria' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-requerimiento-maquinaria">
+                                Maquinaria</label>
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_requerimiento" 
+                                id="tipo-requerimiento-vehiculo" 
+                                value="vehiculo"
+                                {% if datos_formulario and datos_formulario.tipo_requerimiento == 'vehiculo' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-requerimiento-vehiculo">
+                                Vehículo</label>
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_requerimiento" 
+                                id="tipo-requerimiento-vehiculo-maquinaria" 
+                                value="vehiculo-maquinaria"
+                                {% if datos_formulario and datos_formulario.tipo_requerimiento == 'vehiculo-maquinaria' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-requerimiento-vehiculo-maquinaria">
+                                Vehículo-Maquinaria</label>
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_requerimiento" 
+                                id="tipo-requerimiento-quimico" 
+                                value="quimico"
+                                {% if datos_formulario and datos_formulario.tipo_requerimiento == 'quimico' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-requerimiento-quimico">
+                                Producto Químico</label>
+                            <input type="radio" 
+                                class="btn-check" 
+                                name="tipo_requerimiento" 
+                                id="tipo-requerimiento-otros" 
+                                value="otros"
+                                {% if datos_formulario and datos_formulario.tipo_requerimiento == 'otros' %}checked{% endif %}>
+                                <label class="btn btn-outline-light" for="tipo-requerimiento-otros">
+                                Otros</label>
+                        </div>
                         <div class="form-floating mb-3">
                             <textarea 
                                 class="form-control" 

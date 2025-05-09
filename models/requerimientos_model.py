@@ -3,6 +3,7 @@ class RequerimientosCollection:
                  gestor_id,
                  referencia_requerimiento,
                  nombre_requerimiento,
+                 tipo_requerimiento,
                  estado_requerimiento,
                  fecha_activacion,
                  fecha_modificacion,
@@ -12,6 +13,7 @@ class RequerimientosCollection:
         self.gestor_id = gestor_id
         self.referencia_requerimiento = referencia_requerimiento
         self.nombre_requerimiento = nombre_requerimiento
+        self.tipo_requerimiento = tipo_requerimiento
         self.estado_requerimiento = estado_requerimiento
         self.fecha_activacion = fecha_activacion
         self.fecha_modificacion = fecha_modificacion
@@ -24,6 +26,7 @@ class RequerimientosCollection:
             'gestor_id': self.gestor_id,
             'referencia_requerimiento': self.referencia_requerimiento,
             'nombre_requerimiento': self.nombre_requerimiento,
+            'tipo_requerimiento': self.tipo_requerimiento,
             'descripcion_requerimiento': self.descripcion_requerimiento,
             'notas_requerimiento': self.notas_requerimiento,
             'estado_requerimiento': self.estado_requerimiento,
